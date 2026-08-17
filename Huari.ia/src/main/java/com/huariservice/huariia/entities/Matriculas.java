@@ -10,15 +10,16 @@ public class Matriculas {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false,name = "data da matricula")
+    @Column(nullable = false,name = "data_matricula")
     private LocalDate dtMatricula;
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false,name = "statusMT")
     private StatusMT statusMT;
     @ManyToOne
     @JoinColumn(name = "usuario_id",nullable = false)
     private Usuario usuario;
     @ManyToOne
-    @JoinColumn(name = "Cursos_id",nullable = false)
+    @JoinColumn(name = "cursos_id",nullable = false)
     private Cursos cursos;
 
     public Matriculas() {
