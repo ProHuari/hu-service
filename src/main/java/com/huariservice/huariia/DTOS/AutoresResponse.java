@@ -7,8 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AutoresRequest {
+public class AutoresResponse {
 
+    private Long id;
     private String nomeCanal;
     private String linkCanal;
 }
