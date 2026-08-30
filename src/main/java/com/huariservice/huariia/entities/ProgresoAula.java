@@ -1,5 +1,6 @@
 package com.huariservice.huariia.entities;
 
+import com.huariservice.huariia.entities.enums.StatusAula;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

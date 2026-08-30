@@ -1,4 +1,4 @@
-package com.huariservice.huariia.entities;
+package com.huariservice.huariia.entities.enums;
 
 public enum StatusMT {
     ATIVA,
