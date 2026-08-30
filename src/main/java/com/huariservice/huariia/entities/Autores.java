@@ -1,9 +1,15 @@
 package com.huariservice.huariia.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "autores")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Autores {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,42 +18,4 @@ public class Autores {
     private String nomeCanal;
     @Column(name = "linkCanal", length = 254, nullable = false, unique = true)
     private String linkCanal;
-
-    public Autores() {
-    }
-
-    public Autores(String nomeCanal, String linkCanal) {
-        this.nomeCanal = nomeCanal;
-        this.linkCanal = linkCanal;
-    }
-
-    public Autores(Long id, String nomeCanal, String linkCanal) {
-        this.id = id;
-        this.nomeCanal = nomeCanal;
-        this.linkCanal = linkCanal;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNomeCanal() {
-        return nomeCanal;
-    }
-
-    public void setNomeCanal(String nomeCanal) {
-        this.nomeCanal = nomeCanal;
-    }
-
-    public String getLinkCanal() {
-        return linkCanal;
-    }
-
-    public void setLinkCanal(String linkCanal) {
-        this.linkCanal = linkCanal;
-    }
 }
