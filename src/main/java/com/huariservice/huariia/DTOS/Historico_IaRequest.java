@@ -17,7 +17,6 @@ public class Historico_IaRequest {
     private String pergunta;
     @NotBlank(message = "A resposta é obrigatória")
     private String resposta;
-    private LocalDateTime dataConsulta;
     @NotNull(message = "O usuário é obrigatório")
     private Usuario usuario;
 }
