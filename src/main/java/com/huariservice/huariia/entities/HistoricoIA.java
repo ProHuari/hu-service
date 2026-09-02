@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Historico_Ia {
+public class HistoricoIA {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,7 +22,7 @@ public class Historico_Ia {
     private String resposta;
     @Column(name = "dataConsulta",nullable = false)
     private LocalDateTime dataConsulta;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id",nullable = false)
     private Usuario usuario;
 
