@@ -24,7 +24,7 @@ public class Aulas {
     private Integer ordem;
     @Column(name = "duracao_em_minutos")
     private Integer duracaoEmMinutos;
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "modulo_id", nullable = false)
     private Modulos modulos;
 
