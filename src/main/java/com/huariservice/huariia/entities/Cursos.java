@@ -23,7 +23,7 @@ public class Cursos {
     @ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categorias categoria;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "autores_id",nullable = false)
     private Autores autores;
 
