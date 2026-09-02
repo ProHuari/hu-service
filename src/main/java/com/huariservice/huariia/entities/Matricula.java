@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Matriculas {
+public class Matricula {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,10 +22,10 @@ public class Matriculas {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false,name = "statusMT")
     private StatusMT statusMT;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id",nullable = false)
     private Usuario usuario;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cursos_id",nullable = false)
     private Cursos cursos;
 
