@@ -1,6 +1,6 @@
 package com.huariservice.huariia.DTOS;
 
-import com.huariservice.huariia.entities.Modulos;
+import com.huariservice.huariia.entities.Modulo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,5 +15,5 @@ public class AulasRequest {
     private String urlVideo;
     private Integer ordem;
     private Integer duracaoEmMinutos;
-    private Modulos modulos;
+    private Modulo modulo;
 }

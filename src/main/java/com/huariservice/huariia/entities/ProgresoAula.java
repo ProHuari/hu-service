@@ -22,10 +22,10 @@ public class ProgresoAula {
     private StatusAula statusAula;
     @Column(nullable = false,name = "data_conclusao")
     private LocalDateTime conclusao;
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id",nullable = false)
     private Usuario usuario;
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "aula_id", nullable = false)
     private Aulas aulas;
 
