@@ -1,16 +1,25 @@
-<h1>hu-service</h1>
-<h2>Visão geral</h2>
-<h3>No cenário político contemporâneo, analistas, pesquisadores, assessores parlamentares, consultores eleitorais e estudantes enfrentam três desafios estruturais: sobrecarga e pulverização de informações (pesquisas eleitorais, relatórios de conjuntura, discursos, propostas e dados públicos estão dispersos, sem padronização e de difícil cruzamento); ausência de ferramentas especializadas (soluções genéricas de Inteligência Artificial não possuem o contexto, o vocabulário nem os filtros necessários para análises políticas, eleitorais e de políticas públicas, e as poucas ferramentas existentes possuem uma visão enviesada); e escassez de capacitação prática e sequencial (há poucas trilhas estruturadas, ministradas por especialistas e institutos de referência, que combinem teoria, interpretação de dados e aplicação estratégica).</h3>
+# Huari Backend
 
-<h3>Nossa plataforma tem a função de integrar os dados públicos junto com uma análise para garantir a fácil interpretação por parte de jornalistas políticos, membros de órgãos oficiais e toda a sociedade civil que gostaria de ser mais informada, além de ofertar, por meio de conteúdos educativos e cursos, uma educação política inicial para todo e qualquer usuário que quiser utilizar a Huari.</h3>
+O Huari Backend é o núcleo de processamento e inteligência da plataforma, responsável por centralizar e padronizar dados públicos e eleitorais dispersos para gerar análises isentas e acessíveis. A aplicação atende a três frentes principais:
 
-<h2>Huari Backend</h2>
-<h3>O Huari Backend é o núcleo de processamento e inteligência da plataforma. Ele centraliza e padroniza dados públicos e eleitorais dispersos, gerando análises isentas e de fácil interpretação para:</h3>
+* **Jornalistas:** Acesso a dados consolidados para investigações e reportagens baseadas em evidências.
+* **Órgãos oficiais:** Transparência e facilidade na consulta de indicadores e métricas institucionais.
+* **Sociedade civil:** Democratização da informação política, promovendo o controle social e a participação cidadã.
 
-<ul>
-  <li>Jornalistas</li>
-  <li>Órgãos oficiais</li>
-  <li>Sociedade civil</li>
-</ul>
+Além da inteligência de dados, o sistema gerencia a infraestrutura de cursos e trilhas educacionais voltadas para a formação política.
 
-<h3>Além disso, o backend gerencia a infraestrutura de cursos e trilhas educacionais voltadas para a formação política dos usuários.</h3>
+## Arquitetura e Tecnologias
+
+O projeto foi desenvolvido com foco em boas práticas de engenharia de software, separação de responsabilidades e segurança:
+
+* **Linguagem:** Java (versão 25)
+* **Framework:** Spring Boot (versão 4.1.1)
+* **Persistência de Dados:** Mapeamento objeto-relacional (ORM) estruturado em camadas.
+
+### Padrão Arquitetural
+
+* **Entities:** Representação do modelo de domínio e mapeamento das tabelas do banco de dados.
+* **DTOs (Data Transfer Objects):** Blindagem do domínio e segurança no tráfego de dados entre as camadas da API.
+* **Repositories:** Camada de abstração para persistência e comunicação com o banco de dados.
+* **Services:** Centralização das regras de negócio e lógica operacional da aplicação.
+* **Controllers:** Exposição dos endpoints REST para gerenciamento das operações CRUD do sistema.
