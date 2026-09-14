@@ -1,6 +1,7 @@
 package com.huariservice.huariia.service;
 
 import com.huariservice.huariia.DTOS.Historico_IaRequest;
+import com.huariservice.huariia.DTOS.Historico_IaResponse;
 import com.huariservice.huariia.entities.HistoricoIa;
 import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.repositories.HistoricoIaRepository;
@@ -8,6 +9,7 @@ import com.huariservice.huariia.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class HistoricoIaService {
@@ -31,5 +33,13 @@ public class HistoricoIaService {
 
         historicoIaRepository.save(historico);
         return request;
+    }
+
+    public List<Historico_IaResponse> mostrarHistoricoIa() {
+        return historicoIaRepository.findAll().stream().map(historico -> new Historico_IaResponse(
+                historico.getId(),
+                historico.getDataConsulta(),
+                historico.getUsuario()
+        )).toList();
     }
 }
