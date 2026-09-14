@@ -7,6 +7,7 @@ import com.huariservice.huariia.repositories.CategoriasRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoriasService {
@@ -42,5 +43,16 @@ public class CategoriasService {
 
         categoriasRepository.save(categoria);
         return "Categoria alterada";
+    }
+
+    public String deletarId(Long id) {
+        Optional<Categorias> categoria = categoriasRepository.findById(id);
+
+        if (categoria.isEmpty()) {
+            return "Essa categoria não foi cadastrada";
+        } else {
+            categoriasRepository.deleteById(id);
+            return "Categoria excluída";
+        }
     }
 }
