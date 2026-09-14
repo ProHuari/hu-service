@@ -11,6 +11,7 @@ import com.huariservice.huariia.repositories.CursosRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CursosService {
@@ -67,5 +68,16 @@ public class CursosService {
 
         cursosRepository.save(curso);
         return "Curso alterado";
+    }
+
+    public String deletarId(Long id) {
+        Optional<Cursos> curso = cursosRepository.findById(id);
+
+        if (curso.isEmpty()) {
+            return "Esse curso não foi publicado";
+        } else {
+            cursosRepository.deleteById(id);
+            return "Curso excluído";
+        }
     }
 }
