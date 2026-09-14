@@ -9,6 +9,7 @@ import com.huariservice.huariia.repositories.ModuloRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AulasService {
@@ -62,5 +63,16 @@ public class AulasService {
 
         aulasRepository.save(aula);
         return "Aula alterada";
+    }
+
+    public String deletarId(Long id) {
+        Optional<Aulas> aula = aulasRepository.findById(id);
+
+        if (aula.isEmpty()) {
+            return "Essa aula não foi publicada";
+        } else {
+            aulasRepository.deleteById(id);
+            return "Aula excluída";
+        }
     }
 }
