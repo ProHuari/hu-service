@@ -47,4 +47,20 @@ public class AulasService {
                 aula.getModulo()
         )).toList();
     }
+
+    public String mudarAula(Long id, AulasRequest aulaAlterada) {
+        Aulas aula = aulasRepository.findById(id).orElseThrow();
+
+        aula.setTitulos(aulaAlterada.getTitulos());
+        aula.setDescricao(aulaAlterada.getDescricao());
+        aula.setUrlVideo(aulaAlterada.getUrlVideo());
+        aula.setOrdem(aulaAlterada.getOrdem());
+        aula.setDuracaoEmMinutos(aulaAlterada.getDuracaoEmMinutos());
+
+        Modulo modulo = moduloRepository.findById(aulaAlterada.getModulo().getId()).orElseThrow();
+        aula.setModulo(modulo);
+
+        aulasRepository.save(aula);
+        return "Aula alterada";
+    }
 }
