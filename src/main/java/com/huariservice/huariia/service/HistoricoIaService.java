@@ -42,4 +42,17 @@ public class HistoricoIaService {
                 historico.getUsuario()
         )).toList();
     }
+
+    public String mudarHistoricoIa(Long id, Historico_IaRequest historicoAlterado) {
+        HistoricoIa historico = historicoIaRepository.findById(id).orElseThrow();
+
+        historico.setPergunta(historicoAlterado.getPergunta());
+        historico.setResposta(historicoAlterado.getResposta());
+
+        Usuario usuario = usuarioRepository.findById(historicoAlterado.getUsuario().getId()).orElseThrow();
+        historico.setUsuario(usuario);
+
+        historicoIaRepository.save(historico);
+        return "Histórico de IA alterado";
+    }
 }
