@@ -1,6 +1,7 @@
 package com.huariservice.huariia.service;
 
 import com.huariservice.huariia.DTOS.CursosRequest;
+import com.huariservice.huariia.DTOS.CursosResponse;
 import com.huariservice.huariia.entities.Autores;
 import com.huariservice.huariia.entities.Categorias;
 import com.huariservice.huariia.entities.Cursos;
@@ -8,6 +9,8 @@ import com.huariservice.huariia.repositories.AutoresRepository;
 import com.huariservice.huariia.repositories.CategoriasRepository;
 import com.huariservice.huariia.repositories.CursosRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CursosService {
@@ -36,5 +39,16 @@ public class CursosService {
 
         cursosRepository.save(curso);
         return request;
+    }
+
+    public List<CursosResponse> mostrarCursos() {
+        return cursosRepository.findAll().stream().map(curso -> new CursosResponse(
+                curso.getId(),
+                curso.getTitulos(),
+                curso.getDescricao(),
+                curso.getUrlVideo(),
+                curso.getCategoria(),
+                curso.getAutores()
+        )).toList();
     }
 }
