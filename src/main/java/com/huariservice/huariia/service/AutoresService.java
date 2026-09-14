@@ -7,6 +7,7 @@ import com.huariservice.huariia.repositories.AutoresRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AutoresService {
@@ -42,5 +43,16 @@ public class AutoresService {
 
         autoresRepository.save(autor);
         return "Autor alterado";
+    }
+
+    public String deletarId(Long id) {
+        Optional<Autores> autor = autoresRepository.findById(id);
+
+        if (autor.isEmpty()) {
+            return "Esse autor não foi cadastrado";
+        } else {
+            autoresRepository.deleteById(id);
+            return "Autor excluído";
+        }
     }
 }
