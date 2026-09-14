@@ -33,4 +33,14 @@ public class AutoresService {
                 autor.getLinkCanal()
         )).toList();
     }
+
+    public String mudarAutor(Long id, AutoresRequest autorAlterado) {
+        Autores autor = autoresRepository.findById(id).orElseThrow();
+
+        autor.setNomeCanal(autorAlterado.getNomeCanal());
+        autor.setLinkCanal(autorAlterado.getLinkCanal());
+
+        autoresRepository.save(autor);
+        return "Autor alterado";
+    }
 }
