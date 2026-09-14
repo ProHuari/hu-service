@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HistoricoIaService {
@@ -54,5 +55,16 @@ public class HistoricoIaService {
 
         historicoIaRepository.save(historico);
         return "Histórico de IA alterado";
+    }
+
+    public String deletarId(Long id) {
+        Optional<HistoricoIa> historico = historicoIaRepository.findById(id);
+
+        if (historico.isEmpty()) {
+            return "Esse histórico não foi registrado";
+        } else {
+            historicoIaRepository.deleteById(id);
+            return "Histórico excluído";
+        }
     }
 }
