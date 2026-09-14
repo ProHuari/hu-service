@@ -51,4 +51,21 @@ public class CursosService {
                 curso.getAutores()
         )).toList();
     }
+
+    public String mudarCurso(Long id, CursosRequest cursoAlterado) {
+        Cursos curso = cursosRepository.findById(id).orElseThrow();
+
+        curso.setTitulos(cursoAlterado.getTitulos());
+        curso.setDescricao(cursoAlterado.getDescricao());
+        curso.setUrlVideo(cursoAlterado.getUrlVideo());
+
+        Categorias categoria = categoriasRepository.findById(cursoAlterado.getCategoria().getId()).orElseThrow();
+        curso.setCategoria(categoria);
+
+        Autores autores = autoresRepository.findById(cursoAlterado.getAutores().getId()).orElseThrow();
+        curso.setAutores(autores);
+
+        cursosRepository.save(curso);
+        return "Curso alterado";
+    }
 }
