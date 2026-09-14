@@ -33,4 +33,14 @@ public class CategoriasService {
                 categoria.getDescricao()
         )).toList();
     }
+
+    public String mudarCategoria(Long id, CategoriasRequest categoriaAlterada) {
+        Categorias categoria = categoriasRepository.findById(id).orElseThrow();
+
+        categoria.setNome(categoriaAlterada.getNome());
+        categoria.setDescricao(categoriaAlterada.getDescricao());
+
+        categoriasRepository.save(categoria);
+        return "Categoria alterada";
+    }
 }
