@@ -41,4 +41,17 @@ public class ModulosService {
                 modulo.getCursos()
         )).toList();
     }
+    public String mudarModulo(Long id, ModulosRequest moduloAlterado) {
+        Modulo modulo = moduloRepository.findById(id).orElseThrow();
+
+        modulo.setTitulo(moduloAlterado.getTitulo());
+        modulo.setDescricao(moduloAlterado.getDescricao());
+        modulo.setOrdem(moduloAlterado.getOrdem());
+
+        Cursos cursos = cursosRepository.findById(moduloAlterado.getCursos().getId()).orElseThrow();
+        modulo.setCursos(cursos);
+
+        moduloRepository.save(modulo);
+        return "Módulo alterado";
+    }
 }
