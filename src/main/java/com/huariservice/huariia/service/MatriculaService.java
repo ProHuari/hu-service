@@ -11,6 +11,7 @@ import com.huariservice.huariia.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MatriculaService {
@@ -62,5 +63,15 @@ public class MatriculaService {
 
         matriculaRepository.save(matricula);
         return "Matrícula alterada";
+    }
+    public String deletarId(Long id) {
+        Optional<Matricula> matricula = matriculaRepository.findById(id);
+
+        if (matricula.isEmpty()) {
+            return "Essa matrícula não foi realizada";
+        } else {
+            matriculaRepository.deleteById(id);
+            return "Matrícula excluída";
+        }
     }
 }
