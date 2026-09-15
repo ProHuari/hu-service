@@ -51,4 +51,21 @@ public class ProgressoAulaService {
         )).toList();
     }
 
+    public String mudarProgressoAula(Long id, ProgressoAulaRequest progressoAlterado) {
+        ProgressoAula progressoAula = progressoAulaRepository.findById(id).orElseThrow();
+
+        progressoAula.setStatusAula(progressoAlterado.getStatusAula());
+        if (progressoAlterado.getConclusao() != null) {
+            progressoAula.setConclusao(progressoAlterado.getConclusao());
+        }
+
+        Usuario usuario = usuarioRepository.findById(progressoAlterado.getUsuario().getId()).orElseThrow();
+        progressoAula.setUsuario(usuario);
+
+        Aulas aulas = aulasRepository.findById(progressoAlterado.getAulas().getId()).orElseThrow();
+        progressoAula.setAulas(aulas);
+
+        progressoAulaRepository.save(progressoAula);
+        return "Progresso de aula alterado";
+    }
 }
