@@ -1,6 +1,7 @@
 package com.huariservice.huariia.service;
 
 import com.huariservice.huariia.DTOs.ProgressoAulaRequest;
+import com.huariservice.huariia.DTOs.ProgressoAulaResponse;
 import com.huariservice.huariia.entities.Aulas;
 import com.huariservice.huariia.entities.ProgressoAula;
 import com.huariservice.huariia.entities.Usuario;
@@ -10,6 +11,7 @@ import com.huariservice.huariia.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ProgressoAulaService {
@@ -39,5 +41,14 @@ public class ProgressoAulaService {
         return request;
     }
 
+    public List<ProgressoAulaResponse> mostrarProgressoAula() {
+        return progressoAulaRepository.findAll().stream().map(progresso -> new ProgressoAulaResponse(
+                progresso.getId(),
+                progresso.getStatusAula(),
+                progresso.getConclusao(),
+                progresso.getUsuario(),
+                progresso.getAulas()
+        )).toList();
+    }
 
 }
