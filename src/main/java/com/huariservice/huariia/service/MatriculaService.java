@@ -1,5 +1,9 @@
 package com.huariservice.huariia.service;
 
+import com.huariservice.huariia.DTOS.MatriculasRequest;
+import com.huariservice.huariia.entities.Cursos;
+import com.huariservice.huariia.entities.Matricula;
+import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.repositories.CursosRepository;
 import com.huariservice.huariia.repositories.MatriculaRepository;
 import com.huariservice.huariia.repositories.UsuarioRepository;
@@ -16,5 +20,19 @@ public class MatriculaService {
         this.matriculaRepository = matriculaRepository;
         this.cursosRepository = cursosRepository;
         this.usuarioRepository = usuarioRepository;
+    }
+    public MatriculasRequest pubMatricula(MatriculasRequest request) {
+        Matricula matricula = new Matricula();
+        matricula.setDtMatricula(request.getDtMatricula());
+        matricula.setStatusMT(request.getStatusMT());
+
+        Usuario usuario = usuarioRepository.findById(request.getUsuario().getId()).orElseThrow();
+        matricula.setUsuario(usuario);
+
+        Cursos cursos = cursosRepository.findById(request.getCursos().getId()).orElseThrow();
+        matricula.setCursos(cursos);
+
+        matriculaRepository.save(matricula);
+        return request;
     }
 }
