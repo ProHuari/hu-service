@@ -1,9 +1,12 @@
 package com.huariservice.huariia.service;
 
 import com.huariservice.huariia.DTOs.UsuarioRequest;
+import com.huariservice.huariia.DTOs.UsuarioResponse;
 import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UsuarioService {
@@ -23,5 +26,13 @@ public class UsuarioService {
 
         usuarioRepository.save(usuario);
         return request;
+    }
+
+    public List<UsuarioResponse> mostrarUsuarios() {
+        return usuarioRepository.findAll().stream().map(usuario -> new UsuarioResponse(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getTipoPerfil()
+        )).toList();
     }
 }
