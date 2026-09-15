@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProgressoAulaService {
@@ -67,5 +68,16 @@ public class ProgressoAulaService {
 
         progressoAulaRepository.save(progressoAula);
         return "Progresso de aula alterado";
+    }
+
+    public String deletarId(Long id) {
+        Optional<ProgressoAula> progressoAula = progressoAulaRepository.findById(id);
+
+        if (progressoAula.isEmpty()) {
+            return "Esse progresso de aula não foi registrado";
+        } else {
+            progressoAulaRepository.deleteById(id);
+            return "Progresso excluído";
+        }
     }
 }
