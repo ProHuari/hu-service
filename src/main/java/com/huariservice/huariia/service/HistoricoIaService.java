@@ -1,7 +1,7 @@
 package com.huariservice.huariia.service;
 
-import com.huariservice.huariia.DTOS.Historico_IaRequest;
-import com.huariservice.huariia.DTOS.Historico_IaResponse;
+import com.huariservice.huariia.DTOs.Historico_IaRequest;
+import com.huariservice.huariia.DTOs.Historico_IaResponse;
 import com.huariservice.huariia.entities.HistoricoIa;
 import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.repositories.HistoricoIaRepository;

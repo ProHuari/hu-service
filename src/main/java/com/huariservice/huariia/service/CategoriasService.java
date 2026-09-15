@@ -1,7 +1,7 @@
 package com.huariservice.huariia.service;
 
-import com.huariservice.huariia.DTOS.CategoriasRequest;
-import com.huariservice.huariia.DTOS.CategoriasResponse;
+import com.huariservice.huariia.DTOs.CategoriasRequest;
+import com.huariservice.huariia.DTOs.CategoriasResponse;
 import com.huariservice.huariia.entities.Categorias;
 import com.huariservice.huariia.repositories.CategoriasRepository;
 import org.springframework.stereotype.Service;

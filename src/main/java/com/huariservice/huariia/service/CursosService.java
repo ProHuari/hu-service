@@ -1,7 +1,7 @@
 package com.huariservice.huariia.service;
 
-import com.huariservice.huariia.DTOS.CursosRequest;
-import com.huariservice.huariia.DTOS.CursosResponse;
+import com.huariservice.huariia.DTOs.CursosRequest;
+import com.huariservice.huariia.DTOs.CursosResponse;
 import com.huariservice.huariia.entities.Autores;
 import com.huariservice.huariia.entities.Categorias;
 import com.huariservice.huariia.entities.Cursos;

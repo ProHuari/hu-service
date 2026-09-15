@@ -1,7 +1,7 @@
 package com.huariservice.huariia.service;
 
-import com.huariservice.huariia.DTOS.AutoresRequest;
-import com.huariservice.huariia.DTOS.AutoresResponse;
+import com.huariservice.huariia.DTOs.AutoresRequest;
+import com.huariservice.huariia.DTOs.AutoresResponse;
 import com.huariservice.huariia.entities.Autores;
 import com.huariservice.huariia.repositories.AutoresRepository;
 import org.springframework.stereotype.Service;
