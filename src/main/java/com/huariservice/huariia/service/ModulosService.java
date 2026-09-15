@@ -9,6 +9,7 @@ import com.huariservice.huariia.repositories.ModuloRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ModulosService {
@@ -53,5 +54,15 @@ public class ModulosService {
 
         moduloRepository.save(modulo);
         return "Módulo alterado";
+    }
+    public String deletarId(Long id) {
+        Optional<Modulo> modulo = moduloRepository.findById(id);
+
+        if (modulo.isEmpty()) {
+            return "Esse módulo não foi cadastrado";
+        } else {
+            moduloRepository.deleteById(id);
+            return "Módulo excluído";
+        }
     }
 }
