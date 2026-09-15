@@ -1,11 +1,14 @@
 package com.huariservice.huariia.service;
 
 import com.huariservice.huariia.DTOS.ModulosRequest;
+import com.huariservice.huariia.DTOS.ModulosResponse;
 import com.huariservice.huariia.entities.Cursos;
 import com.huariservice.huariia.entities.Modulo;
 import com.huariservice.huariia.repositories.CursosRepository;
 import com.huariservice.huariia.repositories.ModuloRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ModulosService {
@@ -28,5 +31,14 @@ public class ModulosService {
 
         moduloRepository.save(modulo);
         return request;
+    }
+    public List<ModulosResponse> mostrarModulos() {
+        return moduloRepository.findAll().stream().map(modulo -> new ModulosResponse(
+                modulo.getId(),
+                modulo.getTitulo(),
+                modulo.getDescricao(),
+                modulo.getOrdem(),
+                modulo.getCursos()
+        )).toList();
     }
 }
