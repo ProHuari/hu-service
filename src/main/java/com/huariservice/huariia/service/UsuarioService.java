@@ -7,6 +7,7 @@ import com.huariservice.huariia.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioService {
@@ -46,5 +47,16 @@ public class UsuarioService {
 
         usuarioRepository.save(usuario);
         return "Usuário alterado";
+    }
+
+    public String deletarId(Long id) {
+        Optional<Usuario> usuario = usuarioRepository.findById(id);
+
+        if (usuario.isEmpty()) {
+            return "Esse usuário não foi cadastrado";
+        } else {
+            usuarioRepository.deleteById(id);
+            return "Usuário excluído";
+        }
     }
 }
