@@ -27,4 +27,9 @@ public class CategoriaController {
         List<CategoriasResponse> categorias = categoriasService.mostrarCategorias();
         return ResponseEntity.ok(categorias);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> atualizarCategoria(@PathVariable Long id, @RequestBody CategoriasRequest request) {
+        String resposta = categoriasService.mudarCategoria(id, request);
+        return ResponseEntity.ok(resposta);
+    }
 }
