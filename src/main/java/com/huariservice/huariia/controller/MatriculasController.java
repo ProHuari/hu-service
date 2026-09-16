@@ -27,4 +27,9 @@ public class MatriculasController {
         List<MatriculasResponse> matriculas = matriculaService.mostrarMatriculas();
         return ResponseEntity.ok(matriculas);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> atualizarMatricula(@PathVariable Long id, @RequestBody MatriculasRequest request) {
+        String resposta = matriculaService.mudarMatricula(id, request);
+        return ResponseEntity.ok(resposta);
+    }
 }
