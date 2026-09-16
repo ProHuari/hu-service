@@ -34,4 +34,14 @@ public class HistoricoIaController {
         String resposta = historicoIaService.mudarHistoricoIa(id, request);
         return ResponseEntity.ok(resposta);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletarHistorico(@PathVariable Long id) {
+        String resposta = historicoIaService.deletarId(id);
+
+        if (resposta.equals("Esse histórico não foi registrado")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
+        }
+
+        return ResponseEntity.ok(resposta);
+    }
 }
