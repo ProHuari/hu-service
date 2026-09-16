@@ -28,4 +28,9 @@ public class AutroresController {
         List<AutoresResponse> autores = autoresService.mostrarAutores();
         return ResponseEntity.ok(autores);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> atualizarAutor(@PathVariable Long id, @RequestBody AutoresRequest request) {
+        String resposta = autoresService.mudarAutor(id, request);
+        return ResponseEntity.ok(resposta);
+    }
 }
