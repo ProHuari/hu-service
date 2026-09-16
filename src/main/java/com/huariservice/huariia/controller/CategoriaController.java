@@ -1,13 +1,13 @@
 package com.huariservice.huariia.controller;
 
 import com.huariservice.huariia.DTOs.CategoriasRequest;
+import com.huariservice.huariia.DTOs.CategoriasResponse;
 import com.huariservice.huariia.service.CategoriasService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/categoria")
@@ -21,5 +21,10 @@ public class CategoriaController {
     public ResponseEntity<CategoriasRequest> criarCategoria(@RequestBody CategoriasRequest request) {
         CategoriasRequest novaCategoria = categoriasService.pubCategoria(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novaCategoria);
+    }
+    @GetMapping
+    public ResponseEntity<List<CategoriasResponse>> listarCategorias() {
+        List<CategoriasResponse> categorias = categoriasService.mostrarCategorias();
+        return ResponseEntity.ok(categorias);
     }
 }
