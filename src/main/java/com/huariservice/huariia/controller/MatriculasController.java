@@ -32,4 +32,14 @@ public class MatriculasController {
         String resposta = matriculaService.mudarMatricula(id, request);
         return ResponseEntity.ok(resposta);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletarMatricula(@PathVariable Long id) {
+        String resposta = matriculaService.deletarId(id);
+
+        if (resposta.equals("Essa matrícula não foi realizada")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
+        }
+
+        return ResponseEntity.ok(resposta);
+    }
 }
