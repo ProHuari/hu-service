@@ -3,11 +3,11 @@ package com.huariservice.huariia.service;
 import com.huariservice.huariia.DTOs.AutoresRequest;
 import com.huariservice.huariia.DTOs.AutoresResponse;
 import com.huariservice.huariia.entities.Autores;
+import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.AutoresRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AutoresService {
@@ -18,13 +18,13 @@ public class AutoresService {
         this.autoresRepository = autoresRepository;
     }
 
-    public AutoresRequest pubAutor(AutoresRequest request) {
+    public AutoresResponse pubAutor(AutoresRequest request) {
         Autores autor = new Autores();
         autor.setNomeCanal(request.getNomeCanal());
         autor.setLinkCanal(request.getLinkCanal());
 
-        autoresRepository.save(autor);
-        return request;
+        Autores salvo = autoresRepository.save(autor);
+        return new AutoresResponse(salvo.getId(), salvo.getNomeCanal(), salvo.getLinkCanal());
     }
 
     public List<AutoresResponse> mostrarAutores() {
@@ -46,13 +46,9 @@ public class AutoresService {
     }
 
     public String deletarId(Long id) {
-        Optional<Autores> autor = autoresRepository.findById(id);
-
-        if (autor.isEmpty()) {
-            return "Esse autor não foi cadastrado";
-        } else {
-            autoresRepository.deleteById(id);
-            return "Autor excluído";
-        }
+        Autores autor = autoresRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
+        autoresRepository.delete(autor);
+        return null;
     }
 }

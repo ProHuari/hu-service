@@ -3,6 +3,7 @@ package com.huariservice.huariia.controller;
 import com.huariservice.huariia.DTOs.AutoresRequest;
 import com.huariservice.huariia.DTOs.AutoresResponse;
 import com.huariservice.huariia.service.AutoresService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +20,8 @@ public class AutroresController {
     }
 
     @PostMapping
-    public ResponseEntity<AutoresRequest> criarAutor(@RequestBody AutoresRequest request) {
-        AutoresRequest novoAutor = autoresService.pubAutor(request);
+    public ResponseEntity<AutoresResponse> criarAutor(@RequestBody AutoresRequest request) {
+        AutoresResponse novoAutor = autoresService.pubAutor(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoAutor);
     }
     @GetMapping
@@ -29,18 +30,13 @@ public class AutroresController {
         return ResponseEntity.ok(autores);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<String> atualizarAutor(@PathVariable Long id, @RequestBody AutoresRequest request) {
-        String resposta = autoresService.mudarAutor(id, request);
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<AutoresResponse> atualizarAutor(@PathVariable Long id, @Valid @RequestBody AutoresRequest request) {
+        AutoresResponse autorAtualizado = autoresService.mudarAutor(id, request);
+        return ResponseEntity.ok(autorAtualizado);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletarAutor(@PathVariable Long id) {
-        String resposta = autoresService.deletarId(id);
-
-        if (resposta.equals("Esse autor não foi cadastrado")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
-        }
-
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<Void> deletarAutor(@PathVariable Long id) {
+        autoresService.deletarId(id);
+        return ResponseEntity.noContent().build();
     }
 }
