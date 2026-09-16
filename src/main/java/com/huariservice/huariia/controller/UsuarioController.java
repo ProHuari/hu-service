@@ -1,13 +1,13 @@
 package com.huariservice.huariia.controller;
 
 import com.huariservice.huariia.DTOs.UsuarioRequest;
+import com.huariservice.huariia.DTOs.UsuarioResponse;
 import com.huariservice.huariia.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/Usuarios")
@@ -21,5 +21,10 @@ public class UsuarioController {
     public ResponseEntity<UsuarioRequest> criarUsuario(@RequestBody UsuarioRequest request) {
         UsuarioRequest novoUsuario = usuarioService.pubUsuario(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
+    }
+    @GetMapping
+    public ResponseEntity<List<UsuarioResponse>> listarUsuarios() {
+        List<UsuarioResponse> usuarios = usuarioService.mostrarUsuarios();
+        return ResponseEntity.ok(usuarios);
     }
 }
