@@ -32,4 +32,14 @@ public class CategoriaController {
         String resposta = categoriasService.mudarCategoria(id, request);
         return ResponseEntity.ok(resposta);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletarCategoria(@PathVariable Long id) {
+        String resposta = categoriasService.deletarId(id);
+
+        if (resposta.equals("Essa categoria não foi cadastrada")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
+        }
+
+        return ResponseEntity.ok(resposta);
+    }
 }
