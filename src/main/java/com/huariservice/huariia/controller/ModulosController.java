@@ -32,4 +32,14 @@ public class ModulosController {
         String resposta = modulosService.mudarModulo(id, request);
         return ResponseEntity.ok(resposta);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletarModulo(@PathVariable Long id) {
+        String resposta = modulosService.deletarId(id);
+
+        if (resposta.equals("Esse módulo não foi cadastrado")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
+        }
+
+        return ResponseEntity.ok(resposta);
+    }
 }
