@@ -29,4 +29,9 @@ public class HistoricoIaController {
         List<Historico_IaResponse> historicos = historicoIaService.mostrarHistoricoIa();
         return ResponseEntity.ok(historicos);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> atualizarHistorico(@PathVariable Long id, @RequestBody Historico_IaRequest request) {
+        String resposta = historicoIaService.mudarHistoricoIa(id, request);
+        return ResponseEntity.ok(resposta);
+    }
 }
