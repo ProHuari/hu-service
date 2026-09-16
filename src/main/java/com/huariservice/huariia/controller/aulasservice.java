@@ -42,6 +42,13 @@ public class aulasservice {
 
         return ResponseEntity.ok(resposta);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletarAula(
+            @PathVariable Long id) {
 
+        String resposta = aulasService.deletarId(id);
+
+        return ResponseEntity.ok(resposta);
+    }
 
 }
