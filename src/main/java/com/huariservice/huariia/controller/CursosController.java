@@ -27,4 +27,9 @@ public class CursosController {
         List<CursosResponse> cursos = cursosService.mostrarCursos();
         return ResponseEntity.ok(cursos);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> atualizarCurso(@PathVariable Long id, @RequestBody CursosRequest request) {
+        String resposta = cursosService.mudarCurso(id, request);
+        return ResponseEntity.ok(resposta);
+    }
 }
