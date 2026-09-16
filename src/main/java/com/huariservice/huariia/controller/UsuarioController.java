@@ -27,4 +27,9 @@ public class UsuarioController {
         List<UsuarioResponse> usuarios = usuarioService.mostrarUsuarios();
         return ResponseEntity.ok(usuarios);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> atualizarUsuario(@PathVariable Long id, @RequestBody UsuarioRequest request) {
+        String resposta = usuarioService.mudarUsuario(id, request);
+        return ResponseEntity.ok(resposta);
+    }
 }
