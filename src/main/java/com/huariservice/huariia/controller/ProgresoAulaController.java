@@ -32,5 +32,14 @@ public class ProgresoAulaController {
     public ResponseEntity<String> atualizarProgressoAula(@PathVariable Long id, @RequestBody ProgressoAulaRequest request) {
         String resposta = progressoAulaService.mudarProgressoAula(id, request);
         return ResponseEntity.ok(resposta);
+    }@DeleteMapping("/{id}")
+    public ResponseEntity<String> deletarProgressoAula(@PathVariable Long id) {
+        String resposta = progressoAulaService.deletarId(id);
+
+        if (resposta.equals("Esse progresso de aula não foi registrado")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
+        }
+
+        return ResponseEntity.ok(resposta);
     }
 }
