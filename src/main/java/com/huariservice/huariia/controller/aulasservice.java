@@ -33,6 +33,15 @@ public class aulasservice {
 
         return ResponseEntity.ok(aulas);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> mudarAula(
+            @PathVariable Long id,
+            @RequestBody AulasRequest aulaAlterada) {
+
+        String resposta = aulasService.mudarAula(id, aulaAlterada);
+
+        return ResponseEntity.ok(resposta);
+    }
 
 
 }
