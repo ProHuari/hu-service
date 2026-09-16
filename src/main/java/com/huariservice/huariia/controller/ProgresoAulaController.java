@@ -28,4 +28,9 @@ public class ProgresoAulaController {
         List<ProgressoAulaResponse> progressos = progressoAulaService.mostrarProgressoAula();
         return ResponseEntity.ok(progressos);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> atualizarProgressoAula(@PathVariable Long id, @RequestBody ProgressoAulaRequest request) {
+        String resposta = progressoAulaService.mudarProgressoAula(id, request);
+        return ResponseEntity.ok(resposta);
+    }
 }
