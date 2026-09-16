@@ -1,13 +1,13 @@
 package com.huariservice.huariia.controller;
 
 import com.huariservice.huariia.DTOs.Historico_IaRequest;
+import com.huariservice.huariia.DTOs.Historico_IaResponse;
 import com.huariservice.huariia.service.HistoricoIaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/historicoIA")
@@ -23,5 +23,10 @@ public class HistoricoIaController {
     public ResponseEntity<Historico_IaRequest> criarHistorico(@RequestBody Historico_IaRequest request) {
         Historico_IaRequest novoHistorico = historicoIaService.pubHistoricoIa(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoHistorico);
+    }
+    @GetMapping
+    public ResponseEntity<List<Historico_IaResponse>> listarHistoricos() {
+        List<Historico_IaResponse> historicos = historicoIaService.mostrarHistoricoIa();
+        return ResponseEntity.ok(historicos);
     }
 }
