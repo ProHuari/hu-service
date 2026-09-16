@@ -32,4 +32,14 @@ public class CursosController {
         String resposta = cursosService.mudarCurso(id, request);
         return ResponseEntity.ok(resposta);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletarCurso(@PathVariable Long id) {
+        String resposta = cursosService.deletarId(id);
+
+        if (resposta.equals("Esse curso não foi publicado")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
+        }
+
+        return ResponseEntity.ok(resposta);
+    }
 }
