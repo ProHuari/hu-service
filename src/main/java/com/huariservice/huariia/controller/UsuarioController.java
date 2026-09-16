@@ -32,4 +32,14 @@ public class UsuarioController {
         String resposta = usuarioService.mudarUsuario(id, request);
         return ResponseEntity.ok(resposta);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletarUsuario(@PathVariable Long id) {
+        String resposta = usuarioService.deletarId(id);
+
+        if (resposta.equals("Esse usuário não foi cadastrado")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
+        }
+
+        return ResponseEntity.ok(resposta);
+    }
 }
