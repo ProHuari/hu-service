@@ -27,4 +27,9 @@ public class ModulosController {
         List<ModulosResponse> modulos = modulosService.mostrarModulos();
         return ResponseEntity.ok(modulos);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<String> atualizarModulo(@PathVariable Long id, @RequestBody ModulosRequest request) {
+        String resposta = modulosService.mudarModulo(id, request);
+        return ResponseEntity.ok(resposta);
+    }
 }
