@@ -33,4 +33,14 @@ public class AutroresController {
         String resposta = autoresService.mudarAutor(id, request);
         return ResponseEntity.ok(resposta);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletarAutor(@PathVariable Long id) {
+        String resposta = autoresService.deletarId(id);
+
+        if (resposta.equals("Esse autor não foi cadastrado")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
+        }
+
+        return ResponseEntity.ok(resposta);
+    }
 }
