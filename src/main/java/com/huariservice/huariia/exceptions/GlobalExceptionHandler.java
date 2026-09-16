@@ -38,5 +38,15 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
+    // Rede de segurança pra qualquer outro erro não esperado
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErroResponse> tratarErroGenerico(Exception ex) {
+        ErroResponse erro = new ErroResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Erro interno",
+                "Ocorreu um erro inesperado. Tente novamente mais tarde."
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(erro);
+    }
 
 }
