@@ -3,6 +3,7 @@ package com.huariservice.huariia.controller;
 import com.huariservice.huariia.DTOs.CursosRequest;
 import com.huariservice.huariia.DTOs.CursosResponse;
 import com.huariservice.huariia.service.CursosService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,18 +29,13 @@ public class CursosController {
         return ResponseEntity.ok(cursos);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<String> atualizarCurso(@PathVariable Long id, @RequestBody CursosRequest request) {
-        String resposta = cursosService.mudarCurso(id, request);
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<CursosResponse> atualizarCurso(@PathVariable Long id, @Valid @RequestBody CursosRequest request) {
+        CursosResponse cursoAtualizado = cursosService.mudarCurso(id, request);
+        return ResponseEntity.ok(cursoAtualizado);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletarCurso(@PathVariable Long id) {
-        String resposta = cursosService.deletarId(id);
-
-        if (resposta.equals("Esse curso não foi publicado")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
-        }
-
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<Void> deletarCurso(@PathVariable Long id) {
+        cursosService.deletarId(id);
+        return ResponseEntity.noContent().build();
     }
 }

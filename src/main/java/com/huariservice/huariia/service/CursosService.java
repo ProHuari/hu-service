@@ -5,6 +5,7 @@ import com.huariservice.huariia.DTOs.CursosResponse;
 import com.huariservice.huariia.entities.Autores;
 import com.huariservice.huariia.entities.Categorias;
 import com.huariservice.huariia.entities.Cursos;
+import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.AutoresRepository;
 import com.huariservice.huariia.repositories.CategoriasRepository;
 import com.huariservice.huariia.repositories.CursosRepository;
@@ -52,32 +53,29 @@ public class CursosService {
                 curso.getAutores()
         )).toList();
     }
-
-    public String mudarCurso(Long id, CursosRequest cursoAlterado) {
-        Cursos curso = cursosRepository.findById(id).orElseThrow();
+    public CursosResponse mudarCurso(Long id, CursosRequest cursoAlterado) {
+        Cursos curso = cursosRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
 
         curso.setTitulos(cursoAlterado.getTitulos());
         curso.setDescricao(cursoAlterado.getDescricao());
         curso.setUrlVideo(cursoAlterado.getUrlVideo());
 
-        Categorias categoria = categoriasRepository.findById(cursoAlterado.getCategoria().getId()).orElseThrow();
+        Categorias categoria = categoriasRepository.findById(cursoAlterado.getCategoria().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
         curso.setCategoria(categoria);
 
-        Autores autores = autoresRepository.findById(cursoAlterado.getAutores().getId()).orElseThrow();
+        Autores autores = autoresRepository.findById(cursoAlterado.getAutores().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
         curso.setAutores(autores);
 
-        cursosRepository.save(curso);
-        return "Curso alterado";
+        Cursos atualizado = cursosRepository.save(curso);
+        return new CursosResponse(atualizado.getId(), atualizado.getTitulos(), atualizado.getDescricao(), atualizado.getUrlVideo(), atualizado.getCategoria(), atualizado.getAutores());
     }
 
-    public String deletarId(Long id) {
-        Optional<Cursos> curso = cursosRepository.findById(id);
-
-        if (curso.isEmpty()) {
-            return "Esse curso não foi publicado";
-        } else {
-            cursosRepository.deleteById(id);
-            return "Curso excluído";
-        }
+    public void deletarId(Long id) {
+        Cursos curso = cursosRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
+        cursosRepository.delete(curso);
     }
 }

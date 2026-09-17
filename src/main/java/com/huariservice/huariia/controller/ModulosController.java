@@ -3,6 +3,7 @@ package com.huariservice.huariia.controller;
 import com.huariservice.huariia.DTOs.ModulosRequest;
 import com.huariservice.huariia.DTOs.ModulosResponse;
 import com.huariservice.huariia.service.ModulosService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,18 +29,13 @@ public class ModulosController {
         return ResponseEntity.ok(modulos);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<String> atualizarModulo(@PathVariable Long id, @RequestBody ModulosRequest request) {
-        String resposta = modulosService.mudarModulo(id, request);
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<ModulosResponse> atualizarModulo(@PathVariable Long id, @Valid @RequestBody ModulosRequest request) {
+        ModulosResponse moduloAtualizado = modulosService.mudarModulo(id, request);
+        return ResponseEntity.ok(moduloAtualizado);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletarModulo(@PathVariable Long id) {
-        String resposta = modulosService.deletarId(id);
-
-        if (resposta.equals("Esse módulo não foi cadastrado")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
-        }
-
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<Void> deletarModulo(@PathVariable Long id) {
+        modulosService.deletarId(id);
+        return ResponseEntity.noContent().build();
     }
 }

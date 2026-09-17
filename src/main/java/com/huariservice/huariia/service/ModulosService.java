@@ -4,6 +4,7 @@ import com.huariservice.huariia.DTOs.ModulosRequest;
 import com.huariservice.huariia.DTOs.ModulosResponse;
 import com.huariservice.huariia.entities.Cursos;
 import com.huariservice.huariia.entities.Modulo;
+import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.CursosRepository;
 import com.huariservice.huariia.repositories.ModuloRepository;
 import org.springframework.stereotype.Service;
@@ -42,27 +43,24 @@ public class ModulosService {
                 modulo.getCursos()
         )).toList();
     }
-    public String mudarModulo(Long id, ModulosRequest moduloAlterado) {
-        Modulo modulo = moduloRepository.findById(id).orElseThrow();
+    public ModulosResponse mudarModulo(Long id, ModulosRequest moduloAlterado) {
+        Modulo modulo = moduloRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse módulo não foi cadastrado"));
 
         modulo.setTitulo(moduloAlterado.getTitulo());
         modulo.setDescricao(moduloAlterado.getDescricao());
         modulo.setOrdem(moduloAlterado.getOrdem());
 
-        Cursos cursos = cursosRepository.findById(moduloAlterado.getCursos().getId()).orElseThrow();
+        Cursos cursos = cursosRepository.findById(moduloAlterado.getCursos().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
         modulo.setCursos(cursos);
 
-        moduloRepository.save(modulo);
-        return "Módulo alterado";
+        Modulo atualizado = moduloRepository.save(modulo);
+        return new ModulosResponse(atualizado.getId(), atualizado.getTitulo(), atualizado.getDescricao(), atualizado.getOrdem(), atualizado.getCursos());
     }
-    public String deletarId(Long id) {
-        Optional<Modulo> modulo = moduloRepository.findById(id);
-
-        if (modulo.isEmpty()) {
-            return "Esse módulo não foi cadastrado";
-        } else {
-            moduloRepository.deleteById(id);
-            return "Módulo excluído";
-        }
+    public void deletarId(Long id) {
+        Modulo modulo = moduloRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse módulo não foi cadastrado"));
+        moduloRepository.delete(modulo);
     }
 }
