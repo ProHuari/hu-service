@@ -3,6 +3,7 @@ package com.huariservice.huariia.controller;
 import com.huariservice.huariia.DTOs.MatriculasRequest;
 import com.huariservice.huariia.DTOs.MatriculasResponse;
 import com.huariservice.huariia.service.MatriculaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,18 +29,13 @@ public class MatriculasController {
         return ResponseEntity.ok(matriculas);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<String> atualizarMatricula(@PathVariable Long id, @RequestBody MatriculasRequest request) {
-        String resposta = matriculaService.mudarMatricula(id, request);
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<MatriculasResponse> atualizarMatricula(@PathVariable Long id, @Valid @RequestBody MatriculasRequest request) {
+        MatriculasResponse matriculaAtualizada = matriculaService.mudarMatricula(id, request);
+        return ResponseEntity.ok(matriculaAtualizada);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletarMatricula(@PathVariable Long id) {
-        String resposta = matriculaService.deletarId(id);
-
-        if (resposta.equals("Essa matrícula não foi realizada")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
-        }
-
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<Void> deletarMatricula(@PathVariable Long id) {
+        matriculaService.deletarId(id);
+        return ResponseEntity.noContent().build();
     }
 }

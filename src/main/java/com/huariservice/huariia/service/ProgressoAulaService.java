@@ -5,6 +5,7 @@ import com.huariservice.huariia.DTOs.ProgressoAulaResponse;
 import com.huariservice.huariia.entities.Aulas;
 import com.huariservice.huariia.entities.ProgressoAula;
 import com.huariservice.huariia.entities.Usuario;
+import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.AulasRepository;
 import com.huariservice.huariia.repositories.ProgressoAulaRepository;
 import com.huariservice.huariia.repositories.UsuarioRepository;
@@ -51,33 +52,29 @@ public class ProgressoAulaService {
                 progresso.getAulas()
         )).toList();
     }
-
-    public String mudarProgressoAula(Long id, ProgressoAulaRequest progressoAlterado) {
-        ProgressoAula progressoAula = progressoAulaRepository.findById(id).orElseThrow();
+    public ProgressoAulaResponse mudarProgressoAula(Long id, ProgressoAulaRequest progressoAlterado) {
+        ProgressoAula progressoAula = progressoAulaRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse progresso de aula não foi registrado"));
 
         progressoAula.setStatusAula(progressoAlterado.getStatusAula());
         if (progressoAlterado.getConclusao() != null) {
             progressoAula.setConclusao(progressoAlterado.getConclusao());
         }
 
-        Usuario usuario = usuarioRepository.findById(progressoAlterado.getUsuario().getId()).orElseThrow();
+        Usuario usuario = usuarioRepository.findById(progressoAlterado.getUsuario().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
         progressoAula.setUsuario(usuario);
 
-        Aulas aulas = aulasRepository.findById(progressoAlterado.getAulas().getId()).orElseThrow();
+        Aulas aulas = aulasRepository.findById(progressoAlterado.getAulas().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Essa aula não foi publicada"));
         progressoAula.setAulas(aulas);
 
-        progressoAulaRepository.save(progressoAula);
-        return "Progresso de aula alterado";
+        ProgressoAula atualizado = progressoAulaRepository.save(progressoAula);
+        return new ProgressoAulaResponse(atualizado.getId(), atualizado.getStatusAula(), atualizado.getConclusao(), atualizado.getUsuario(), atualizado.getAulas());
     }
-
-    public String deletarId(Long id) {
-        Optional<ProgressoAula> progressoAula = progressoAulaRepository.findById(id);
-
-        if (progressoAula.isEmpty()) {
-            return "Esse progresso de aula não foi registrado";
-        } else {
-            progressoAulaRepository.deleteById(id);
-            return "Progresso excluído";
-        }
+    public void deletarId(Long id) {
+        ProgressoAula progressoAula = progressoAulaRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse progresso de aula não foi registrado"));
+        progressoAulaRepository.delete(progressoAula);
     }
 }
