@@ -21,8 +21,8 @@ public class HistoricoIaController {
     }
 
     @PostMapping
-    public ResponseEntity<Historico_IaRequest> criarHistorico(@RequestBody Historico_IaRequest request) {
-        Historico_IaRequest novoHistorico = historicoIaService.pubHistoricoIa(request);
+    public ResponseEntity<Historico_IaResponse> criarHistorico(@Valid @RequestBody Historico_IaRequest request) {
+        Historico_IaResponse novoHistorico = historicoIaService.pubHistoricoIa(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoHistorico);
     }
     @GetMapping
