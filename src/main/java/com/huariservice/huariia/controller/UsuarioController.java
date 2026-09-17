@@ -19,8 +19,8 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
     @PostMapping
-    public ResponseEntity<UsuarioRequest> criarUsuario(@RequestBody UsuarioRequest request) {
-        UsuarioRequest novoUsuario = usuarioService.pubUsuario(request);
+    public ResponseEntity<UsuarioResponse> criarUsuario(@Valid @RequestBody UsuarioRequest request) {
+        UsuarioResponse novoUsuario = usuarioService.pubUsuario(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
     }
     @GetMapping
