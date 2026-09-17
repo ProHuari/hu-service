@@ -23,7 +23,7 @@ public class AulasService {
         this.moduloRepository = moduloRepository;
     }
 
-    public AulasRequest pubAula(AulasRequest request) {
+    public AulasResponse pubAula(AulasRequest request) {
         Aulas aula = new Aulas();
         aula.setTitulos(request.getTitulos());
         aula.setDescricao(request.getDescricao());
@@ -31,11 +31,12 @@ public class AulasService {
         aula.setOrdem(request.getOrdem());
         aula.setDuracaoEmMinutos(request.getDuracaoEmMinutos());
 
-        Modulo modulo = moduloRepository.findById(request.getModulo().getId()).orElseThrow();
+        Modulo modulo = moduloRepository.findById(request.getModulo().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse módulo não foi cadastrado"));
         aula.setModulo(modulo);
 
-        aulasRepository.save(aula);
-        return request;
+        Aulas salva = aulasRepository.save(aula);
+        return new AulasResponse(salva.getId(), salva.getTitulos(), salva.getDescricao(), salva.getUrlVideo(), salva.getOrdem(), salva.getDuracaoEmMinutos(), salva.getModulo());
     }
 
     public List<AulasResponse> mostrarAulas() {
