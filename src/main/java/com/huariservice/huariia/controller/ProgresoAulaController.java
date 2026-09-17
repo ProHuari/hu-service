@@ -3,6 +3,7 @@ package com.huariservice.huariia.controller;
 import com.huariservice.huariia.DTOs.ProgressoAulaRequest;
 import com.huariservice.huariia.DTOs.ProgressoAulaResponse;
 import com.huariservice.huariia.service.ProgressoAulaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,17 +30,13 @@ public class ProgresoAulaController {
         return ResponseEntity.ok(progressos);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<String> atualizarProgressoAula(@PathVariable Long id, @RequestBody ProgressoAulaRequest request) {
-        String resposta = progressoAulaService.mudarProgressoAula(id, request);
-        return ResponseEntity.ok(resposta);
-    }@DeleteMapping("/{id}")
-    public ResponseEntity<String> deletarProgressoAula(@PathVariable Long id) {
-        String resposta = progressoAulaService.deletarId(id);
-
-        if (resposta.equals("Esse progresso de aula não foi registrado")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
-        }
-
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<ProgressoAulaResponse> atualizarProgressoAula(@PathVariable Long id, @Valid @RequestBody ProgressoAulaRequest request) {
+        ProgressoAulaResponse progressoAtualizado = progressoAulaService.mudarProgressoAula(id, request);
+        return ResponseEntity.ok(progressoAtualizado);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarProgressoAula(@PathVariable Long id) {
+        progressoAulaService.deletarId(id);
+        return ResponseEntity.noContent().build();
     }
 }
