@@ -19,8 +19,8 @@ public class MatriculasController {
         this.matriculaService = matriculaService;
     }
     @PostMapping
-    public ResponseEntity<MatriculasRequest> criarMatricula(@RequestBody MatriculasRequest request) {
-        MatriculasRequest novaMatricula = matriculaService.pubMatricula(request);
+    public ResponseEntity<MatriculasResponse> criarMatricula(@Valid @RequestBody MatriculasRequest request) {
+        MatriculasResponse novaMatricula = matriculaService.pubMatricula(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novaMatricula);
     }
     @GetMapping
