@@ -27,20 +27,22 @@ public class CursosService {
         this.categoriasRepository = categoriasRepository;
     }
 
-    public CursosRequest pubCurso(CursosRequest request) {
+    public CursosResponse pubCurso(CursosRequest request) {
         Cursos curso = new Cursos();
         curso.setTitulos(request.getTitulos());
         curso.setDescricao(request.getDescricao());
         curso.setUrlVideo(request.getUrlVideo());
 
-        Categorias categoria = categoriasRepository.findById(request.getCategoria().getId()).orElseThrow();
+        Categorias categoria = categoriasRepository.findById(request.getCategoria().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
         curso.setCategoria(categoria);
 
-        Autores autores = autoresRepository.findById(request.getAutores().getId()).orElseThrow();
+        Autores autores = autoresRepository.findById(request.getAutores().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
         curso.setAutores(autores);
 
-        cursosRepository.save(curso);
-        return request;
+        Cursos salvo = cursosRepository.save(curso);
+        return new CursosResponse(salvo.getId(), salvo.getTitulos(), salvo.getDescricao(), salvo.getUrlVideo(), salvo.getCategoria(), salvo.getAutores());
     }
 
     public List<CursosResponse> mostrarCursos() {
