@@ -4,6 +4,7 @@ import com.huariservice.huariia.DTOs.Historico_IaRequest;
 import com.huariservice.huariia.DTOs.Historico_IaResponse;
 import com.huariservice.huariia.entities.HistoricoIa;
 import com.huariservice.huariia.entities.Usuario;
+import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.HistoricoIaRepository;
 import com.huariservice.huariia.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -44,27 +45,23 @@ public class HistoricoIaService {
         )).toList();
     }
 
-    public String mudarHistoricoIa(Long id, Historico_IaRequest historicoAlterado) {
-        HistoricoIa historico = historicoIaRepository.findById(id).orElseThrow();
+    public Historico_IaResponse mudarHistoricoIa(Long id, Historico_IaRequest historicoAlterado) {
+        HistoricoIa historico = historicoIaRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse histórico não foi registrado"));
 
         historico.setPergunta(historicoAlterado.getPergunta());
         historico.setResposta(historicoAlterado.getResposta());
 
-        Usuario usuario = usuarioRepository.findById(historicoAlterado.getUsuario().getId()).orElseThrow();
+        Usuario usuario = usuarioRepository.findById(historicoAlterado.getUsuario().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
         historico.setUsuario(usuario);
 
-        historicoIaRepository.save(historico);
-        return "Histórico de IA alterado";
+        HistoricoIa atualizado = historicoIaRepository.save(historico);
+        return new Historico_IaResponse(atualizado.getId(), atualizado.getDataConsulta(), atualizado.getUsuario());
     }
-
-    public String deletarId(Long id) {
-        Optional<HistoricoIa> historico = historicoIaRepository.findById(id);
-
-        if (historico.isEmpty()) {
-            return "Esse histórico não foi registrado";
-        } else {
-            historicoIaRepository.deleteById(id);
-            return "Histórico excluído";
-        }
+    public void deletarId(Long id) {
+        HistoricoIa historico = historicoIaRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse histórico não foi registrado"));
+        historicoIaRepository.delete(historico);
     }
 }

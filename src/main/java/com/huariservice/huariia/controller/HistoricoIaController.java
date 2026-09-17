@@ -3,6 +3,7 @@ package com.huariservice.huariia.controller;
 import com.huariservice.huariia.DTOs.Historico_IaRequest;
 import com.huariservice.huariia.DTOs.Historico_IaResponse;
 import com.huariservice.huariia.service.HistoricoIaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,18 +31,13 @@ public class HistoricoIaController {
         return ResponseEntity.ok(historicos);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<String> atualizarHistorico(@PathVariable Long id, @RequestBody Historico_IaRequest request) {
-        String resposta = historicoIaService.mudarHistoricoIa(id, request);
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<Historico_IaResponse> atualizarHistorico(@PathVariable Long id, @Valid @RequestBody Historico_IaRequest request) {
+        Historico_IaResponse historicoAtualizado = historicoIaService.mudarHistoricoIa(id, request);
+        return ResponseEntity.ok(historicoAtualizado);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletarHistorico(@PathVariable Long id) {
-        String resposta = historicoIaService.deletarId(id);
-
-        if (resposta.equals("Esse histórico não foi registrado")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
-        }
-
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<Void> deletarHistorico(@PathVariable Long id) {
+        historicoIaService.deletarId(id);
+        return ResponseEntity.noContent().build();
     }
 }
