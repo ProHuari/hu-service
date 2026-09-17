@@ -3,6 +3,7 @@ package com.huariservice.huariia.service;
 import com.huariservice.huariia.DTOs.CategoriasRequest;
 import com.huariservice.huariia.DTOs.CategoriasResponse;
 import com.huariservice.huariia.entities.Categorias;
+import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.CategoriasRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +19,13 @@ public class CategoriasService {
         this.categoriasRepository = categoriasRepository;
     }
 
-    public CategoriasRequest pubCategoria(CategoriasRequest request) {
+    public CategoriasResponse pubCategoria(CategoriasRequest request) {
         Categorias categoria = new Categorias();
         categoria.setNome(request.getNome());
         categoria.setDescricao(request.getDescricao());
 
-        categoriasRepository.save(categoria);
-        return request;
+        Categorias salva = categoriasRepository.save(categoria);
+        return new CategoriasResponse(salva.getId(), salva.getNome(), salva.getDescricao());
     }
 
     public List<CategoriasResponse> mostrarCategorias() {
@@ -35,24 +36,19 @@ public class CategoriasService {
         )).toList();
     }
 
-    public String mudarCategoria(Long id, CategoriasRequest categoriaAlterada) {
-        Categorias categoria = categoriasRepository.findById(id).orElseThrow();
+    public CategoriasResponse mudarCategoria(Long id, CategoriasRequest categoriaAlterada) {
+        Categorias categoria = categoriasRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
 
         categoria.setNome(categoriaAlterada.getNome());
         categoria.setDescricao(categoriaAlterada.getDescricao());
 
-        categoriasRepository.save(categoria);
-        return "Categoria alterada";
+        Categorias atualizada = categoriasRepository.save(categoria);
+        return new CategoriasResponse(atualizada.getId(), atualizada.getNome(), atualizada.getDescricao());
     }
-
-    public String deletarId(Long id) {
-        Optional<Categorias> categoria = categoriasRepository.findById(id);
-
-        if (categoria.isEmpty()) {
-            return "Essa categoria não foi cadastrada";
-        } else {
-            categoriasRepository.deleteById(id);
-            return "Categoria excluída";
-        }
+    public void deletarId(Long id) {
+        Categorias categoria = categoriasRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
+        categoriasRepository.delete(categoria);
     }
 }

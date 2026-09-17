@@ -3,6 +3,7 @@ package com.huariservice.huariia.controller;
 import com.huariservice.huariia.DTOs.CategoriasRequest;
 import com.huariservice.huariia.DTOs.CategoriasResponse;
 import com.huariservice.huariia.service.CategoriasService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +19,8 @@ public class CategoriaController {
         this.categoriasService = categoriasService;
     }
     @PostMapping
-    public ResponseEntity<CategoriasRequest> criarCategoria(@RequestBody CategoriasRequest request) {
-        CategoriasRequest novaCategoria = categoriasService.pubCategoria(request);
+    public ResponseEntity<CategoriasResponse> criarCategoria(@Valid @RequestBody CategoriasRequest request) {
+        CategoriasResponse novaCategoria = categoriasService.pubCategoria(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novaCategoria);
     }
     @GetMapping
@@ -28,18 +29,13 @@ public class CategoriaController {
         return ResponseEntity.ok(categorias);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<String> atualizarCategoria(@PathVariable Long id, @RequestBody CategoriasRequest request) {
-        String resposta = categoriasService.mudarCategoria(id, request);
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<CategoriasResponse> atualizarCategoria(@PathVariable Long id, @Valid @RequestBody CategoriasRequest request) {
+        CategoriasResponse categoriaAtualizada = categoriasService.mudarCategoria(id, request);
+        return ResponseEntity.ok(categoriaAtualizada);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletarCategoria(@PathVariable Long id) {
-        String resposta = categoriasService.deletarId(id);
-
-        if (resposta.equals("Essa categoria não foi cadastrada")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
-        }
-
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<Void> deletarCategoria(@PathVariable Long id) {
+        categoriasService.deletarId(id);
+        return ResponseEntity.noContent().build();
     }
 }
