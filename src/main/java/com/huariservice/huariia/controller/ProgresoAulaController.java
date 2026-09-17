@@ -20,8 +20,8 @@ public class ProgresoAulaController {
     }
 
     @PostMapping
-    public ResponseEntity<ProgressoAulaRequest> criarProgressoAula(@RequestBody ProgressoAulaRequest request) {
-        ProgressoAulaRequest novoProgresso = progressoAulaService.pubProgressoAula(request);
+    public ResponseEntity<ProgressoAulaResponse> criarProgressoAula(@Valid @RequestBody ProgressoAulaRequest request) {
+        ProgressoAulaResponse novoProgresso = progressoAulaService.pubProgressoAula(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoProgresso);
     }
     @GetMapping
