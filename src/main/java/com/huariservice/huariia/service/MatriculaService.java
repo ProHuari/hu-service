@@ -27,19 +27,21 @@ public class MatriculaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public MatriculasRequest pubMatricula(MatriculasRequest request) {
+    public MatriculasResponse pubMatricula(MatriculasRequest request) {
         Matricula matricula = new Matricula();
         matricula.setDtMatricula(request.getDtMatricula());
         matricula.setStatusMT(request.getStatusMT());
 
-        Usuario usuario = usuarioRepository.findById(request.getUsuario().getId()).orElseThrow();
+        Usuario usuario = usuarioRepository.findById(request.getUsuario().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
         matricula.setUsuario(usuario);
 
-        Cursos cursos = cursosRepository.findById(request.getCursos().getId()).orElseThrow();
+        Cursos cursos = cursosRepository.findById(request.getCursos().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
         matricula.setCursos(cursos);
 
-        matriculaRepository.save(matricula);
-        return request;
+        Matricula salva = matriculaRepository.save(matricula);
+        return new MatriculasResponse(salva.getId(), salva.getDtMatricula(), salva.getStatusMT(), salva.getUsuario(), salva.getCursos());
     }
 
     public List<MatriculasResponse> mostrarMatriculas() {
