@@ -28,19 +28,21 @@ public class ProgressoAulaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public ProgressoAulaRequest pubProgressoAula(ProgressoAulaRequest request) {
+    public ProgressoAulaResponse pubProgressoAula(ProgressoAulaRequest request) {
         ProgressoAula progressoAula = new ProgressoAula();
         progressoAula.setStatusAula(request.getStatusAula());
         progressoAula.setConclusao(request.getConclusao() != null ? request.getConclusao() : LocalDateTime.now());
 
-        Usuario usuario = usuarioRepository.findById(request.getUsuario().getId()).orElseThrow();
+        Usuario usuario = usuarioRepository.findById(request.getUsuario().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
         progressoAula.setUsuario(usuario);
 
-        Aulas aulas = aulasRepository.findById(request.getAulas().getId()).orElseThrow();
+        Aulas aulas = aulasRepository.findById(request.getAulas().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Essa aula não foi publicada"));
         progressoAula.setAulas(aulas);
 
-        progressoAulaRepository.save(progressoAula);
-        return request;
+        ProgressoAula salvo = progressoAulaRepository.save(progressoAula);
+        return new ProgressoAulaResponse(salvo.getId(), salvo.getStatusAula(), salvo.getConclusao(), salvo.getUsuario(), salvo.getAulas());
     }
 
     public List<ProgressoAulaResponse> mostrarProgressoAula() {
