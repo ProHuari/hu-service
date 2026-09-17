@@ -4,6 +4,7 @@ import com.huariservice.huariia.DTOs.AulasRequest;
 import com.huariservice.huariia.DTOs.AulasResponse;
 import com.huariservice.huariia.service.AulasService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +21,9 @@ public class AulasController {
 
 
     @PostMapping
-    public ResponseEntity<AulasRequest> publicarAula(
-            @RequestBody AulasRequest request) {
-
-        AulasRequest aula = aulasService.pubAula(request);
-
-        return ResponseEntity.ok(aula);
+    public ResponseEntity<AulasResponse> publicarAula(@Valid @RequestBody AulasRequest request) {
+        AulasResponse aula = aulasService.pubAula(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(aula);
     }
     @GetMapping
     public ResponseEntity<List<AulasResponse>> mostrarAulas() {
