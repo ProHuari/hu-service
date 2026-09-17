@@ -19,15 +19,15 @@ public class UsuarioService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public UsuarioRequest pubUsuario(UsuarioRequest request) {
+    public UsuarioResponse pubUsuario(UsuarioRequest request) {
         Usuario usuario = new Usuario();
         usuario.setNome(request.getNome());
         usuario.setEmail(request.getEmail());
         usuario.setSenha(request.getSenha());
         usuario.setTipoPerfil(request.getTipoPerfil());
 
-        usuarioRepository.save(usuario);
-        return request;
+        Usuario salvo = usuarioRepository.save(usuario);
+        return new UsuarioResponse(salvo.getId(), salvo.getNome(), salvo.getTipoPerfil());
     }
 
     public List<UsuarioResponse> mostrarUsuarios() {
