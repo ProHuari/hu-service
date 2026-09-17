@@ -19,8 +19,8 @@ public class ModulosController {
         this.modulosService = modulosService;
     }
     @PostMapping
-    public ResponseEntity<ModulosRequest> criarModulo(@RequestBody ModulosRequest request) {
-        ModulosRequest novoModulo = modulosService.pubModulo(request);
+    public ResponseEntity<ModulosResponse> criarModulo(@Valid @RequestBody ModulosRequest request) {
+        ModulosResponse novoModulo = modulosService.pubModulo(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoModulo);
     }
     @GetMapping
