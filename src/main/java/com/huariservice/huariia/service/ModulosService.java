@@ -22,17 +22,18 @@ public class ModulosService {
         this.moduloRepository = moduloRepository;
         this.cursosRepository = cursosRepository;
     }
-    public ModulosRequest pubModulo(ModulosRequest request) {
+    public ModulosResponse pubModulo(ModulosRequest request) {
         Modulo modulo = new Modulo();
         modulo.setTitulo(request.getTitulo());
         modulo.setDescricao(request.getDescricao());
         modulo.setOrdem(request.getOrdem());
 
-        Cursos cursos = cursosRepository.findById(request.getCursos().getId()).orElseThrow();
+        Cursos cursos = cursosRepository.findById(request.getCursos().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
         modulo.setCursos(cursos);
 
-        moduloRepository.save(modulo);
-        return request;
+        Modulo salvo = moduloRepository.save(modulo);
+        return new ModulosResponse(salvo.getId(), salvo.getTitulo(), salvo.getDescricao(), salvo.getOrdem(), salvo.getCursos());
     }
     public List<ModulosResponse> mostrarModulos() {
         return moduloRepository.findAll().stream().map(modulo -> new ModulosResponse(
