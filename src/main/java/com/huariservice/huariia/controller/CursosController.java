@@ -19,8 +19,8 @@ public class CursosController {
         this.cursosService = cursosService;
     }
     @PostMapping
-    public ResponseEntity<CursosRequest> criarCurso(@RequestBody CursosRequest request) {
-        CursosRequest novoCurso = cursosService.pubCurso(request);
+    public ResponseEntity<CursosResponse> criarCurso(@Valid @RequestBody CursosRequest request) {
+        CursosResponse novoCurso = cursosService.pubCurso(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoCurso);
     }
     @GetMapping
