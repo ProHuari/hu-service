@@ -3,6 +3,7 @@ package com.huariservice.huariia.controller;
 import com.huariservice.huariia.DTOs.UsuarioRequest;
 import com.huariservice.huariia.DTOs.UsuarioResponse;
 import com.huariservice.huariia.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,18 +29,13 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarios);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<String> atualizarUsuario(@PathVariable Long id, @RequestBody UsuarioRequest request) {
-        String resposta = usuarioService.mudarUsuario(id, request);
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<UsuarioResponse> atualizarUsuario(@PathVariable Long id, @Valid @RequestBody UsuarioRequest request) {
+        UsuarioResponse usuarioAtualizado = usuarioService.mudarUsuario(id, request);
+        return ResponseEntity.ok(usuarioAtualizado);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletarUsuario(@PathVariable Long id) {
-        String resposta = usuarioService.deletarId(id);
-
-        if (resposta.equals("Esse usuário não foi cadastrado")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
-        }
-
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
+        usuarioService.deletarId(id);
+        return ResponseEntity.noContent().build();
     }
 }

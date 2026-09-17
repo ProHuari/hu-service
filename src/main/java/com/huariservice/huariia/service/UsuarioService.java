@@ -3,6 +3,7 @@ package com.huariservice.huariia.service;
 import com.huariservice.huariia.DTOs.UsuarioRequest;
 import com.huariservice.huariia.DTOs.UsuarioResponse;
 import com.huariservice.huariia.entities.Usuario;
+import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
@@ -37,26 +38,21 @@ public class UsuarioService {
         )).toList();
     }
 
-    public String mudarUsuario(Long id, UsuarioRequest usuarioAlterado) {
-        Usuario usuario = usuarioRepository.findById(id).orElseThrow();
+    public UsuarioResponse mudarUsuario(Long id, UsuarioRequest usuarioAlterado) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
 
         usuario.setNome(usuarioAlterado.getNome());
         usuario.setEmail(usuarioAlterado.getEmail());
         usuario.setSenha(usuarioAlterado.getSenha());
         usuario.setTipoPerfil(usuarioAlterado.getTipoPerfil());
 
-        usuarioRepository.save(usuario);
-        return "Usuário alterado";
+        Usuario atualizado = usuarioRepository.save(usuario);
+        return new UsuarioResponse(atualizado.getId(), atualizado.getNome(), atualizado.getTipoPerfil());
     }
-
-    public String deletarId(Long id) {
-        Optional<Usuario> usuario = usuarioRepository.findById(id);
-
-        if (usuario.isEmpty()) {
-            return "Esse usuário não foi cadastrado";
-        } else {
-            usuarioRepository.deleteById(id);
-            return "Usuário excluído";
-        }
+    public void deletarId(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
+        usuarioRepository.delete(usuario);
     }
 }
