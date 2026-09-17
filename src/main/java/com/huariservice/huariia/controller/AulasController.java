@@ -3,6 +3,7 @@ package com.huariservice.huariia.controller;
 import com.huariservice.huariia.DTOs.AulasRequest;
 import com.huariservice.huariia.DTOs.AulasResponse;
 import com.huariservice.huariia.service.AulasService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,21 +35,14 @@ public class AulasController {
         return ResponseEntity.ok(aulas);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<String> mudarAula(
-            @PathVariable Long id,
-            @RequestBody AulasRequest aulaAlterada) {
-
-        String resposta = aulasService.mudarAula(id, aulaAlterada);
-
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<AulasResponse> mudarAula(@PathVariable Long id, @Valid @RequestBody AulasRequest aulaAlterada) {
+        AulasResponse aula = aulasService.mudarAula(id, aulaAlterada);
+        return ResponseEntity.ok(aula);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletarAula(
-            @PathVariable Long id) {
-
-        String resposta = aulasService.deletarId(id);
-
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<Void> deletarAula(@PathVariable Long id) {
+        aulasService.deletarId(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

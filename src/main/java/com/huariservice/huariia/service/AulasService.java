@@ -4,6 +4,7 @@ import com.huariservice.huariia.DTOs.AulasRequest;
 import com.huariservice.huariia.DTOs.AulasResponse;
 import com.huariservice.huariia.entities.Aulas;
 import com.huariservice.huariia.entities.Modulo;
+import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.AulasRepository;
 import com.huariservice.huariia.repositories.ModuloRepository;
 import org.springframework.stereotype.Service;
@@ -49,8 +50,9 @@ public class AulasService {
         )).toList();
     }
 
-    public String mudarAula(Long id, AulasRequest aulaAlterada) {
-        Aulas aula = aulasRepository.findById(id).orElseThrow();
+    public AulasResponse mudarAula(Long id, AulasRequest aulaAlterada) {
+        Aulas aula = aulasRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Essa aula não foi publicada"));
 
         aula.setTitulos(aulaAlterada.getTitulos());
         aula.setDescricao(aulaAlterada.getDescricao());
@@ -58,21 +60,16 @@ public class AulasService {
         aula.setOrdem(aulaAlterada.getOrdem());
         aula.setDuracaoEmMinutos(aulaAlterada.getDuracaoEmMinutos());
 
-        Modulo modulo = moduloRepository.findById(aulaAlterada.getModulo().getId()).orElseThrow();
+        Modulo modulo = moduloRepository.findById(aulaAlterada.getModulo().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse módulo não foi cadastrado"));
         aula.setModulo(modulo);
 
-        aulasRepository.save(aula);
-        return "Aula alterada";
+        Aulas atualizada = aulasRepository.save(aula);
+        return new AulasResponse(atualizada.getId(), atualizada.getTitulos(), atualizada.getDescricao(), atualizada.getUrlVideo(), atualizada.getOrdem(), atualizada.getDuracaoEmMinutos(), atualizada.getModulo());
     }
-
-    public String deletarId(Long id) {
-        Optional<Aulas> aula = aulasRepository.findById(id);
-
-        if (aula.isEmpty()) {
-            return "Essa aula não foi publicada";
-        } else {
-            aulasRepository.deleteById(id);
-            return "Aula excluída";
-        }
+    public void deletarId(Long id) {
+        Aulas aula = aulasRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Essa aula não foi publicada"));
+        aulasRepository.delete(aula);
     }
 }
