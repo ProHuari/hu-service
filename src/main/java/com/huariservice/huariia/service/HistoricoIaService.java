@@ -24,17 +24,18 @@ public class HistoricoIaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public Historico_IaRequest pubHistoricoIa(Historico_IaRequest request) {
+    public Historico_IaResponse pubHistoricoIa(Historico_IaRequest request) {
         HistoricoIa historico = new HistoricoIa();
         historico.setPergunta(request.getPergunta());
         historico.setResposta(request.getResposta());
         historico.setDataConsulta(LocalDateTime.now());
 
-        Usuario usuario = usuarioRepository.findById(request.getUsuario().getId()).orElseThrow();
+        Usuario usuario = usuarioRepository.findById(request.getUsuario().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
         historico.setUsuario(usuario);
 
-        historicoIaRepository.save(historico);
-        return request;
+        HistoricoIa salvo = historicoIaRepository.save(historico);
+        return new Historico_IaResponse(salvo.getId(), salvo.getDataConsulta(), salvo.getUsuario());
     }
 
     public List<Historico_IaResponse> mostrarHistoricoIa() {
