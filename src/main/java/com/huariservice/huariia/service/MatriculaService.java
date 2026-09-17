@@ -5,6 +5,7 @@ import com.huariservice.huariia.DTOs.MatriculasResponse;
 import com.huariservice.huariia.entities.Cursos;
 import com.huariservice.huariia.entities.Matricula;
 import com.huariservice.huariia.entities.Usuario;
+import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.CursosRepository;
 import com.huariservice.huariia.repositories.MatriculaRepository;
 import com.huariservice.huariia.repositories.UsuarioRepository;
@@ -49,29 +50,27 @@ public class MatriculaService {
                 matricula.getUsuario(),
                 matricula.getCursos())).toList();
     }
-    public String mudarMatricula(Long id, MatriculasRequest matriculaAlterada) {
-        Matricula matricula = matriculaRepository.findById(id).orElseThrow();
+    public MatriculasResponse mudarMatricula(Long id, MatriculasRequest matriculaAlterada) {
+        Matricula matricula = matriculaRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Essa matrícula não foi realizada"));
 
         matricula.setDtMatricula(matriculaAlterada.getDtMatricula());
         matricula.setStatusMT(matriculaAlterada.getStatusMT());
 
-        Usuario usuario = usuarioRepository.findById(matriculaAlterada.getUsuario().getId()).orElseThrow();
+        Usuario usuario = usuarioRepository.findById(matriculaAlterada.getUsuario().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
         matricula.setUsuario(usuario);
 
-        Cursos cursos = cursosRepository.findById(matriculaAlterada.getCursos().getId()).orElseThrow();
+        Cursos cursos = cursosRepository.findById(matriculaAlterada.getCursos().getId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
         matricula.setCursos(cursos);
 
-        matriculaRepository.save(matricula);
-        return "Matrícula alterada";
+        Matricula atualizada = matriculaRepository.save(matricula);
+        return new MatriculasResponse(atualizada.getId(), atualizada.getDtMatricula(), atualizada.getStatusMT(), atualizada.getUsuario(), atualizada.getCursos());
     }
-    public String deletarId(Long id) {
-        Optional<Matricula> matricula = matriculaRepository.findById(id);
-
-        if (matricula.isEmpty()) {
-            return "Essa matrícula não foi realizada";
-        } else {
-            matriculaRepository.deleteById(id);
-            return "Matrícula excluída";
-        }
+    public void deletarId(Long id) {
+        Matricula matricula = matriculaRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Essa matrícula não foi realizada"));
+        matriculaRepository.delete(matricula);
     }
 }
