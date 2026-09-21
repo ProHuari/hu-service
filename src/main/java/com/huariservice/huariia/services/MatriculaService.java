@@ -1,4 +1,4 @@
-package com.huariservice.huariia.service;
+package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.MatriculasRequest;
 import com.huariservice.huariia.DTOs.MatriculasResponse;
@@ -12,7 +12,6 @@ import com.huariservice.huariia.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class MatriculaService {

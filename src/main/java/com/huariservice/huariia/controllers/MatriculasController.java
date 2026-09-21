@@ -1,8 +1,8 @@
-package com.huariservice.huariia.controller;
+package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.MatriculasRequest;
 import com.huariservice.huariia.DTOs.MatriculasResponse;
-import com.huariservice.huariia.service.MatriculaService;
+import com.huariservice.huariia.services.MatriculaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

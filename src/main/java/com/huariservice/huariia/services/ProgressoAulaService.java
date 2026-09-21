@@ -1,4 +1,4 @@
-package com.huariservice.huariia.service;
+package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.ProgressoAulaRequest;
 import com.huariservice.huariia.DTOs.ProgressoAulaResponse;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProgressoAulaService {

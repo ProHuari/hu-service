@@ -1,4 +1,4 @@
-package com.huariservice.huariia.service;
+package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.Historico_IaRequest;
 import com.huariservice.huariia.DTOs.Historico_IaResponse;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class HistoricoIaService {

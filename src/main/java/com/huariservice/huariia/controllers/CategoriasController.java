@@ -1,8 +1,8 @@
-package com.huariservice.huariia.controller;
+package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.CategoriasRequest;
 import com.huariservice.huariia.DTOs.CategoriasResponse;
-import com.huariservice.huariia.service.CategoriasService;
+import com.huariservice.huariia.services.CategoriasService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/categoria")
+@RequestMapping("/Categoria")
 public class CategoriaController {
     private final CategoriasService categoriasService;
 

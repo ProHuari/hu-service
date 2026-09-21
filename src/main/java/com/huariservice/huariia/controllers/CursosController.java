@@ -1,8 +1,8 @@
-package com.huariservice.huariia.controller;
+package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.CursosRequest;
 import com.huariservice.huariia.DTOs.CursosResponse;
-import com.huariservice.huariia.service.CursosService;
+import com.huariservice.huariia.services.CursosService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

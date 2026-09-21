@@ -1,8 +1,8 @@
-package com.huariservice.huariia.controller;
+package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.ModulosRequest;
 import com.huariservice.huariia.DTOs.ModulosResponse;
-import com.huariservice.huariia.service.ModulosService;
+import com.huariservice.huariia.services.ModulosService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

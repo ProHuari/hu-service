@@ -1,8 +1,8 @@
-package com.huariservice.huariia.controller;
+package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.Historico_IaRequest;
 import com.huariservice.huariia.DTOs.Historico_IaResponse;
-import com.huariservice.huariia.service.HistoricoIaService;
+import com.huariservice.huariia.services.HistoricoIaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

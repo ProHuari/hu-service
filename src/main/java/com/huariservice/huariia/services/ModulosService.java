@@ -1,4 +1,4 @@
-package com.huariservice.huariia.service;
+package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.ModulosRequest;
 import com.huariservice.huariia.DTOs.ModulosResponse;
@@ -10,7 +10,6 @@ import com.huariservice.huariia.repositories.ModuloRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ModulosService {

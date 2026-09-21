@@ -1,4 +1,4 @@
-package com.huariservice.huariia.service;
+package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.CategoriasRequest;
 import com.huariservice.huariia.DTOs.CategoriasResponse;
@@ -8,7 +8,6 @@ import com.huariservice.huariia.repositories.CategoriasRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CategoriasService {

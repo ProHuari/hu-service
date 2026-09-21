@@ -1,8 +1,8 @@
-package com.huariservice.huariia.controller;
+package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.AutoresRequest;
 import com.huariservice.huariia.DTOs.AutoresResponse;
-import com.huariservice.huariia.service.AutoresService;
+import com.huariservice.huariia.services.AutoresService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/autores")
+@RequestMapping("/Autores")
 public class AutroresController {
     private final AutoresService autoresService;
 
