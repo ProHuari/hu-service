@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/ProgresoAula")
+@RequestMapping("/ProgressoAula")
 public class ProgresoAulaController {
     private final ProgressoAulaService progressoAulaService;
 

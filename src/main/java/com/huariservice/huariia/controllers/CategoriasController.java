@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Categoria")
-public class CategoriaController {
+@RequestMapping("/Categorias")
+public class CategoriasController {
     private final CategoriasService categoriasService;
 
-    public CategoriaController(CategoriasService categoriasService) {
+    public CategoriasController(CategoriasService categoriasService) {
         this.categoriasService = categoriasService;
     }
     @PostMapping

@@ -11,14 +11,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/aulas")
+@RequestMapping("/Aulas")
 public class AulasController {
     private final AulasService aulasService;
 
     public AulasController(AulasService aulasService) {
         this.aulasService = aulasService;
     }
-
 
     @PostMapping
     public ResponseEntity<AulasResponse> publicarAula(@Valid @RequestBody AulasRequest request) {

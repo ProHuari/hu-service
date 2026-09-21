@@ -19,4 +19,5 @@ public class ProgressoAulaResponse {
     private LocalDateTime conclusao;
     private Usuario usuario;
     private Aulas aulas;
+
 }
