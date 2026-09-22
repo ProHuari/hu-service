@@ -20,8 +20,8 @@ public class AutoresService {
 
     public AutoresResponse pubAutor(AutoresRequest request) {
         Autores autor = new Autores();
-        autor.setNomeCanal(request.getNomeCanal());
-        autor.setLinkCanal(request.getLinkCanal());
+        autor.setNomeCanal(request.nomeCanal());
+        autor.setLinkCanal(request.linkCanal());
 
         Autores salvo = autoresRepository.save(autor);
         return new AutoresResponse(salvo.getId(), salvo.getNomeCanal(), salvo.getLinkCanal());
