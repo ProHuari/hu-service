@@ -39,14 +39,12 @@ public class AutoresService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
         return new AutoresResponse(autor.getId(), autor.getNomeCanal(), autor.getLinkCanal());
     }
-
-
     public AutoresResponse mudarAutor(Long id, AutoresRequest autorAlterado) {
         Autores autor = autoresRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
 
-        autor.setNomeCanal(autorAlterado.getNomeCanal());
-        autor.setLinkCanal(autorAlterado.getLinkCanal());
+        autor.setNomeCanal(autorAlterado.nomeCanal());
+        autor.setLinkCanal(autorAlterado.linkCanal());
 
         Autores atualizado = autoresRepository.save(autor);
         return new AutoresResponse(atualizado.getId(), atualizado.getNomeCanal(), atualizado.getLinkCanal());
