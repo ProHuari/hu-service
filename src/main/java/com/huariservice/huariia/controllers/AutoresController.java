@@ -30,6 +30,10 @@ public class AutoresController {
         List<AutoresResponse> autores = autoresService.mostrarAutores();
         return ResponseEntity.ok(autores);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<AutoresResponse> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(autoresService.buscarPorId(id));
+    }
     @PutMapping("/{id}")
     public ResponseEntity<AutoresResponse> atualizarAutor(@PathVariable Long id, @Valid @RequestBody AutoresRequest request) {
         AutoresResponse autorAtualizado = autoresService.mudarAutor(id, request);
