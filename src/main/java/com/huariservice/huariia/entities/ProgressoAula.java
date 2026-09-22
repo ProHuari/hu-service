@@ -20,7 +20,7 @@ public class ProgressoAula {
     @Enumerated(EnumType.STRING)
     @Column(name = "status_aula",nullable = false)
     private StatusAula statusAula;
-    @Column(nullable = false,name = "data_conclusao")
+    @Column(name = "data_conclusao")
     private LocalDateTime conclusao;
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id",nullable = false)

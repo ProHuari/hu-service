@@ -1,4 +1,4 @@
-package com.huariservice.huariia;
+package com.huariservice.huariia.swagger;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

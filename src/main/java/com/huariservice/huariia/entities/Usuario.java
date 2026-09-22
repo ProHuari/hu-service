@@ -2,6 +2,8 @@ package com.huariservice.huariia.entities;
 
 import com.huariservice.huariia.entities.enums.TipoPerfil;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,11 +19,15 @@ public class Usuario {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank(message = "O nome é obrigatório")
     @Size(min = 1, max = 100, message = "O nome deve ter entre 1 e 100 caracteres")
-    @Column(length = 100,nullable = false)
+    @Column(length = 100, nullable = false)
     private String nome;
-    @Column(length = 100,nullable = false, unique = true)
+    @NotBlank(message = "O e-mail é obrigatório")
+    @Email(message = "E-mail inválido")
+    @Column(length = 100, nullable = false, unique = true)
     private String email;
+    @NotBlank(message = "A senha é obrigatória")
     @Size(min = 1, max = 50, message = "A senha deve ter entre 1 e 50 caracteres")
     @Column(length = 50, nullable = false)
     private String senha;

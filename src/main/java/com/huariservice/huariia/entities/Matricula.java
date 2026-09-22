@@ -9,11 +9,14 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "matriculas")
+@Table(name = "matriculas", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"usuario_id", "cursos_id"})
+})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Matricula {
+
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,5 +31,6 @@ public class Matricula {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cursos_id",nullable = false)
     private Cursos cursos;
+
 
 }
