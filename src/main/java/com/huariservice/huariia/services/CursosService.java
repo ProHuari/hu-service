@@ -54,6 +54,8 @@ public class CursosService {
                 curso.getAutores()
         )).toList();
     }
+
+
     public CursosResponse mudarCurso(Long id, CursosRequest cursoAlterado) {
         Cursos curso = cursosRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));

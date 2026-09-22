@@ -28,6 +28,10 @@ public class CategoriasController {
         List<CategoriasResponse> categorias = categoriasService.mostrarCategorias();
         return ResponseEntity.ok(categorias);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoriasResponse> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(categoriasService.buscarPorId(id));
+    }
     @PutMapping("/{id}")
     public ResponseEntity<CategoriasResponse> atualizarCategoria(@PathVariable Long id, @Valid @RequestBody CategoriasRequest request) {
         CategoriasResponse categoriaAtualizada = categoriasService.mudarCategoria(id, request);
