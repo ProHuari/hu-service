@@ -49,4 +49,9 @@ public class CategoriasService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
         categoriasRepository.delete(categoria);
     }
+    public CategoriasResponse buscarPorId(Long id) {
+        Categorias categoria = categoriasRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
+        return new CategoriasResponse(categoria.getId(), categoria.getNome(), categoria.getDescricao());
+    }
 }
