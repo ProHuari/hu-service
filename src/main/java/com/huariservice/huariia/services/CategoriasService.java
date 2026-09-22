@@ -26,7 +26,6 @@ public class CategoriasService {
         Categorias salva = categoriasRepository.save(categoria);
         return new CategoriasResponse(salva.getId(), salva.getNome(), salva.getDescricao());
     }
-
     public List<CategoriasResponse> mostrarCategorias() {
         return categoriasRepository.findAll().stream().map(categoria -> new CategoriasResponse(
                 categoria.getId(),
@@ -34,17 +33,17 @@ public class CategoriasService {
                 categoria.getDescricao()
         )).toList();
     }
-
     public CategoriasResponse mudarCategoria(Long id, CategoriasRequest categoriaAlterada) {
         Categorias categoria = categoriasRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
 
-        categoria.setNome(categoriaAlterada.getNome());
-        categoria.setDescricao(categoriaAlterada.getDescricao());
+        categoria.setNome(categoriaAlterada.nome());
+        categoria.setDescricao(categoriaAlterada.descricao());
 
         Categorias atualizada = categoriasRepository.save(categoria);
         return new CategoriasResponse(atualizada.getId(), atualizada.getNome(), atualizada.getDescricao());
     }
+
     public void deletarId(Long id) {
         Categorias categoria = categoriasRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
