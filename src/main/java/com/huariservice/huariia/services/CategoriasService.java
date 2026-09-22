@@ -20,8 +20,8 @@ public class CategoriasService {
 
     public CategoriasResponse pubCategoria(CategoriasRequest request) {
         Categorias categoria = new Categorias();
-        categoria.setNome(request.getNome());
-        categoria.setDescricao(request.getDescricao());
+        categoria.setNome(request.nome());
+        categoria.setDescricao(request.descricao());
 
         Categorias salva = categoriasRepository.save(categoria);
         return new CategoriasResponse(salva.getId(), salva.getNome(), salva.getDescricao());

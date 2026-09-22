@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "aulas")
+@Table(name = "aulas", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"titulos", "modulo_id"})
+})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,7 +16,7 @@ public class Aulas {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(length = 155,nullable = false,unique = true)
+    @Column(length = 155, nullable = false)
     private String titulos;
     @Column(columnDefinition = "TEXT", nullable = false)
     private String descricao;
