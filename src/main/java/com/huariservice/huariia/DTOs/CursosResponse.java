@@ -1,7 +1,7 @@
 package com.huariservice.huariia.DTOs;
 
 import com.huariservice.huariia.entities.Autores;
-import com.huariservice.huariia.entities.Categorias;
+import com.huariservice.huariia.entities.Categoria;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +15,6 @@ public class CursosResponse {
     private String titulos;
     private String descricao;
     private String urlVideo;
-    private Categorias categoria;
+    private Categoria categoria;
     private Autores autores;
 }

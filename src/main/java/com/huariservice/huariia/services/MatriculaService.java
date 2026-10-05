@@ -29,7 +29,7 @@ public class MatriculaService {
     public MatriculasResponse pubMatricula(MatriculasRequest request) {
         Matricula matricula = new Matricula();
         matricula.setDtMatricula(request.getDtMatricula());
-        matricula.setStatusMT(request.getStatusMT());
+        matricula.setStatusMT(request.getStatusMatricula());
 
         Usuario usuario = usuarioRepository.findById(request.getUsuario().getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
@@ -56,7 +56,7 @@ public class MatriculaService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa matrícula não foi realizada"));
 
         matricula.setDtMatricula(matriculaAlterada.getDtMatricula());
-        matricula.setStatusMT(matriculaAlterada.getStatusMT());
+        matricula.setStatusMT(matriculaAlterada.getStatusMatricula());
 
         Usuario usuario = usuarioRepository.findById(matriculaAlterada.getUsuario().getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));

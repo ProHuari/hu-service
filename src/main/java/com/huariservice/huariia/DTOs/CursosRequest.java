@@ -1,7 +1,7 @@
 package com.huariservice.huariia.DTOs;
 
 import com.huariservice.huariia.entities.Autores;
-import com.huariservice.huariia.entities.Categorias;
+import com.huariservice.huariia.entities.Categoria;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -22,7 +22,7 @@ public class CursosRequest {
     @Size(max = 254)
     private String urlVideo;
     @NotNull(message = "A categoria é obrigatória")
-    private Categorias categoria;
+    private Categoria categoria;
     @NotNull(message = "O autor é obrigatório")
     private Autores autores;
 }

@@ -2,7 +2,7 @@ package com.huariservice.huariia.DTOs;
 
 import com.huariservice.huariia.entities.Cursos;
 import com.huariservice.huariia.entities.Usuario;
-import com.huariservice.huariia.entities.enums.StatusMT;
+import com.huariservice.huariia.entities.enums.StatusMatricula;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +17,7 @@ public class MatriculasRequest {
     @NotNull(message = "A data de matrícula é obrigatória")
     private LocalDate dtMatricula;
     @NotNull(message = "O status é obrigatório")
-    private StatusMT statusMT;
+    private StatusMatricula statusMatricula;
     @NotNull(message = "O usuário é obrigatório")
     private Usuario usuario;
     @NotNull(message = "O curso é obrigatório")

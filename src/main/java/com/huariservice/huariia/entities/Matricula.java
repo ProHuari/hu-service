@@ -1,6 +1,6 @@
 package com.huariservice.huariia.entities;
 
-import com.huariservice.huariia.entities.enums.StatusMT;
+import com.huariservice.huariia.entities.enums.StatusMatricula;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,7 +28,7 @@ public class Matricula {
     @Enumerated(EnumType.STRING)
     @Column(name = "status_matricula", nullable = false)
     @ToString.Include
-    private StatusMT statusMatricula = StatusMT.ATIVA;
+    private StatusMatricula statusMatricula = StatusMatricula.ATIVA;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)

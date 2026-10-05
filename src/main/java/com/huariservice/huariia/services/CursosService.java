@@ -3,7 +3,7 @@ package com.huariservice.huariia.services;
 import com.huariservice.huariia.DTOs.CursosRequest;
 import com.huariservice.huariia.DTOs.CursosResponse;
 import com.huariservice.huariia.entities.Autores;
-import com.huariservice.huariia.entities.Categorias;
+import com.huariservice.huariia.entities.Categoria;
 import com.huariservice.huariia.entities.Cursos;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.AutoresRepository;
@@ -32,7 +32,7 @@ public class CursosService {
         curso.setDescricao(request.getDescricao());
         curso.setUrlVideo(request.getUrlVideo());
 
-        Categorias categoria = categoriasRepository.findById(request.getCategoria().getId())
+        Categoria categoria = categoriasRepository.findById(request.getCategoria().getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
         curso.setCategoria(categoria);
 
@@ -64,7 +64,7 @@ public class CursosService {
         curso.setDescricao(cursoAlterado.getDescricao());
         curso.setUrlVideo(cursoAlterado.getUrlVideo());
 
-        Categorias categoria = categoriasRepository.findById(cursoAlterado.getCategoria().getId())
+        Categoria categoria = categoriasRepository.findById(cursoAlterado.getCategoria().getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
         curso.setCategoria(categoria);
 
