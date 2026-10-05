@@ -8,6 +8,10 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import java.time.LocalDateTime;
+import java.util.Locale;
 
 
 @Entity
@@ -16,23 +20,57 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Usuario {
-
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ToString.Include
     private Long id;
-    @NotBlank(message = "O nome é obrigatório")
-    @Size(min = 1, max = 100, message = "O nome deve ter entre 1 e 100 caracteres")
+
     @Column(length = 100, nullable = false)
+    @ToString.Include
     private String nome;
-    @NotBlank(message = "O e-mail é obrigatório")
-    @Email(message = "E-mail inválido")
+
     @Column(length = 100, nullable = false, unique = true)
+    @ToString.Include
     private String email;
-    @NotBlank(message = "A senha é obrigatória")
-    @Size(min = 1, max = 50, message = "A senha deve ter entre 1 e 50 caracteres")
-    @Column(length = 50, nullable = false)
-    private String senha;
+
+    // Hash BCrypt (60 caracteres). Nunca guardar a senha em texto puro.
+    @Column(name = "senha_hash", length = 60, nullable = false)
+    private String senhaHash;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "Tipo_Perfil")
-    private TipoPerfil tipoPerfil;
+    @Column(name = "tipo_perfil", nullable = false)
+    private TipoPerfil tipoPerfil = TipoPerfil.ALUNO;
+
+    @Column(name = "criado_em", nullable = false, updatable = false)
+    private LocalDateTime criadoEm;
+
+    @PrePersist
+    void aoCriar() {
+        this.criadoEm = LocalDateTime.now();
+        normalizarEmail();
+    }
+
+    @PreUpdateffffff
+    void aoAtualizar() {
+        normalizarEmail();
+    }
+
+    private void normalizarEmail() {
+        if (email != null) {
+            this.email = email.trim().toLowerCase(Locale.ROOT);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Usuario other)) return false;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 
 }
