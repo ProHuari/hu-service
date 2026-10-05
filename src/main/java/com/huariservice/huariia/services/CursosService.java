@@ -6,7 +6,7 @@ import com.huariservice.huariia.entities.Autor;
 import com.huariservice.huariia.entities.Categoria;
 import com.huariservice.huariia.entities.Curso;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
-import com.huariservice.huariia.repositories.AutoresRepository;
+import com.huariservice.huariia.repositories.AutorRepository;
 import com.huariservice.huariia.repositories.CategoriasRepository;
 import com.huariservice.huariia.repositories.CursosRepository;
 import org.springframework.stereotype.Service;
@@ -17,12 +17,12 @@ import java.util.List;
 public class CursosService {
 
     private final CursosRepository cursosRepository;
-    private final AutoresRepository autoresRepository;
+    private final AutorRepository autorRepository;
     private final CategoriasRepository categoriasRepository;
 
-    public CursosService(CursosRepository cursosRepository, AutoresRepository autoresRepository, CategoriasRepository categoriasRepository) {
+    public CursosService(CursosRepository cursosRepository, AutorRepository autorRepository, CategoriasRepository categoriasRepository) {
         this.cursosRepository = cursosRepository;
-        this.autoresRepository = autoresRepository;
+        this.autorRepository = autorRepository;
         this.categoriasRepository = categoriasRepository;
     }
 
@@ -36,7 +36,7 @@ public class CursosService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
         curso.setCategoria(categoria);
 
-        Autor autor = autoresRepository.findById(request.getAutores().getId())
+        Autor autor = autorRepository.findById(request.getAutores().getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
         curso.setAutores(autor);
 
@@ -68,7 +68,7 @@ public class CursosService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
         curso.setCategoria(categoria);
 
-        Autor autor = autoresRepository.findById(cursoAlterado.getAutores().getId())
+        Autor autor = autorRepository.findById(cursoAlterado.getAutores().getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
         curso.setAutores(autor);
 

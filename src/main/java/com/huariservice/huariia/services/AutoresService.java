@@ -4,7 +4,7 @@ import com.huariservice.huariia.DTOs.AutorRequest;
 import com.huariservice.huariia.DTOs.AutorResponse;
 import com.huariservice.huariia.entities.Autor;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
-import com.huariservice.huariia.repositories.AutoresRepository;
+import com.huariservice.huariia.repositories.AutorRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,10 +12,10 @@ import java.util.List;
 @Service
 public class AutoresService {
 
-    private final AutoresRepository autoresRepository;
+    private final AutorRepository autorRepository;
 
-    public AutoresService(AutoresRepository autoresRepository) {
-        this.autoresRepository = autoresRepository;
+    public AutoresService(AutorRepository autorRepository) {
+        this.autorRepository = autorRepository;
     }
 
     public AutorResponse pubAutor(AutorRequest request) {
@@ -23,35 +23,35 @@ public class AutoresService {
         autor.setNomeCanal(request.nomeCanal());
         autor.setLinkCanal(request.linkCanal());
 
-        Autor salvo = autoresRepository.save(autor);
+        Autor salvo = autorRepository.save(autor);
         return new AutorResponse(salvo.getId(), salvo.getNomeCanal(), salvo.getLinkCanal());
     }
 
     public List<AutorResponse> mostrarAutores() {
-        return autoresRepository.findAll().stream().map(autor -> new AutorResponse(
+        return autorRepository.findAll().stream().map(autor -> new AutorResponse(
                 autor.getId(),
                 autor.getNomeCanal(),
                 autor.getLinkCanal()
         )).toList();
     }
     public AutorResponse buscarPorId(Long id) {
-        Autor autor = autoresRepository.findById(id)
+        Autor autor = autorRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
         return new AutorResponse(autor.getId(), autor.getNomeCanal(), autor.getLinkCanal());
     }
     public AutorResponse mudarAutor(Long id, AutorRequest autorAlterado) {
-        Autor autor = autoresRepository.findById(id)
+        Autor autor = autorRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
 
         autor.setNomeCanal(autorAlterado.nomeCanal());
         autor.setLinkCanal(autorAlterado.linkCanal());
 
-        Autor atualizado = autoresRepository.save(autor);
+        Autor atualizado = autorRepository.save(autor);
         return new AutorResponse(atualizado.getId(), atualizado.getNomeCanal(), atualizado.getLinkCanal());
     }
     public void deletarId(Long id) {
-        Autor autor = autoresRepository.findById(id)
+        Autor autor = autorRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
-        autoresRepository.delete(autor);
+        autorRepository.delete(autor);
     }
 }
