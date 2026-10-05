@@ -1,24 +1,18 @@
 package com.huariservice.huariia.DTOs;
 
-import com.huariservice.huariia.entities.Aula;
-import com.huariservice.huariia.entities.Usuario;
+
 import com.huariservice.huariia.entities.enums.StatusAula;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+public record ProgressoAulaRequest (
+        @NotNull(message = "O status é obrigatório")
+        StatusAula statusAula,
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ProgressoAulaRequest {
-    @NotNull(message = "O status é obrigatório")
-    private StatusAula statusAula;
-    private LocalDateTime conclusao;
-    @NotNull(message = "O usuário é obrigatório")
-    private Usuario usuario;
-    @NotNull(message = "A aula é obrigatória")
-    private Aula aula;
-}
+        @NotNull(message = "O usuário é obrigatório")
+        Long usuarioId,
+
+        @NotNull(message = "A aula é obrigatória")
+        Long aulaId
+) {}
+
+
