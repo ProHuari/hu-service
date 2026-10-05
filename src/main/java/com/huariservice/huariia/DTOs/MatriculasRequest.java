@@ -10,16 +10,11 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class MatriculasRequest {
-    @NotNull(message = "A data de matrícula é obrigatória")
-    private LocalDate dtMatricula;
-    @NotNull(message = "O status é obrigatório")
-    private StatusMatricula statusMatricula;
-    @NotNull(message = "O usuário é obrigatório")
-    private Usuario usuario;
-    @NotNull(message = "O curso é obrigatório")
-    private Cursos cursos;
-}
+
+public record MatriculasRequest (
+        @NotNull(message = "O usuário é obrigatório")
+        Long usuarioId,
+
+        @NotNull(message = "O curso é obrigatório")
+        Long cursoId
+) {}

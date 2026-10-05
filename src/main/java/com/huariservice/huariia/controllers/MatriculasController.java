@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.MatriculasRequest;
-import com.huariservice.huariia.DTOs.MatriculasResponse;
+import com.huariservice.huariia.DTOs.MatriculaResponse;
 import com.huariservice.huariia.services.MatriculaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -19,18 +19,18 @@ public class MatriculasController {
         this.matriculaService = matriculaService;
     }
     @PostMapping
-    public ResponseEntity<MatriculasResponse> criarMatricula(@Valid @RequestBody MatriculasRequest request) {
-        MatriculasResponse novaMatricula = matriculaService.pubMatricula(request);
+    public ResponseEntity<MatriculaResponse> criarMatricula(@Valid @RequestBody MatriculasRequest request) {
+        MatriculaResponse novaMatricula = matriculaService.pubMatricula(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novaMatricula);
     }
     @GetMapping
-    public ResponseEntity<List<MatriculasResponse>> listarMatriculas() {
-        List<MatriculasResponse> matriculas = matriculaService.mostrarMatriculas();
+    public ResponseEntity<List<MatriculaResponse>> listarMatriculas() {
+        List<MatriculaResponse> matriculas = matriculaService.mostrarMatriculas();
         return ResponseEntity.ok(matriculas);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<MatriculasResponse> atualizarMatricula(@PathVariable Long id, @Valid @RequestBody MatriculasRequest request) {
-        MatriculasResponse matriculaAtualizada = matriculaService.mudarMatricula(id, request);
+    public ResponseEntity<MatriculaResponse> atualizarMatricula(@PathVariable Long id, @Valid @RequestBody MatriculasRequest request) {
+        MatriculaResponse matriculaAtualizada = matriculaService.mudarMatricula(id, request);
         return ResponseEntity.ok(matriculaAtualizada);
     }
     @DeleteMapping("/{id}")

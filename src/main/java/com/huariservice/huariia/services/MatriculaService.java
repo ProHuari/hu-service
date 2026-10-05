@@ -1,7 +1,7 @@
 package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.MatriculasRequest;
-import com.huariservice.huariia.DTOs.MatriculasResponse;
+import com.huariservice.huariia.DTOs.MatriculaResponse;
 import com.huariservice.huariia.entities.Cursos;
 import com.huariservice.huariia.entities.Matricula;
 import com.huariservice.huariia.entities.Usuario;
@@ -26,7 +26,7 @@ public class MatriculaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public MatriculasResponse pubMatricula(MatriculasRequest request) {
+    public MatriculaResponse pubMatricula(MatriculasRequest request) {
         Matricula matricula = new Matricula();
         matricula.setDtMatricula(request.getDtMatricula());
         matricula.setStatusMT(request.getStatusMatricula());
@@ -40,18 +40,18 @@ public class MatriculaService {
         matricula.setCursos(cursos);
 
         Matricula salva = matriculaRepository.save(matricula);
-        return new MatriculasResponse(salva.getId(), salva.getDtMatricula(), salva.getStatusMT(), salva.getUsuario(), salva.getCursos());
+        return new MatriculaResponse(salva.getId(), salva.getDtMatricula(), salva.getStatusMT(), salva.getUsuario(), salva.getCursos());
     }
 
-    public List<MatriculasResponse> mostrarMatriculas() {
-        return matriculaRepository.findAll().stream().map(matricula -> new MatriculasResponse(
+    public List<MatriculaResponse> mostrarMatriculas() {
+        return matriculaRepository.findAll().stream().map(matricula -> new MatriculaResponse(
                 matricula.getId(),
                 matricula.getDtMatricula(),
                 matricula.getStatusMT(),
                 matricula.getUsuario(),
                 matricula.getCursos())).toList();
     }
-    public MatriculasResponse mudarMatricula(Long id, MatriculasRequest matriculaAlterada) {
+    public MatriculaResponse mudarMatricula(Long id, MatriculasRequest matriculaAlterada) {
         Matricula matricula = matriculaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa matrícula não foi realizada"));
 
@@ -67,7 +67,7 @@ public class MatriculaService {
         matricula.setCursos(cursos);
 
         Matricula atualizada = matriculaRepository.save(matricula);
-        return new MatriculasResponse(atualizada.getId(), atualizada.getDtMatricula(), atualizada.getStatusMT(), atualizada.getUsuario(), atualizada.getCursos());
+        return new MatriculaResponse(atualizada.getId(), atualizada.getDtMatricula(), atualizada.getStatusMT(), atualizada.getUsuario(), atualizada.getCursos());
     }
     public void deletarId(Long id) {
         Matricula matricula = matriculaRepository.findById(id)
