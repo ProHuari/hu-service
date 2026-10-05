@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.Historico_IaRequest;
-import com.huariservice.huariia.DTOs.Historico_IaResponse;
+import com.huariservice.huariia.DTOs.HistoricoIaResponse;
 import com.huariservice.huariia.services.HistoricoIaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -21,18 +21,18 @@ public class HistoricoIaController {
     }
 
     @PostMapping
-    public ResponseEntity<Historico_IaResponse> criarHistorico(@Valid @RequestBody Historico_IaRequest request) {
-        Historico_IaResponse novoHistorico = historicoIaService.pubHistoricoIa(request);
+    public ResponseEntity<HistoricoIaResponse> criarHistorico(@Valid @RequestBody Historico_IaRequest request) {
+        HistoricoIaResponse novoHistorico = historicoIaService.pubHistoricoIa(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoHistorico);
     }
     @GetMapping
-    public ResponseEntity<List<Historico_IaResponse>> listarHistoricos() {
-        List<Historico_IaResponse> historicos = historicoIaService.mostrarHistoricoIa();
+    public ResponseEntity<List<HistoricoIaResponse>> listarHistoricos() {
+        List<HistoricoIaResponse> historicos = historicoIaService.mostrarHistoricoIa();
         return ResponseEntity.ok(historicos);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Historico_IaResponse> atualizarHistorico(@PathVariable Long id, @Valid @RequestBody Historico_IaRequest request) {
-        Historico_IaResponse historicoAtualizado = historicoIaService.mudarHistoricoIa(id, request);
+    public ResponseEntity<HistoricoIaResponse> atualizarHistorico(@PathVariable Long id, @Valid @RequestBody Historico_IaRequest request) {
+        HistoricoIaResponse historicoAtualizado = historicoIaService.mudarHistoricoIa(id, request);
         return ResponseEntity.ok(historicoAtualizado);
     }
     @DeleteMapping("/{id}")

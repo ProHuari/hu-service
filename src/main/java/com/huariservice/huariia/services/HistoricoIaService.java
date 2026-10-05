@@ -1,7 +1,7 @@
 package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.Historico_IaRequest;
-import com.huariservice.huariia.DTOs.Historico_IaResponse;
+import com.huariservice.huariia.DTOs.HistoricoIaResponse;
 import com.huariservice.huariia.entities.HistoricoIa;
 import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
@@ -23,7 +23,7 @@ public class HistoricoIaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public Historico_IaResponse pubHistoricoIa(Historico_IaRequest request) {
+    public HistoricoIaResponse pubHistoricoIa(Historico_IaRequest request) {
         HistoricoIa historico = new HistoricoIa();
         historico.setPergunta(request.getPergunta());
         historico.setResposta(request.getResposta());
@@ -34,18 +34,18 @@ public class HistoricoIaService {
         historico.setUsuario(usuario);
 
         HistoricoIa salvo = historicoIaRepository.save(historico);
-        return new Historico_IaResponse(salvo.getId(), salvo.getDataConsulta(), salvo.getUsuario());
+        return new HistoricoIaResponse(salvo.getId(), salvo.getDataConsulta(), salvo.getUsuario());
     }
 
-    public List<Historico_IaResponse> mostrarHistoricoIa() {
-        return historicoIaRepository.findAll().stream().map(historico -> new Historico_IaResponse(
+    public List<HistoricoIaResponse> mostrarHistoricoIa() {
+        return historicoIaRepository.findAll().stream().map(historico -> new HistoricoIaResponse(
                 historico.getId(),
                 historico.getDataConsulta(),
                 historico.getUsuario()
         )).toList();
     }
 
-    public Historico_IaResponse mudarHistoricoIa(Long id, Historico_IaRequest historicoAlterado) {
+    public HistoricoIaResponse mudarHistoricoIa(Long id, Historico_IaRequest historicoAlterado) {
         HistoricoIa historico = historicoIaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse histórico não foi registrado"));
 
@@ -57,7 +57,7 @@ public class HistoricoIaService {
         historico.setUsuario(usuario);
 
         HistoricoIa atualizado = historicoIaRepository.save(historico);
-        return new Historico_IaResponse(atualizado.getId(), atualizado.getDataConsulta(), atualizado.getUsuario());
+        return new HistoricoIaResponse(atualizado.getId(), atualizado.getDataConsulta(), atualizado.getUsuario());
     }
     public void deletarId(Long id) {
         HistoricoIa historico = historicoIaRepository.findById(id)
