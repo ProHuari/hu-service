@@ -8,19 +8,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class UsuarioRequest {
-    @NotBlank(message = "O nome é obrigatório")
-    @Size(min = 1, max = 100, message = "O nome deve ter entre 1 e 100 caracteres")
-    private String nome;
-    @NotBlank(message = "O e-mail é obrigatório")
-    @Email(message = "E-mail inválido")
-    @Size(max = 100)
-    private String email;
-    @NotBlank(message = "A senha é obrigatória")
-    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
-    private String senha;
-    private TipoPerfil tipoPerfil;
-}
+
+public record UsuarioRequest(
+        @NotBlank(message = "O nome é obrigatório")
+        @Size(max = 100, message = "O nome deve ter no máximo 100 caracteres")
+        String nome,
+
+        @NotBlank(message = "O e-mail é obrigatório")
+        @Email(message = "E-mail inválido")
+        @Size(max = 100)
+        String email,
+
+        // BCrypt só considera os primeiros 72 bytes
+        @NotBlank(message = "A senha é obrigatória")
+        @Size(min = 6, max = 72, message = "A senha deve ter entre 6 e 72 caracteres")
+        String senha
+){}
+
