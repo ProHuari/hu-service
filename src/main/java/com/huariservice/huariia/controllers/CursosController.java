@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.CursosRequest;
-import com.huariservice.huariia.DTOs.CursosResponse;
+import com.huariservice.huariia.DTOs.CursoResponse;
 import com.huariservice.huariia.services.CursosService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -19,18 +19,18 @@ public class CursosController {
         this.cursosService = cursosService;
     }
     @PostMapping
-    public ResponseEntity<CursosResponse> criarCurso(@Valid @RequestBody CursosRequest request) {
-        CursosResponse novoCurso = cursosService.pubCurso(request);
+    public ResponseEntity<CursoResponse> criarCurso(@Valid @RequestBody CursosRequest request) {
+        CursoResponse novoCurso = cursosService.pubCurso(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoCurso);
     }
     @GetMapping
-    public ResponseEntity<List<CursosResponse>> listarCursos() {
-        List<CursosResponse> cursos = cursosService.mostrarCursos();
+    public ResponseEntity<List<CursoResponse>> listarCursos() {
+        List<CursoResponse> cursos = cursosService.mostrarCursos();
         return ResponseEntity.ok(cursos);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<CursosResponse> atualizarCurso(@PathVariable Long id, @Valid @RequestBody CursosRequest request) {
-        CursosResponse cursoAtualizado = cursosService.mudarCurso(id, request);
+    public ResponseEntity<CursoResponse> atualizarCurso(@PathVariable Long id, @Valid @RequestBody CursosRequest request) {
+        CursoResponse cursoAtualizado = cursosService.mudarCurso(id, request);
         return ResponseEntity.ok(cursoAtualizado);
     }
     @DeleteMapping("/{id}")

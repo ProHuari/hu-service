@@ -2,7 +2,7 @@ package com.huariservice.huariia.DTOs;
 
 
 
-public record CategoriasResponse(
+public record CategoriaResponse(
         Long id,
         String nome,
         String descricao

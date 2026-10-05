@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.AulasRequest;
-import com.huariservice.huariia.DTOs.AulasResponse;
+import com.huariservice.huariia.DTOs.AulaResponse;
 import com.huariservice.huariia.services.AulasService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -20,20 +20,20 @@ public class AulasController {
     }
 
     @PostMapping
-    public ResponseEntity<AulasResponse> publicarAula(@Valid @RequestBody AulasRequest request) {
-        AulasResponse aula = aulasService.pubAula(request);
+    public ResponseEntity<AulaResponse> publicarAula(@Valid @RequestBody AulasRequest request) {
+        AulaResponse aula = aulasService.pubAula(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(aula);
     }
     @GetMapping
-    public ResponseEntity<List<AulasResponse>> mostrarAulas() {
+    public ResponseEntity<List<AulaResponse>> mostrarAulas() {
 
-        List<AulasResponse> aulas = aulasService.mostrarAulas();
+        List<AulaResponse> aulas = aulasService.mostrarAulas();
 
         return ResponseEntity.ok(aulas);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<AulasResponse> mudarAula(@PathVariable Long id, @Valid @RequestBody AulasRequest aulaAlterada) {
-        AulasResponse aula = aulasService.mudarAula(id, aulaAlterada);
+    public ResponseEntity<AulaResponse> mudarAula(@PathVariable Long id, @Valid @RequestBody AulasRequest aulaAlterada) {
+        AulaResponse aula = aulasService.mudarAula(id, aulaAlterada);
         return ResponseEntity.ok(aula);
     }
     @DeleteMapping("/{id}")

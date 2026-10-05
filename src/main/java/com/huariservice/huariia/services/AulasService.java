@@ -1,7 +1,7 @@
 package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.AulasRequest;
-import com.huariservice.huariia.DTOs.AulasResponse;
+import com.huariservice.huariia.DTOs.AulaResponse;
 import com.huariservice.huariia.entities.Aula;
 import com.huariservice.huariia.entities.Modulo;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
@@ -22,7 +22,7 @@ public class AulasService {
         this.moduloRepository = moduloRepository;
     }
 
-    public AulasResponse pubAula(AulasRequest request) {
+    public AulaResponse pubAula(AulasRequest request) {
         Aula aula = new Aula();
         aula.setTitulos(request.getTitulos());
         aula.setDescricao(request.getDescricao());
@@ -35,11 +35,11 @@ public class AulasService {
         aula.setModulo(modulo);
 
         Aula salva = aulasRepository.save(aula);
-        return new AulasResponse(salva.getId(), salva.getTitulos(), salva.getDescricao(), salva.getUrlVideo(), salva.getOrdem(), salva.getDuracaoEmMinutos(), salva.getModulo());
+        return new AulaResponse(salva.getId(), salva.getTitulos(), salva.getDescricao(), salva.getUrlVideo(), salva.getOrdem(), salva.getDuracaoEmMinutos(), salva.getModulo());
     }
 
-    public List<AulasResponse> mostrarAulas() {
-        return aulasRepository.findAll().stream().map(aula -> new AulasResponse(
+    public List<AulaResponse> mostrarAulas() {
+        return aulasRepository.findAll().stream().map(aula -> new AulaResponse(
                 aula.getId(),
                 aula.getTitulos(),
                 aula.getDescricao(),
@@ -50,7 +50,7 @@ public class AulasService {
         )).toList();
     }
 
-    public AulasResponse mudarAula(Long id, AulasRequest aulaAlterada) {
+    public AulaResponse mudarAula(Long id, AulasRequest aulaAlterada) {
         Aula aula = aulasRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa aula não foi publicada"));
 
@@ -65,7 +65,7 @@ public class AulasService {
         aula.setModulo(modulo);
 
         Aula atualizada = aulasRepository.save(aula);
-        return new AulasResponse(atualizada.getId(), atualizada.getTitulos(), atualizada.getDescricao(), atualizada.getUrlVideo(), atualizada.getOrdem(), atualizada.getDuracaoEmMinutos(), atualizada.getModulo());
+        return new AulaResponse(atualizada.getId(), atualizada.getTitulos(), atualizada.getDescricao(), atualizada.getUrlVideo(), atualizada.getOrdem(), atualizada.getDuracaoEmMinutos(), atualizada.getModulo());
     }
     public void deletarId(Long id) {
         Aula aula = aulasRepository.findById(id)

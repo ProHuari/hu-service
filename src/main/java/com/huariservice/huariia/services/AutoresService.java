@@ -1,7 +1,7 @@
 package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.AutoresRequest;
-import com.huariservice.huariia.DTOs.AutoresResponse;
+import com.huariservice.huariia.DTOs.AutorResponse;
 import com.huariservice.huariia.entities.Autores;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.AutoresRepository;
@@ -18,28 +18,28 @@ public class AutoresService {
         this.autoresRepository = autoresRepository;
     }
 
-    public AutoresResponse pubAutor(AutoresRequest request) {
+    public AutorResponse pubAutor(AutoresRequest request) {
         Autores autor = new Autores();
         autor.setNomeCanal(request.nomeCanal());
         autor.setLinkCanal(request.linkCanal());
 
         Autores salvo = autoresRepository.save(autor);
-        return new AutoresResponse(salvo.getId(), salvo.getNomeCanal(), salvo.getLinkCanal());
+        return new AutorResponse(salvo.getId(), salvo.getNomeCanal(), salvo.getLinkCanal());
     }
 
-    public List<AutoresResponse> mostrarAutores() {
-        return autoresRepository.findAll().stream().map(autor -> new AutoresResponse(
+    public List<AutorResponse> mostrarAutores() {
+        return autoresRepository.findAll().stream().map(autor -> new AutorResponse(
                 autor.getId(),
                 autor.getNomeCanal(),
                 autor.getLinkCanal()
         )).toList();
     }
-    public AutoresResponse buscarPorId(Long id) {
+    public AutorResponse buscarPorId(Long id) {
         Autores autor = autoresRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
-        return new AutoresResponse(autor.getId(), autor.getNomeCanal(), autor.getLinkCanal());
+        return new AutorResponse(autor.getId(), autor.getNomeCanal(), autor.getLinkCanal());
     }
-    public AutoresResponse mudarAutor(Long id, AutoresRequest autorAlterado) {
+    public AutorResponse mudarAutor(Long id, AutoresRequest autorAlterado) {
         Autores autor = autoresRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
 
@@ -47,7 +47,7 @@ public class AutoresService {
         autor.setLinkCanal(autorAlterado.linkCanal());
 
         Autores atualizado = autoresRepository.save(autor);
-        return new AutoresResponse(atualizado.getId(), atualizado.getNomeCanal(), atualizado.getLinkCanal());
+        return new AutorResponse(atualizado.getId(), atualizado.getNomeCanal(), atualizado.getLinkCanal());
     }
     public void deletarId(Long id) {
         Autores autor = autoresRepository.findById(id)

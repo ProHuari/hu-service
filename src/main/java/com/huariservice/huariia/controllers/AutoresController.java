@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.AutoresRequest;
-import com.huariservice.huariia.DTOs.AutoresResponse;
+import com.huariservice.huariia.DTOs.AutorResponse;
 import com.huariservice.huariia.services.AutoresService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -21,22 +21,22 @@ public class AutoresController {
     }
 
     @PostMapping
-    public ResponseEntity<AutoresResponse> criarAutor(@RequestBody AutoresRequest request) {
-        AutoresResponse novoAutor = autoresService.pubAutor(request);
+    public ResponseEntity<AutorResponse> criarAutor(@RequestBody AutoresRequest request) {
+        AutorResponse novoAutor = autoresService.pubAutor(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoAutor);
     }
     @GetMapping
-    public ResponseEntity<List<AutoresResponse>> listarAutores() {
-        List<AutoresResponse> autores = autoresService.mostrarAutores();
+    public ResponseEntity<List<AutorResponse>> listarAutores() {
+        List<AutorResponse> autores = autoresService.mostrarAutores();
         return ResponseEntity.ok(autores);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<AutoresResponse> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<AutorResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(autoresService.buscarPorId(id));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<AutoresResponse> atualizarAutor(@PathVariable Long id, @Valid @RequestBody AutoresRequest request) {
-        AutoresResponse autorAtualizado = autoresService.mudarAutor(id, request);
+    public ResponseEntity<AutorResponse> atualizarAutor(@PathVariable Long id, @Valid @RequestBody AutoresRequest request) {
+        AutorResponse autorAtualizado = autoresService.mudarAutor(id, request);
         return ResponseEntity.ok(autorAtualizado);
     }
     @DeleteMapping("/{id}")

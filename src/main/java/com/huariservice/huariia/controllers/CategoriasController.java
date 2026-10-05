@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.CategoriasRequest;
-import com.huariservice.huariia.DTOs.CategoriasResponse;
+import com.huariservice.huariia.DTOs.CategoriaResponse;
 import com.huariservice.huariia.services.CategoriasService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -19,22 +19,22 @@ public class CategoriasController {
         this.categoriasService = categoriasService;
     }
     @PostMapping
-    public ResponseEntity<CategoriasResponse> criarCategoria(@Valid @RequestBody CategoriasRequest request) {
-        CategoriasResponse novaCategoria = categoriasService.pubCategoria(request);
+    public ResponseEntity<CategoriaResponse> criarCategoria(@Valid @RequestBody CategoriasRequest request) {
+        CategoriaResponse novaCategoria = categoriasService.pubCategoria(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novaCategoria);
     }
     @GetMapping
-    public ResponseEntity<List<CategoriasResponse>> listarCategorias() {
-        List<CategoriasResponse> categorias = categoriasService.mostrarCategorias();
+    public ResponseEntity<List<CategoriaResponse>> listarCategorias() {
+        List<CategoriaResponse> categorias = categoriasService.mostrarCategorias();
         return ResponseEntity.ok(categorias);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<CategoriasResponse> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<CategoriaResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(categoriasService.buscarPorId(id));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<CategoriasResponse> atualizarCategoria(@PathVariable Long id, @Valid @RequestBody CategoriasRequest request) {
-        CategoriasResponse categoriaAtualizada = categoriasService.mudarCategoria(id, request);
+    public ResponseEntity<CategoriaResponse> atualizarCategoria(@PathVariable Long id, @Valid @RequestBody CategoriasRequest request) {
+        CategoriaResponse categoriaAtualizada = categoriasService.mudarCategoria(id, request);
         return ResponseEntity.ok(categoriaAtualizada);
     }
     @DeleteMapping("/{id}")
