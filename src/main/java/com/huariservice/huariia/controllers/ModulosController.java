@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.ModulosRequest;
-import com.huariservice.huariia.DTOs.ModulosResponse;
+import com.huariservice.huariia.DTOs.ModuloRequest;
+import com.huariservice.huariia.DTOs.ModuloResponse;
 import com.huariservice.huariia.services.ModulosService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -19,18 +19,18 @@ public class ModulosController {
         this.modulosService = modulosService;
     }
     @PostMapping
-    public ResponseEntity<ModulosResponse> criarModulo(@Valid @RequestBody ModulosRequest request) {
-        ModulosResponse novoModulo = modulosService.pubModulo(request);
+    public ResponseEntity<ModuloResponse> criarModulo(@Valid @RequestBody ModuloRequest request) {
+        ModuloResponse novoModulo = modulosService.pubModulo(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoModulo);
     }
     @GetMapping
-    public ResponseEntity<List<ModulosResponse>> listarModulos() {
-        List<ModulosResponse> modulos = modulosService.mostrarModulos();
+    public ResponseEntity<List<ModuloResponse>> listarModulos() {
+        List<ModuloResponse> modulos = modulosService.mostrarModulos();
         return ResponseEntity.ok(modulos);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<ModulosResponse> atualizarModulo(@PathVariable Long id, @Valid @RequestBody ModulosRequest request) {
-        ModulosResponse moduloAtualizado = modulosService.mudarModulo(id, request);
+    public ResponseEntity<ModuloResponse> atualizarModulo(@PathVariable Long id, @Valid @RequestBody ModuloRequest request) {
+        ModuloResponse moduloAtualizado = modulosService.mudarModulo(id, request);
         return ResponseEntity.ok(moduloAtualizado);
     }
     @DeleteMapping("/{id}")

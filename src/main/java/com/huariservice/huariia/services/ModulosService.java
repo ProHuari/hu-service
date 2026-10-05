@@ -1,7 +1,7 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.ModulosRequest;
-import com.huariservice.huariia.DTOs.ModulosResponse;
+import com.huariservice.huariia.DTOs.ModuloRequest;
+import com.huariservice.huariia.DTOs.ModuloResponse;
 import com.huariservice.huariia.entities.Cursos;
 import com.huariservice.huariia.entities.Modulo;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
@@ -21,7 +21,7 @@ public class ModulosService {
         this.moduloRepository = moduloRepository;
         this.cursosRepository = cursosRepository;
     }
-    public ModulosResponse pubModulo(ModulosRequest request) {
+    public ModuloResponse pubModulo(ModuloRequest request) {
         Modulo modulo = new Modulo();
         modulo.setTitulo(request.getTitulo());
         modulo.setDescricao(request.getDescricao());
@@ -32,10 +32,10 @@ public class ModulosService {
         modulo.setCursos(cursos);
 
         Modulo salvo = moduloRepository.save(modulo);
-        return new ModulosResponse(salvo.getId(), salvo.getTitulo(), salvo.getDescricao(), salvo.getOrdem(), salvo.getCursos());
+        return new ModuloResponse(salvo.getId(), salvo.getTitulo(), salvo.getDescricao(), salvo.getOrdem(), salvo.getCursos());
     }
-    public List<ModulosResponse> mostrarModulos() {
-        return moduloRepository.findAll().stream().map(modulo -> new ModulosResponse(
+    public List<ModuloResponse> mostrarModulos() {
+        return moduloRepository.findAll().stream().map(modulo -> new ModuloResponse(
                 modulo.getId(),
                 modulo.getTitulo(),
                 modulo.getDescricao(),
@@ -43,7 +43,7 @@ public class ModulosService {
                 modulo.getCursos()
         )).toList();
     }
-    public ModulosResponse mudarModulo(Long id, ModulosRequest moduloAlterado) {
+    public ModuloResponse mudarModulo(Long id, ModuloRequest moduloAlterado) {
         Modulo modulo = moduloRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse módulo não foi cadastrado"));
 
@@ -56,7 +56,7 @@ public class ModulosService {
         modulo.setCursos(cursos);
 
         Modulo atualizado = moduloRepository.save(modulo);
-        return new ModulosResponse(atualizado.getId(), atualizado.getTitulo(), atualizado.getDescricao(), atualizado.getOrdem(), atualizado.getCursos());
+        return new ModuloResponse(atualizado.getId(), atualizado.getTitulo(), atualizado.getDescricao(), atualizado.getOrdem(), atualizado.getCursos());
     }
     public void deletarId(Long id) {
         Modulo modulo = moduloRepository.findById(id)
