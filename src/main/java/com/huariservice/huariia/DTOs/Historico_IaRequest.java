@@ -7,14 +7,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class Historico_IaRequest {
-    @NotBlank(message = "A pergunta é obrigatória")
-    private String pergunta;
-    @NotBlank(message = "A resposta é obrigatória")
-    private String resposta;
-    @NotNull(message = "O usuário é obrigatório")
-    private Usuario usuario;
-}
+
+public record  Historico_IaRequest (
+        @NotBlank(message = "A pergunta é obrigatória")
+        String pergunta,
+
+        @NotBlank(message = "A resposta é obrigatória")
+        String resposta,
+
+        @NotNull(message = "O usuário é obrigatório")
+        Long usuarioId
+) {}
