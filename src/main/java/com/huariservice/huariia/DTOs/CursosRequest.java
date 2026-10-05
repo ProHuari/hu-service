@@ -1,13 +1,8 @@
 package com.huariservice.huariia.DTOs;
 
-import com.huariservice.huariia.entities.Autores;
-import com.huariservice.huariia.entities.Categoria;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.URL;
 
 

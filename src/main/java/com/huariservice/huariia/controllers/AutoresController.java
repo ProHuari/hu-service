@@ -1,6 +1,6 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.AutoresRequest;
+import com.huariservice.huariia.DTOs.AutorRequest;
 import com.huariservice.huariia.DTOs.AutorResponse;
 import com.huariservice.huariia.services.AutoresService;
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ public class AutoresController {
     }
 
     @PostMapping
-    public ResponseEntity<AutorResponse> criarAutor(@RequestBody AutoresRequest request) {
+    public ResponseEntity<AutorResponse> criarAutor(@RequestBody AutorRequest request) {
         AutorResponse novoAutor = autoresService.pubAutor(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoAutor);
     }
@@ -35,7 +35,7 @@ public class AutoresController {
         return ResponseEntity.ok(autoresService.buscarPorId(id));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<AutorResponse> atualizarAutor(@PathVariable Long id, @Valid @RequestBody AutoresRequest request) {
+    public ResponseEntity<AutorResponse> atualizarAutor(@PathVariable Long id, @Valid @RequestBody AutorRequest request) {
         AutorResponse autorAtualizado = autoresService.mudarAutor(id, request);
         return ResponseEntity.ok(autorAtualizado);
     }

@@ -11,7 +11,7 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Autores {
+public class Autor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ToString.Include
@@ -27,7 +27,7 @@ public class Autores {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Autores other)) return false;
+        if (!(o instanceof Autor other)) return false;
         return id != null && id.equals(other.id);
     }
 

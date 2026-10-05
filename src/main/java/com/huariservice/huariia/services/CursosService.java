@@ -2,7 +2,7 @@ package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.CursosRequest;
 import com.huariservice.huariia.DTOs.CursoResponse;
-import com.huariservice.huariia.entities.Autores;
+import com.huariservice.huariia.entities.Autor;
 import com.huariservice.huariia.entities.Categoria;
 import com.huariservice.huariia.entities.Cursos;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
@@ -36,9 +36,9 @@ public class CursosService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
         curso.setCategoria(categoria);
 
-        Autores autores = autoresRepository.findById(request.getAutores().getId())
+        Autor autor = autoresRepository.findById(request.getAutores().getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
-        curso.setAutores(autores);
+        curso.setAutores(autor);
 
         Cursos salvo = cursosRepository.save(curso);
         return new CursoResponse(salvo.getId(), salvo.getTitulos(), salvo.getDescricao(), salvo.getUrlVideo(), salvo.getCategoria(), salvo.getAutores());
@@ -68,9 +68,9 @@ public class CursosService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
         curso.setCategoria(categoria);
 
-        Autores autores = autoresRepository.findById(cursoAlterado.getAutores().getId())
+        Autor autor = autoresRepository.findById(cursoAlterado.getAutores().getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
-        curso.setAutores(autores);
+        curso.setAutores(autor);
 
         Cursos atualizado = cursosRepository.save(curso);
         return new CursoResponse(atualizado.getId(), atualizado.getTitulos(), atualizado.getDescricao(), atualizado.getUrlVideo(), atualizado.getCategoria(), atualizado.getAutores());
