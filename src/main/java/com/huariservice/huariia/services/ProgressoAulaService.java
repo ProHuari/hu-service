@@ -2,7 +2,7 @@ package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.ProgressoAulaRequest;
 import com.huariservice.huariia.DTOs.ProgressoAulaResponse;
-import com.huariservice.huariia.entities.Aulas;
+import com.huariservice.huariia.entities.Aula;
 import com.huariservice.huariia.entities.ProgressoAula;
 import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
@@ -36,12 +36,12 @@ public class ProgressoAulaService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
         progressoAula.setUsuario(usuario);
 
-        Aulas aulas = aulasRepository.findById(request.getAulas().getId())
+        Aula aula = aulasRepository.findById(request.getAula().getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa aula não foi publicada"));
-        progressoAula.setAulas(aulas);
+        progressoAula.setAula(aula);
 
         ProgressoAula salvo = progressoAulaRepository.save(progressoAula);
-        return new ProgressoAulaResponse(salvo.getId(), salvo.getStatusAula(), salvo.getConclusao(), salvo.getUsuario(), salvo.getAulas());
+        return new ProgressoAulaResponse(salvo.getId(), salvo.getStatusAula(), salvo.getConclusao(), salvo.getUsuario(), salvo.getAula());
     }
 
     public List<ProgressoAulaResponse> mostrarProgressoAula() {
@@ -50,7 +50,7 @@ public class ProgressoAulaService {
                 progresso.getStatusAula(),
                 progresso.getConclusao(),
                 progresso.getUsuario(),
-                progresso.getAulas()
+                progresso.getAula()
         )).toList();
     }
     public ProgressoAulaResponse mudarProgressoAula(Long id, ProgressoAulaRequest progressoAlterado) {
@@ -66,12 +66,12 @@ public class ProgressoAulaService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
         progressoAula.setUsuario(usuario);
 
-        Aulas aulas = aulasRepository.findById(progressoAlterado.getAulas().getId())
+        Aula aula = aulasRepository.findById(progressoAlterado.getAula().getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa aula não foi publicada"));
-        progressoAula.setAulas(aulas);
+        progressoAula.setAula(aula);
 
         ProgressoAula atualizado = progressoAulaRepository.save(progressoAula);
-        return new ProgressoAulaResponse(atualizado.getId(), atualizado.getStatusAula(), atualizado.getConclusao(), atualizado.getUsuario(), atualizado.getAulas());
+        return new ProgressoAulaResponse(atualizado.getId(), atualizado.getStatusAula(), atualizado.getConclusao(), atualizado.getUsuario(), atualizado.getAula());
     }
     public void deletarId(Long id) {
         ProgressoAula progressoAula = progressoAulaRepository.findById(id)

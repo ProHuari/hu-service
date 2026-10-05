@@ -1,6 +1,6 @@
 package com.huariservice.huariia.DTOs;
 
-import com.huariservice.huariia.entities.Aulas;
+import com.huariservice.huariia.entities.Aula;
 import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.entities.enums.StatusAula;
 import lombok.AllArgsConstructor;
@@ -18,6 +18,6 @@ public class ProgressoAulaResponse {
     private StatusAula statusAula;
     private LocalDateTime conclusao;
     private Usuario usuario;
-    private Aulas aulas;
+    private Aula aula;
 
 }

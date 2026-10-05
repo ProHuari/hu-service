@@ -27,6 +27,6 @@ public class ProgressoAula {
     private Usuario usuario;
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "aula_id", nullable = false)
-    private Aulas aulas;
+    private Aula aula;
 
 }

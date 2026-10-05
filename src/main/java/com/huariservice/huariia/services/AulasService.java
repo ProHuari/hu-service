@@ -2,7 +2,7 @@ package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.AulasRequest;
 import com.huariservice.huariia.DTOs.AulasResponse;
-import com.huariservice.huariia.entities.Aulas;
+import com.huariservice.huariia.entities.Aula;
 import com.huariservice.huariia.entities.Modulo;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.AulasRepository;
@@ -23,7 +23,7 @@ public class AulasService {
     }
 
     public AulasResponse pubAula(AulasRequest request) {
-        Aulas aula = new Aulas();
+        Aula aula = new Aula();
         aula.setTitulos(request.getTitulos());
         aula.setDescricao(request.getDescricao());
         aula.setUrlVideo(request.getUrlVideo());
@@ -34,7 +34,7 @@ public class AulasService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse módulo não foi cadastrado"));
         aula.setModulo(modulo);
 
-        Aulas salva = aulasRepository.save(aula);
+        Aula salva = aulasRepository.save(aula);
         return new AulasResponse(salva.getId(), salva.getTitulos(), salva.getDescricao(), salva.getUrlVideo(), salva.getOrdem(), salva.getDuracaoEmMinutos(), salva.getModulo());
     }
 
@@ -51,7 +51,7 @@ public class AulasService {
     }
 
     public AulasResponse mudarAula(Long id, AulasRequest aulaAlterada) {
-        Aulas aula = aulasRepository.findById(id)
+        Aula aula = aulasRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa aula não foi publicada"));
 
         aula.setTitulos(aulaAlterada.getTitulos());
@@ -64,11 +64,11 @@ public class AulasService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse módulo não foi cadastrado"));
         aula.setModulo(modulo);
 
-        Aulas atualizada = aulasRepository.save(aula);
+        Aula atualizada = aulasRepository.save(aula);
         return new AulasResponse(atualizada.getId(), atualizada.getTitulos(), atualizada.getDescricao(), atualizada.getUrlVideo(), atualizada.getOrdem(), atualizada.getDuracaoEmMinutos(), atualizada.getModulo());
     }
     public void deletarId(Long id) {
-        Aulas aula = aulasRepository.findById(id)
+        Aula aula = aulasRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa aula não foi publicada"));
         aulasRepository.delete(aula);
     }

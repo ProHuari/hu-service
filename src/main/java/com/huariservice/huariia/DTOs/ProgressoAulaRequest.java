@@ -1,6 +1,6 @@
 package com.huariservice.huariia.DTOs;
 
-import com.huariservice.huariia.entities.Aulas;
+import com.huariservice.huariia.entities.Aula;
 import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.entities.enums.StatusAula;
 import jakarta.validation.constraints.NotNull;
@@ -20,5 +20,5 @@ public class ProgressoAulaRequest {
     @NotNull(message = "O usuário é obrigatório")
     private Usuario usuario;
     @NotNull(message = "A aula é obrigatória")
-    private Aulas aulas;
+    private Aula aula;
 }
