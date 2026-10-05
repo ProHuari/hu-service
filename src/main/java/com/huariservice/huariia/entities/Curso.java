@@ -11,7 +11,7 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Cursos {
+public class Curso {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ToString.Include
@@ -38,7 +38,7 @@ public class Cursos {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Cursos other)) return false;
+        if (!(o instanceof Curso other)) return false;
         return id != null && id.equals(other.id);
     }
 

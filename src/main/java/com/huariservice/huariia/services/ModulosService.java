@@ -2,7 +2,7 @@ package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.DTOs.ModuloRequest;
 import com.huariservice.huariia.DTOs.ModuloResponse;
-import com.huariservice.huariia.entities.Cursos;
+import com.huariservice.huariia.entities.Curso;
 import com.huariservice.huariia.entities.Modulo;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.CursosRepository;
@@ -27,9 +27,9 @@ public class ModulosService {
         modulo.setDescricao(request.getDescricao());
         modulo.setOrdem(request.getOrdem());
 
-        Cursos cursos = cursosRepository.findById(request.getCursos().getId())
+        Curso curso = cursosRepository.findById(request.getCursos().getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
-        modulo.setCursos(cursos);
+        modulo.setCursos(curso);
 
         Modulo salvo = moduloRepository.save(modulo);
         return new ModuloResponse(salvo.getId(), salvo.getTitulo(), salvo.getDescricao(), salvo.getOrdem(), salvo.getCursos());
@@ -51,9 +51,9 @@ public class ModulosService {
         modulo.setDescricao(moduloAlterado.getDescricao());
         modulo.setOrdem(moduloAlterado.getOrdem());
 
-        Cursos cursos = cursosRepository.findById(moduloAlterado.getCursos().getId())
+        Curso curso = cursosRepository.findById(moduloAlterado.getCursos().getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
-        modulo.setCursos(cursos);
+        modulo.setCursos(curso);
 
         Modulo atualizado = moduloRepository.save(modulo);
         return new ModuloResponse(atualizado.getId(), atualizado.getTitulo(), atualizado.getDescricao(), atualizado.getOrdem(), atualizado.getCursos());

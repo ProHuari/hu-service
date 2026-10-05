@@ -1,6 +1,6 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.Historico_IaRequest;
+import com.huariservice.huariia.DTOs.HistoricoIARequest;
 import com.huariservice.huariia.DTOs.HistoricoIaResponse;
 import com.huariservice.huariia.entities.HistoricoIa;
 import com.huariservice.huariia.entities.Usuario;
@@ -23,7 +23,7 @@ public class HistoricoIaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public HistoricoIaResponse pubHistoricoIa(Historico_IaRequest request) {
+    public HistoricoIaResponse pubHistoricoIa(HistoricoIARequest request) {
         HistoricoIa historico = new HistoricoIa();
         historico.setPergunta(request.getPergunta());
         historico.setResposta(request.getResposta());
@@ -45,7 +45,7 @@ public class HistoricoIaService {
         )).toList();
     }
 
-    public HistoricoIaResponse mudarHistoricoIa(Long id, Historico_IaRequest historicoAlterado) {
+    public HistoricoIaResponse mudarHistoricoIa(Long id, HistoricoIARequest historicoAlterado) {
         HistoricoIa historico = historicoIaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse histórico não foi registrado"));
 

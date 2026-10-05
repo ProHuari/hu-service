@@ -1,6 +1,6 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.Historico_IaRequest;
+import com.huariservice.huariia.DTOs.HistoricoIARequest;
 import com.huariservice.huariia.DTOs.HistoricoIaResponse;
 import com.huariservice.huariia.services.HistoricoIaService;
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ public class HistoricoIaController {
     }
 
     @PostMapping
-    public ResponseEntity<HistoricoIaResponse> criarHistorico(@Valid @RequestBody Historico_IaRequest request) {
+    public ResponseEntity<HistoricoIaResponse> criarHistorico(@Valid @RequestBody HistoricoIARequest request) {
         HistoricoIaResponse novoHistorico = historicoIaService.pubHistoricoIa(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoHistorico);
     }
@@ -31,7 +31,7 @@ public class HistoricoIaController {
         return ResponseEntity.ok(historicos);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<HistoricoIaResponse> atualizarHistorico(@PathVariable Long id, @Valid @RequestBody Historico_IaRequest request) {
+    public ResponseEntity<HistoricoIaResponse> atualizarHistorico(@PathVariable Long id, @Valid @RequestBody HistoricoIARequest request) {
         HistoricoIaResponse historicoAtualizado = historicoIaService.mudarHistoricoIa(id, request);
         return ResponseEntity.ok(historicoAtualizado);
     }

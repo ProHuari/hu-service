@@ -1,10 +1,10 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.CursosRequest;
+import com.huariservice.huariia.DTOs.CursoRequest;
 import com.huariservice.huariia.DTOs.CursoResponse;
 import com.huariservice.huariia.entities.Autor;
 import com.huariservice.huariia.entities.Categoria;
-import com.huariservice.huariia.entities.Cursos;
+import com.huariservice.huariia.entities.Curso;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.AutoresRepository;
 import com.huariservice.huariia.repositories.CategoriasRepository;
@@ -26,8 +26,8 @@ public class CursosService {
         this.categoriasRepository = categoriasRepository;
     }
 
-    public CursoResponse pubCurso(CursosRequest request) {
-        Cursos curso = new Cursos();
+    public CursoResponse pubCurso(CursoRequest request) {
+        Curso curso = new Curso();
         curso.setTitulos(request.getTitulos());
         curso.setDescricao(request.getDescricao());
         curso.setUrlVideo(request.getUrlVideo());
@@ -40,7 +40,7 @@ public class CursosService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
         curso.setAutores(autor);
 
-        Cursos salvo = cursosRepository.save(curso);
+        Curso salvo = cursosRepository.save(curso);
         return new CursoResponse(salvo.getId(), salvo.getTitulos(), salvo.getDescricao(), salvo.getUrlVideo(), salvo.getCategoria(), salvo.getAutores());
     }
 
@@ -56,8 +56,8 @@ public class CursosService {
     }
 
 
-    public CursoResponse mudarCurso(Long id, CursosRequest cursoAlterado) {
-        Cursos curso = cursosRepository.findById(id)
+    public CursoResponse mudarCurso(Long id, CursoRequest cursoAlterado) {
+        Curso curso = cursosRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
 
         curso.setTitulos(cursoAlterado.getTitulos());
@@ -72,12 +72,12 @@ public class CursosService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
         curso.setAutores(autor);
 
-        Cursos atualizado = cursosRepository.save(curso);
+        Curso atualizado = cursosRepository.save(curso);
         return new CursoResponse(atualizado.getId(), atualizado.getTitulos(), atualizado.getDescricao(), atualizado.getUrlVideo(), atualizado.getCategoria(), atualizado.getAutores());
     }
 
     public void deletarId(Long id) {
-        Cursos curso = cursosRepository.findById(id)
+        Curso curso = cursosRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
         cursosRepository.delete(curso);
     }

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.URL;
 
 
-public record CursosRequest (
+public record CursoRequest(
         @NotBlank(message = "O título é obrigatório")
         @Size(max = 155, message = "O título deve ter no máximo 155 caracteres")
         String titulo,

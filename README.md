@@ -6,7 +6,7 @@ O Huari Backend é o núcleo de processamento e inteligência da plataforma, res
 * **Órgãos oficiais:** Transparência e facilidade na consulta de indicadores e métricas institucionais.
 * **Sociedade civil:** Democratização da informação política, promovendo o controle social e a participação cidadã.
 
-Além da inteligência de dados, o sistema gerencia a infraestrutura de cursos e trilhas educacionais voltadas para a formação política.
+Além da inteligência de dados, o sistema gerencia a infraestrutura de curso e trilhas educacionais voltadas para a formação política.
 
 ## Arquitetura e Tecnologias
 

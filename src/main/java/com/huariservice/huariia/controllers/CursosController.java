@@ -1,6 +1,6 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.CursosRequest;
+import com.huariservice.huariia.DTOs.CursoRequest;
 import com.huariservice.huariia.DTOs.CursoResponse;
 import com.huariservice.huariia.services.CursosService;
 import jakarta.validation.Valid;
@@ -19,7 +19,7 @@ public class CursosController {
         this.cursosService = cursosService;
     }
     @PostMapping
-    public ResponseEntity<CursoResponse> criarCurso(@Valid @RequestBody CursosRequest request) {
+    public ResponseEntity<CursoResponse> criarCurso(@Valid @RequestBody CursoRequest request) {
         CursoResponse novoCurso = cursosService.pubCurso(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoCurso);
     }
@@ -29,7 +29,7 @@ public class CursosController {
         return ResponseEntity.ok(cursos);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<CursoResponse> atualizarCurso(@PathVariable Long id, @Valid @RequestBody CursosRequest request) {
+    public ResponseEntity<CursoResponse> atualizarCurso(@PathVariable Long id, @Valid @RequestBody CursoRequest request) {
         CursoResponse cursoAtualizado = cursosService.mudarCurso(id, request);
         return ResponseEntity.ok(cursoAtualizado);
     }

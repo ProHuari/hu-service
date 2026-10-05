@@ -1,6 +1,6 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.CategoriasRequest;
+import com.huariservice.huariia.DTOs.CategoriaRequest;
 import com.huariservice.huariia.DTOs.CategoriaResponse;
 import com.huariservice.huariia.entities.Categoria;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
@@ -18,7 +18,7 @@ public class CategoriasService {
         this.categoriasRepository = categoriasRepository;
     }
 
-    public CategoriaResponse pubCategoria(CategoriasRequest request) {
+    public CategoriaResponse pubCategoria(CategoriaRequest request) {
         Categoria categoria = new Categoria();
         categoria.setNome(request.nome());
         categoria.setDescricao(request.descricao());
@@ -33,7 +33,7 @@ public class CategoriasService {
                 categoria.getDescricao()
         )).toList();
     }
-    public CategoriaResponse mudarCategoria(Long id, CategoriasRequest categoriaAlterada) {
+    public CategoriaResponse mudarCategoria(Long id, CategoriaRequest categoriaAlterada) {
         Categoria categoria = categoriasRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
 

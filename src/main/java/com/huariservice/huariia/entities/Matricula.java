@@ -36,7 +36,7 @@ public class Matricula {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "curso_id", nullable = false)
-    private Cursos curso;
+    private Curso curso;
 
     @PrePersist
     void aoCriar() {

@@ -33,7 +33,7 @@ public class Modulo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "curso_id", nullable = false)
-    private Cursos curso;
+    private Curso curso;
 
     @Override
     public boolean equals(Object o) {

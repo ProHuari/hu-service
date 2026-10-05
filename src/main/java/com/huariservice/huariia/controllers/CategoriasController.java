@@ -1,6 +1,6 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.CategoriasRequest;
+import com.huariservice.huariia.DTOs.CategoriaRequest;
 import com.huariservice.huariia.DTOs.CategoriaResponse;
 import com.huariservice.huariia.services.CategoriasService;
 import jakarta.validation.Valid;
@@ -19,7 +19,7 @@ public class CategoriasController {
         this.categoriasService = categoriasService;
     }
     @PostMapping
-    public ResponseEntity<CategoriaResponse> criarCategoria(@Valid @RequestBody CategoriasRequest request) {
+    public ResponseEntity<CategoriaResponse> criarCategoria(@Valid @RequestBody CategoriaRequest request) {
         CategoriaResponse novaCategoria = categoriasService.pubCategoria(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novaCategoria);
     }
@@ -33,7 +33,7 @@ public class CategoriasController {
         return ResponseEntity.ok(categoriasService.buscarPorId(id));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<CategoriaResponse> atualizarCategoria(@PathVariable Long id, @Valid @RequestBody CategoriasRequest request) {
+    public ResponseEntity<CategoriaResponse> atualizarCategoria(@PathVariable Long id, @Valid @RequestBody CategoriaRequest request) {
         CategoriaResponse categoriaAtualizada = categoriasService.mudarCategoria(id, request);
         return ResponseEntity.ok(categoriaAtualizada);
     }

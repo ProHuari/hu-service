@@ -1,6 +1,6 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.MatriculasRequest;
+import com.huariservice.huariia.DTOs.MatriculaRequest;
 import com.huariservice.huariia.DTOs.MatriculaResponse;
 import com.huariservice.huariia.services.MatriculaService;
 import jakarta.validation.Valid;
@@ -19,7 +19,7 @@ public class MatriculasController {
         this.matriculaService = matriculaService;
     }
     @PostMapping
-    public ResponseEntity<MatriculaResponse> criarMatricula(@Valid @RequestBody MatriculasRequest request) {
+    public ResponseEntity<MatriculaResponse> criarMatricula(@Valid @RequestBody MatriculaRequest request) {
         MatriculaResponse novaMatricula = matriculaService.pubMatricula(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novaMatricula);
     }
@@ -29,7 +29,7 @@ public class MatriculasController {
         return ResponseEntity.ok(matriculas);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<MatriculaResponse> atualizarMatricula(@PathVariable Long id, @Valid @RequestBody MatriculasRequest request) {
+    public ResponseEntity<MatriculaResponse> atualizarMatricula(@PathVariable Long id, @Valid @RequestBody MatriculaRequest request) {
         MatriculaResponse matriculaAtualizada = matriculaService.mudarMatricula(id, request);
         return ResponseEntity.ok(matriculaAtualizada);
     }

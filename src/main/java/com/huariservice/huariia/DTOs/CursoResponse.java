@@ -1,6 +1,6 @@
 package com.huariservice.huariia.DTOs;
 
-import com.huariservice.huariia.entities.Cursos;
+import com.huariservice.huariia.entities.Curso;
 
 
 public record CursoResponse(
@@ -12,7 +12,7 @@ public record CursoResponse(
         AutorResponse autor
 ) {
     // Chamar dentro de uma transação (@Transactional) por causa do LAZY.
-    public static CursoResponse from(Cursos curso) {
+    public static CursoResponse from(Curso curso) {
         return new CursoResponse(
                 curso.getId(),
                 curso.getTitulo(),
