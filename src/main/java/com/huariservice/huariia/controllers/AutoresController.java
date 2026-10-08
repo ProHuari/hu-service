@@ -2,7 +2,7 @@ package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.AutorRequest;
 import com.huariservice.huariia.DTOs.AutorResponse;
-import com.huariservice.huariia.services.AutoresService;
+import com.huariservice.huariia.services.AutorService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,34 +14,34 @@ import java.util.List;
 @RequestMapping("/Autores")
 public class AutoresController {
 
-    private final AutoresService autoresService;
+    private final AutorService autorService;
 
-    public AutoresController(AutoresService autoresService) {
-        this.autoresService = autoresService;
+    public AutoresController(AutorService autorService) {
+        this.autorService = autorService;
     }
 
     @PostMapping
     public ResponseEntity<AutorResponse> criarAutor(@RequestBody AutorRequest request) {
-        AutorResponse novoAutor = autoresService.pubAutor(request);
+        AutorResponse novoAutor = autorService.pubAutor(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoAutor);
     }
     @GetMapping
     public ResponseEntity<List<AutorResponse>> listarAutores() {
-        List<AutorResponse> autores = autoresService.mostrarAutores();
+        List<AutorResponse> autores = autorService.mostrarAutores();
         return ResponseEntity.ok(autores);
     }
     @GetMapping("/{id}")
     public ResponseEntity<AutorResponse> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(autoresService.buscarPorId(id));
+        return ResponseEntity.ok(autorService.buscarPorId(id));
     }
     @PutMapping("/{id}")
     public ResponseEntity<AutorResponse> atualizarAutor(@PathVariable Long id, @Valid @RequestBody AutorRequest request) {
-        AutorResponse autorAtualizado = autoresService.mudarAutor(id, request);
+        AutorResponse autorAtualizado = autorService.mudarAutor(id, request);
         return ResponseEntity.ok(autorAtualizado);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarAutor(@PathVariable Long id) {
-        autoresService.deletarId(id);
+        autorService.deletarId(id);
         return ResponseEntity.noContent().build();
     }
 }
