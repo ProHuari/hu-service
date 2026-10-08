@@ -5,77 +5,103 @@ import com.huariservice.huariia.DTOs.ProgressoAulaResponse;
 import com.huariservice.huariia.entities.Aula;
 import com.huariservice.huariia.entities.ProgressoAula;
 import com.huariservice.huariia.entities.Usuario;
+import com.huariservice.huariia.entities.enums.StatusAula;
+import com.huariservice.huariia.exceptions.ConflitoException;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
-import com.huariservice.huariia.repositories.AulasRepository;
+import com.huariservice.huariia.exceptions.RegraNegocioException;
+import com.huariservice.huariia.repositories.AulaRepository;
+import com.huariservice.huariia.repositories.MatriculaRepository;
 import com.huariservice.huariia.repositories.ProgressoAulaRepository;
 import com.huariservice.huariia.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Transactional
 public class ProgressoAulaService {
 
     private final ProgressoAulaRepository progressoAulaRepository;
-    private final AulasRepository aulasRepository;
+    private final AulaRepository aulaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final MatriculaRepository matriculaRepository;
 
-    public ProgressoAulaService(ProgressoAulaRepository progressoAulaRepository, AulasRepository aulasRepository, UsuarioRepository usuarioRepository) {
+    public ProgressoAulaService(ProgressoAulaRepository progressoAulaRepository,
+                                AulaRepository aulaRepository,
+                                UsuarioRepository usuarioRepository,
+                                MatriculaRepository matriculaRepository) {
         this.progressoAulaRepository = progressoAulaRepository;
-        this.aulasRepository = aulasRepository;
+        this.aulaRepository = aulaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.matriculaRepository = matriculaRepository;
     }
 
     public ProgressoAulaResponse pubProgressoAula(ProgressoAulaRequest request) {
-        ProgressoAula progressoAula = new ProgressoAula();
-        progressoAula.setStatusAula(request.getStatusAula());
-        progressoAula.setConclusao(request.getConclusao() != null ? request.getConclusao() : LocalDateTime.now());
-
-        Usuario usuario = usuarioRepository.findById(request.getUsuario().getId())
+        Usuario usuario = usuarioRepository.findById(request.usuarioId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
-        progressoAula.setUsuario(usuario);
-
-        Aula aula = aulasRepository.findById(request.getAula().getId())
+        Aula aula = aulaRepository.findById(request.aulaId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa aula não foi publicada"));
-        progressoAula.setAula(aula);
 
-        ProgressoAula salvo = progressoAulaRepository.save(progressoAula);
-        return new ProgressoAulaResponse(salvo.getId(), salvo.getStatusAula(), salvo.getConclusao(), salvo.getUsuario(), salvo.getAula());
-    }
-
-    public List<ProgressoAulaResponse> mostrarProgressoAula() {
-        return progressoAulaRepository.findAll().stream().map(progresso -> new ProgressoAulaResponse(
-                progresso.getId(),
-                progresso.getStatusAula(),
-                progresso.getConclusao(),
-                progresso.getUsuario(),
-                progresso.getAula()
-        )).toList();
-    }
-    public ProgressoAulaResponse mudarProgressoAula(Long id, ProgressoAulaRequest progressoAlterado) {
-        ProgressoAula progressoAula = progressoAulaRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse progresso de aula não foi registrado"));
-
-        progressoAula.setStatusAula(progressoAlterado.getStatusAula());
-        if (progressoAlterado.getConclusao() != null) {
-            progressoAula.setConclusao(progressoAlterado.getConclusao());
+        Long cursoId = aula.getModulo().getCurso().getId();
+        if (!matriculaRepository.existsByUsuarioIdAndCursoId(usuario.getId(), cursoId)) {
+            throw new RegraNegocioException("O usuário não está matriculado no curso dessa aula");
+        }
+        if (progressoAulaRepository.findByUsuarioIdAndAulaId(usuario.getId(), aula.getId()).isPresent()) {
+            throw new ConflitoException("Já existe progresso registrado para essa aula; atualize o existente");
         }
 
-        Usuario usuario = usuarioRepository.findById(progressoAlterado.getUsuario().getId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
-        progressoAula.setUsuario(usuario);
+        ProgressoAula progresso = new ProgressoAula();
+        progresso.setUsuario(usuario);
+        progresso.setAula(aula);
+        aplicarStatus(progresso, request.statusAula());
 
-        Aula aula = aulasRepository.findById(progressoAlterado.getAula().getId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Essa aula não foi publicada"));
-        progressoAula.setAula(aula);
-
-        ProgressoAula atualizado = progressoAulaRepository.save(progressoAula);
-        return new ProgressoAulaResponse(atualizado.getId(), atualizado.getStatusAula(), atualizado.getConclusao(), atualizado.getUsuario(), atualizado.getAula());
+        return ProgressoAulaResponse.from(progressoAulaRepository.save(progresso));
     }
+
+    @Transactional(readOnly = true)
+    public List<ProgressoAulaResponse> mostrarProgressoAula() {
+        return progressoAulaRepository.findAll().stream().map(ProgressoAulaResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProgressoAulaResponse> mostrarProgressoDoUsuario(Long usuarioId) {
+        return progressoAulaRepository.findByUsuarioId(usuarioId).stream()
+                .map(ProgressoAulaResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ProgressoAulaResponse buscarPorId(Long id) {
+        return ProgressoAulaResponse.from(buscarProgresso(id));
+    }
+
+    // Só o status muda; usuário e aula do registro não podem ser trocados.
+    public ProgressoAulaResponse mudarProgressoAula(Long id, ProgressoAulaRequest request) {
+        ProgressoAula progresso = buscarProgresso(id);
+        aplicarStatus(progresso, request.statusAula());
+
+        return ProgressoAulaResponse.from(progressoAulaRepository.save(progresso));
+    }
+
     public void deletarId(Long id) {
-        ProgressoAula progressoAula = progressoAulaRepository.findById(id)
+        progressoAulaRepository.delete(buscarProgresso(id));
+    }
+
+    // dataConclusao só existe quando a aula está CONCLUIDA.
+    private void aplicarStatus(ProgressoAula progresso, StatusAula status) {
+        progresso.setStatusAula(status);
+        if (status == StatusAula.CONCLUIDA) {
+            if (progresso.getDataConclusao() == null) {
+                progresso.setDataConclusao(LocalDateTime.now());
+            }
+        } else {
+            progresso.setDataConclusao(null);
+        }
+    }
+
+    private ProgressoAula buscarProgresso(Long id) {
+        return progressoAulaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse progresso de aula não foi registrado"));
-        progressoAulaRepository.delete(progressoAula);
     }
 }
