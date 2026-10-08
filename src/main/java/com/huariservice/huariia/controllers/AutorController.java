@@ -1,8 +1,8 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.AulaRequest;
-import com.huariservice.huariia.DTOs.AulaResponse;
-import com.huariservice.huariia.services.AulaService;
+import com.huariservice.huariia.DTOs.AutorRequest;
+import com.huariservice.huariia.DTOs.AutorResponse;
+import com.huariservice.huariia.services.AutorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -14,51 +14,48 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/aulas")
-@Tag(name = "Aulas")
-public class AulaController {
+@RequestMapping("/autores")
+@Tag(name = "Autores")
+public class AutorController {
 
-    private final AulaService aulaService;
+    private final AutorService autorService;
 
-    public AulaController(AulaService aulaService) {
-        this.aulaService = aulaService;
+    public AutorController(AutorService autorService) {
+        this.autorService = autorService;
     }
 
     @PostMapping
-    @Operation(summary = "Publica uma aula")
-    public ResponseEntity<AulaResponse> criar(@Valid @RequestBody AulaRequest request) {
-        AulaResponse response = aulaService.pubAula(request);
+    @Operation(summary = "Cadastra um autor")
+    public ResponseEntity<AutorResponse> criar(@Valid @RequestBody AutorRequest request) {
+        AutorResponse response = autorService.pubAutor(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 
     @GetMapping
-    @Operation(summary = "Lista as aulas (use moduloId para filtrar por módulo, em ordem)")
-    public ResponseEntity<List<AulaResponse>> listar(@RequestParam(required = false) Long moduloId) {
-        List<AulaResponse> aulas = (moduloId != null)
-                ? aulaService.mostrarAulasDoModulo(moduloId)
-                : aulaService.mostrarAulas();
-        return ResponseEntity.ok(aulas);
+    @Operation(summary = "Lista os autores")
+    public ResponseEntity<List<AutorResponse>> listar() {
+        return ResponseEntity.ok(autorService.mostrarAutores());
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Busca uma aula pelo id")
-    public ResponseEntity<AulaResponse> buscar(@PathVariable Long id) {
-        return ResponseEntity.ok(aulaService.buscarPorId(id));
+    @Operation(summary = "Busca um autor pelo id")
+    public ResponseEntity<AutorResponse> buscar(@PathVariable Long id) {
+        return ResponseEntity.ok(autorService.buscarPorId(id));
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Atualiza uma aula")
-    public ResponseEntity<AulaResponse> atualizar(@PathVariable Long id,
-                                                  @Valid @RequestBody AulaRequest request) {
-        return ResponseEntity.ok(aulaService.mudarAula(id, request));
+    @Operation(summary = "Atualiza um autor")
+    public ResponseEntity<AutorResponse> atualizar(@PathVariable Long id,
+                                                   @Valid @RequestBody AutorRequest request) {
+        return ResponseEntity.ok(autorService.mudarAutor(id, request));
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Remove uma aula")
+    @Operation(summary = "Remove um autor")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        aulaService.deletarId(id);
+        autorService.deletarId(id);
         return ResponseEntity.noContent().build();
     }
 }
