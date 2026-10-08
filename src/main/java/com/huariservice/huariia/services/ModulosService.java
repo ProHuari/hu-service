@@ -4,63 +4,84 @@ import com.huariservice.huariia.DTOs.ModuloRequest;
 import com.huariservice.huariia.DTOs.ModuloResponse;
 import com.huariservice.huariia.entities.Curso;
 import com.huariservice.huariia.entities.Modulo;
+import com.huariservice.huariia.exceptions.ConflitoException;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
-import com.huariservice.huariia.repositories.CursosRepository;
+import com.huariservice.huariia.repositories.CursoRepository;
 import com.huariservice.huariia.repositories.ModuloRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-public class ModulosService {
+@Transactional
+public class ModuloService {
+
     private final ModuloRepository moduloRepository;
-    private final CursosRepository cursosRepository;
+    private final CursoRepository cursoRepository;
 
-
-    public ModulosService(ModuloRepository moduloRepository, CursosRepository cursosRepository) {
+    public ModuloService(ModuloRepository moduloRepository, CursoRepository cursoRepository) {
         this.moduloRepository = moduloRepository;
-        this.cursosRepository = cursosRepository;
+        this.cursoRepository = cursoRepository;
     }
+
     public ModuloResponse pubModulo(ModuloRequest request) {
+        if (moduloRepository.existsByCursoIdAndOrdem(request.cursoId(), request.ordem())) {
+            throw new ConflitoException("Já existe um módulo com essa ordem no curso");
+        }
+
         Modulo modulo = new Modulo();
-        modulo.setTitulo(request.getTitulo());
-        modulo.setDescricao(request.getDescricao());
-        modulo.setOrdem(request.getOrdem());
+        preencher(modulo, request);
 
-        Curso curso = cursosRepository.findById(request.getCursos().getId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
-        modulo.setCursos(curso);
-
-        Modulo salvo = moduloRepository.save(modulo);
-        return new ModuloResponse(salvo.getId(), salvo.getTitulo(), salvo.getDescricao(), salvo.getOrdem(), salvo.getCursos());
+        return ModuloResponse.from(moduloRepository.save(modulo));
     }
+
+    @Transactional(readOnly = true)
     public List<ModuloResponse> mostrarModulos() {
-        return moduloRepository.findAll().stream().map(modulo -> new ModuloResponse(
-                modulo.getId(),
-                modulo.getTitulo(),
-                modulo.getDescricao(),
-                modulo.getOrdem(),
-                modulo.getCursos()
-        )).toList();
+        return moduloRepository.findAll().stream().map(ModuloResponse::from).toList();
     }
-    public ModuloResponse mudarModulo(Long id, ModuloRequest moduloAlterado) {
-        Modulo modulo = moduloRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse módulo não foi cadastrado"));
 
-        modulo.setTitulo(moduloAlterado.getTitulo());
-        modulo.setDescricao(moduloAlterado.getDescricao());
-        modulo.setOrdem(moduloAlterado.getOrdem());
-
-        Curso curso = cursosRepository.findById(moduloAlterado.getCursos().getId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
-        modulo.setCursos(curso);
-
-        Modulo atualizado = moduloRepository.save(modulo);
-        return new ModuloResponse(atualizado.getId(), atualizado.getTitulo(), atualizado.getDescricao(), atualizado.getOrdem(), atualizado.getCursos());
+    @Transactional(readOnly = true)
+    public List<ModuloResponse> mostrarModulosDoCurso(Long cursoId) {
+        return moduloRepository.findByCursoIdOrderByOrdemAsc(cursoId).stream()
+                .map(ModuloResponse::from).toList();
     }
+
+    @Transactional(readOnly = true)
+    public ModuloResponse buscarPorId(Long id) {
+        return ModuloResponse.from(buscarModulo(id));
+    }
+
+    public ModuloResponse mudarModulo(Long id, ModuloRequest request) {
+        Modulo modulo = buscarModulo(id);
+
+        boolean mudouPosicao = !modulo.getCurso().getId().equals(request.cursoId())
+                || !modulo.getOrdem().equals(request.ordem());
+        if (mudouPosicao && moduloRepository.existsByCursoIdAndOrdem(request.cursoId(), request.ordem())) {
+            throw new ConflitoException("Já existe um módulo com essa ordem no curso");
+        }
+
+        preencher(modulo, request);
+
+        return ModuloResponse.from(moduloRepository.save(modulo));
+    }
+
     public void deletarId(Long id) {
-        Modulo modulo = moduloRepository.findById(id)
+        moduloRepository.delete(buscarModulo(id));
+    }
+
+    private void preencher(Modulo modulo, ModuloRequest request) {
+        Curso curso = cursoRepository.findById(request.cursoId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
+
+        modulo.setTitulo(request.titulo());
+        modulo.setDescricao(request.descricao());
+        modulo.setOrdem(request.ordem());
+        modulo.setCurso(curso);
+    }
+
+    private Modulo buscarModulo(Long id) {
+        return moduloRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse módulo não foi cadastrado"));
-        moduloRepository.delete(modulo);
     }
 }

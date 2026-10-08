@@ -4,7 +4,7 @@ import com.huariservice.huariia.DTOs.CategoriaRequest;
 import com.huariservice.huariia.DTOs.CategoriaResponse;
 import com.huariservice.huariia.entities.Categoria;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
-import com.huariservice.huariia.repositories.CategoriasRepository;
+import com.huariservice.huariia.repositories.CategoriaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,10 +12,10 @@ import java.util.List;
 @Service
 public class CategoriasService {
 
-    private final CategoriasRepository categoriasRepository;
+    private final CategoriaRepository categoriaRepository;
 
-    public CategoriasService(CategoriasRepository categoriasRepository) {
-        this.categoriasRepository = categoriasRepository;
+    public CategoriasService(CategoriaRepository categoriaRepository) {
+        this.categoriaRepository = categoriaRepository;
     }
 
     public CategoriaResponse pubCategoria(CategoriaRequest request) {
@@ -23,34 +23,34 @@ public class CategoriasService {
         categoria.setNome(request.nome());
         categoria.setDescricao(request.descricao());
 
-        Categoria salva = categoriasRepository.save(categoria);
+        Categoria salva = categoriaRepository.save(categoria);
         return new CategoriaResponse(salva.getId(), salva.getNome(), salva.getDescricao());
     }
     public List<CategoriaResponse> mostrarCategorias() {
-        return categoriasRepository.findAll().stream().map(categoria -> new CategoriaResponse(
+        return categoriaRepository.findAll().stream().map(categoria -> new CategoriaResponse(
                 categoria.getId(),
                 categoria.getNome(),
                 categoria.getDescricao()
         )).toList();
     }
     public CategoriaResponse mudarCategoria(Long id, CategoriaRequest categoriaAlterada) {
-        Categoria categoria = categoriasRepository.findById(id)
+        Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
 
         categoria.setNome(categoriaAlterada.nome());
         categoria.setDescricao(categoriaAlterada.descricao());
 
-        Categoria atualizada = categoriasRepository.save(categoria);
+        Categoria atualizada = categoriaRepository.save(categoria);
         return new CategoriaResponse(atualizada.getId(), atualizada.getNome(), atualizada.getDescricao());
     }
 
     public void deletarId(Long id) {
-        Categoria categoria = categoriasRepository.findById(id)
+        Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
-        categoriasRepository.delete(categoria);
+        categoriaRepository.delete(categoria);
     }
     public CategoriaResponse buscarPorId(Long id) {
-        Categoria categoria = categoriasRepository.findById(id)
+        Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa categoria não foi cadastrada"));
         return new CategoriaResponse(categoria.getId(), categoria.getNome(), categoria.getDescricao());
     }
