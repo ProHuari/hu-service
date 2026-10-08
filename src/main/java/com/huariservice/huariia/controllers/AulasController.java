@@ -1,6 +1,6 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.AulasRequest;
+import com.huariservice.huariia.DTOs.AulaRequest;
 import com.huariservice.huariia.DTOs.AulaResponse;
 import com.huariservice.huariia.services.AulasService;
 import jakarta.validation.Valid;
@@ -20,7 +20,7 @@ public class AulasController {
     }
 
     @PostMapping
-    public ResponseEntity<AulaResponse> publicarAula(@Valid @RequestBody AulasRequest request) {
+    public ResponseEntity<AulaResponse> publicarAula(@Valid @RequestBody AulaRequest request) {
         AulaResponse aula = aulasService.pubAula(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(aula);
     }
@@ -32,7 +32,7 @@ public class AulasController {
         return ResponseEntity.ok(aulas);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<AulaResponse> mudarAula(@PathVariable Long id, @Valid @RequestBody AulasRequest aulaAlterada) {
+    public ResponseEntity<AulaResponse> mudarAula(@PathVariable Long id, @Valid @RequestBody AulaRequest aulaAlterada) {
         AulaResponse aula = aulasService.mudarAula(id, aulaAlterada);
         return ResponseEntity.ok(aula);
     }

@@ -1,17 +1,13 @@
 package com.huariservice.huariia.DTOs;
 
-import com.huariservice.huariia.entities.Modulo;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.URL;
 
 
-public record AulasRequest(
+public record AulaRequest(
 @NotBlank(message = "O título é obrigatório")
 @Size(max = 155)
 String titulo,
