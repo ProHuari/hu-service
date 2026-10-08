@@ -8,7 +8,7 @@ import com.huariservice.huariia.entities.Curso;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.AutorRepository;
 import com.huariservice.huariia.repositories.CategoriasRepository;
-import com.huariservice.huariia.repositories.CursosRepository;
+import com.huariservice.huariia.repositories.CursoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,12 +16,12 @@ import java.util.List;
 @Service
 public class CursosService {
 
-    private final CursosRepository cursosRepository;
+    private final CursoRepository cursoRepository;
     private final AutorRepository autorRepository;
     private final CategoriasRepository categoriasRepository;
 
-    public CursosService(CursosRepository cursosRepository, AutorRepository autorRepository, CategoriasRepository categoriasRepository) {
-        this.cursosRepository = cursosRepository;
+    public CursosService(CursoRepository cursoRepository, AutorRepository autorRepository, CategoriasRepository categoriasRepository) {
+        this.cursoRepository = cursoRepository;
         this.autorRepository = autorRepository;
         this.categoriasRepository = categoriasRepository;
     }
@@ -40,12 +40,12 @@ public class CursosService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
         curso.setAutores(autor);
 
-        Curso salvo = cursosRepository.save(curso);
+        Curso salvo = cursoRepository.save(curso);
         return new CursoResponse(salvo.getId(), salvo.getTitulos(), salvo.getDescricao(), salvo.getUrlVideo(), salvo.getCategoria(), salvo.getAutores());
     }
 
     public List<CursoResponse> mostrarCursos() {
-        return cursosRepository.findAll().stream().map(curso -> new CursoResponse(
+        return cursoRepository.findAll().stream().map(curso -> new CursoResponse(
                 curso.getId(),
                 curso.getTitulos(),
                 curso.getDescricao(),
@@ -57,7 +57,7 @@ public class CursosService {
 
 
     public CursoResponse mudarCurso(Long id, CursoRequest cursoAlterado) {
-        Curso curso = cursosRepository.findById(id)
+        Curso curso = cursoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
 
         curso.setTitulos(cursoAlterado.getTitulos());
@@ -72,13 +72,13 @@ public class CursosService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse autor não foi cadastrado"));
         curso.setAutores(autor);
 
-        Curso atualizado = cursosRepository.save(curso);
+        Curso atualizado = cursoRepository.save(curso);
         return new CursoResponse(atualizado.getId(), atualizado.getTitulos(), atualizado.getDescricao(), atualizado.getUrlVideo(), atualizado.getCategoria(), atualizado.getAutores());
     }
 
     public void deletarId(Long id) {
-        Curso curso = cursosRepository.findById(id)
+        Curso curso = cursoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
-        cursosRepository.delete(curso);
+        cursoRepository.delete(curso);
     }
 }
