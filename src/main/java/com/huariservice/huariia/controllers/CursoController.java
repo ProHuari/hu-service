@@ -12,10 +12,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/Cursos")
-public class CursosController {
+public class CursoController {
     private final CursoService cursoService;
 
-    public CursosController(CursoService cursoService) {
+    public CursoController(CursoService cursoService) {
         this.cursoService = cursoService;
     }
     @PostMapping
