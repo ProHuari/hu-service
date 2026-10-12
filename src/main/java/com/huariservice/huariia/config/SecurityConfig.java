@@ -34,13 +34,23 @@ public class SecurityConfig {
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .authorizeHttpRequests(auth -> auth
+                        // públicas
                         .requestMatchers("/auth/login", "/error").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/usuarios").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/usuarios/**").hasRole("ADMIN")
+
+                        // usuários: só ADMIN (cadastro público acima é a exceção)
+                        .requestMatchers("/usuarios", "/usuarios/**").hasRole("ADMIN")
+
+                        // conteúdo: qualquer logado lê, só ADMIN escreve
                         .requestMatchers(HttpMethod.GET, CONTEUDO).authenticated()
                         .requestMatchers(CONTEUDO).hasRole("ADMIN")
+
+                        // matrículas: alterar status e apagar só ADMIN
+                        .requestMatchers(HttpMethod.PATCH, "/matriculas/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/matriculas/**").hasRole("ADMIN")
+
+                        // o resto (matrícula, progresso, histórico): qualquer logado
                         .anyRequest().authenticated())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
 
