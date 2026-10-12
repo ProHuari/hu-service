@@ -1,4 +1,4 @@
 package com.huariservice.huariia.security;
 
-public class DadosToken {
+public record DadosToken(Long usuarioId, String email, String perfil) {
 }
