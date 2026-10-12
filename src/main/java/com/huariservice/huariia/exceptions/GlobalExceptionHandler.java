@@ -12,6 +12,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 
@@ -115,5 +116,15 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<ErroResponse> resposta(HttpStatus status, String erro, String mensagem) {
         return ResponseEntity.status(status).body(new ErroResponse(status.value(), erro, mensagem));
+    }
+    // 401: e-mail ou senha incorretos no login
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    public ResponseEntity<ErroResponse> tratarCredenciaisInvalidas(CredenciaisInvalidasException ex) {
+        return resposta(HttpStatus.UNAUTHORIZED, "Não autorizado", ex.getMessage());
+    }
+    // 404: rota inexistente (sem este handler cairia no handler genérico e viraria 500)
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErroResponse> tratarRotaInexistente(NoResourceFoundException ex) {
+        return resposta(HttpStatus.NOT_FOUND, "Recurso não encontrado", "A rota solicitada não existe.");
     }
 }
