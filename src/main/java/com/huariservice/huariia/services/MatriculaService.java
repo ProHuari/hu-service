@@ -32,9 +32,9 @@ public class MatriculaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    // Data e status inicial (ATIVA) são definidos pela entidade.
-    public MatriculaResponse pubMatricula(MatriculaRequest request) {
-        Usuario usuario = usuarioRepository.findById(request.usuarioId())
+    // O usuarioId vem do token, nunca do corpo da requisição.
+    public MatriculaResponse pubMatricula(Long usuarioId, MatriculaRequest request) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
         Curso curso = cursoRepository.findById(request.cursoId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse curso não foi publicado"));
@@ -62,8 +62,14 @@ public class MatriculaService {
     }
 
     @Transactional(readOnly = true)
-    public MatriculaResponse buscarPorId(Long id) {
-        return MatriculaResponse.from(buscarMatricula(id));
+    public MatriculaResponse buscarPorId(Long id, Long usuarioId, boolean admin) {
+        Matricula matricula = buscarMatricula(id);
+
+        // Aluno só enxerga as próprias. Devolve 404 (e não 403) para não revelar que o id existe.
+        if (!admin && !matricula.getUsuario().getId().equals(usuarioId)) {
+            throw new RecursoNaoEncontradoException("Essa matrícula não foi realizada");
+        }
+        return MatriculaResponse.from(matricula);
     }
 
     // Substitui o antigo mudarMatricula: usuário e curso não mudam depois de matriculado.

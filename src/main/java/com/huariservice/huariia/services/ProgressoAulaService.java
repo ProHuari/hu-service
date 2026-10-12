@@ -38,8 +38,9 @@ public class ProgressoAulaService {
         this.matriculaRepository = matriculaRepository;
     }
 
-    public ProgressoAulaResponse pubProgressoAula(ProgressoAulaRequest request) {
-        Usuario usuario = usuarioRepository.findById(request.usuarioId())
+    // O usuarioId vem do token, nunca do corpo da requisição.
+    public ProgressoAulaResponse pubProgressoAula(Long usuarioId, ProgressoAulaRequest request) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
         Aula aula = aulaRepository.findById(request.aulaId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Essa aula não foi publicada"));
@@ -72,20 +73,21 @@ public class ProgressoAulaService {
     }
 
     @Transactional(readOnly = true)
-    public ProgressoAulaResponse buscarPorId(Long id) {
-        return ProgressoAulaResponse.from(buscarProgresso(id));
+    public ProgressoAulaResponse buscarPorId(Long id, Long usuarioId, boolean admin) {
+        return ProgressoAulaResponse.from(buscarProgresso(id, usuarioId, admin));
     }
 
     // Só o status muda; usuário e aula do registro não podem ser trocados.
-    public ProgressoAulaResponse mudarProgressoAula(Long id, ProgressoAulaRequest request) {
-        ProgressoAula progresso = buscarProgresso(id);
+    public ProgressoAulaResponse mudarProgressoAula(Long id, ProgressoAulaRequest request,
+                                                    Long usuarioId, boolean admin) {
+        ProgressoAula progresso = buscarProgresso(id, usuarioId, admin);
         aplicarStatus(progresso, request.statusAula());
 
         return ProgressoAulaResponse.from(progressoAulaRepository.save(progresso));
     }
 
-    public void deletarId(Long id) {
-        progressoAulaRepository.delete(buscarProgresso(id));
+    public void deletarId(Long id, Long usuarioId, boolean admin) {
+        progressoAulaRepository.delete(buscarProgresso(id, usuarioId, admin));
     }
 
     // dataConclusao só existe quando a aula está CONCLUIDA.
@@ -100,8 +102,14 @@ public class ProgressoAulaService {
         }
     }
 
-    private ProgressoAula buscarProgresso(Long id) {
-        return progressoAulaRepository.findById(id)
+    // Aluno só acessa os próprios registros. Devolve 404 (e não 403) para não revelar que o id existe.
+    private ProgressoAula buscarProgresso(Long id, Long usuarioId, boolean admin) {
+        ProgressoAula progresso = progressoAulaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse progresso de aula não foi registrado"));
+
+        if (!admin && !progresso.getUsuario().getId().equals(usuarioId)) {
+            throw new RecursoNaoEncontradoException("Esse progresso de aula não foi registrado");
+        }
+        return progresso;
     }
 }
