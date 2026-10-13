@@ -46,6 +46,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, CONTEUDO).authenticated()
                         .requestMatchers(CONTEUDO).hasRole("ADMIN")
 
+                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
+
+                        // perfil do próprio usuário: qualquer usuário logado
+                        .requestMatchers("/usuarios/me", "/usuarios/me/**").authenticated()
+
+                        // usuários: só ADMIN (cadastro público acima é a exceção)
+                        .requestMatchers("/usuarios", "/usuarios/**").hasRole("ADMIN")
+
                         // matrículas: alterar status e apagar só ADMIN
                         .requestMatchers(HttpMethod.PATCH, "/matriculas/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/matriculas/**").hasRole("ADMIN")
