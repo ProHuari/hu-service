@@ -39,20 +39,15 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
 
+                        // perfil do próprio usuário: qualquer usuário logado
+                        .requestMatchers("/usuarios/me", "/usuarios/me/**").authenticated()
+
                         // usuários: só ADMIN (cadastro público acima é a exceção)
                         .requestMatchers("/usuarios", "/usuarios/**").hasRole("ADMIN")
 
                         // conteúdo: qualquer logado lê, só ADMIN escreve
                         .requestMatchers(HttpMethod.GET, CONTEUDO).authenticated()
                         .requestMatchers(CONTEUDO).hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
-
-                        // perfil do próprio usuário: qualquer usuário logado
-                        .requestMatchers("/usuarios/me", "/usuarios/me/**").authenticated()
-
-                        // usuários: só ADMIN (cadastro público acima é a exceção)
-                        .requestMatchers("/usuarios", "/usuarios/**").hasRole("ADMIN")
 
                         // matrículas: alterar status e apagar só ADMIN
                         .requestMatchers(HttpMethod.PATCH, "/matriculas/**").hasRole("ADMIN")
