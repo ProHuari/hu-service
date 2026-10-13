@@ -9,7 +9,7 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "historicoIA")
+@Table(name = "historico_ia")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
