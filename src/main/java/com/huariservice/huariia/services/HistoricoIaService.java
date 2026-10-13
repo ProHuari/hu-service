@@ -26,8 +26,9 @@ public class HistoricoIaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public HistoricoIaResponse pubHistoricoIa(HistoricoIaRequest request) {
-        Usuario usuario = usuarioRepository.findById(request.usuarioId())
+    // O usuarioId vem do token, nunca do corpo da requisição.
+    public HistoricoIaResponse pubHistoricoIa(Long usuarioId, HistoricoIaRequest request) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
 
         HistoricoIa historico = new HistoricoIa();
@@ -50,16 +51,22 @@ public class HistoricoIaService {
     }
 
     @Transactional(readOnly = true)
-    public HistoricoIaResponse buscarPorId(Long id) {
-        return HistoricoIaResponse.from(buscarHistorico(id));
+    public HistoricoIaResponse buscarPorId(Long id, Long usuarioId, boolean admin) {
+        return HistoricoIaResponse.from(buscarHistorico(id, usuarioId, admin));
     }
 
-    public void deletarId(Long id) {
-        historicoIaRepository.delete(buscarHistorico(id));
+    public void deletarId(Long id, Long usuarioId, boolean admin) {
+        historicoIaRepository.delete(buscarHistorico(id, usuarioId, admin));
     }
 
-    private HistoricoIa buscarHistorico(Long id) {
-        return historicoIaRepository.findById(id)
+    // Aluno só acessa o próprio histórico. Devolve 404 (e não 403) para não revelar que o id existe.
+    private HistoricoIa buscarHistorico(Long id, Long usuarioId, boolean admin) {
+        HistoricoIa historico = historicoIaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Esse histórico não foi registrado"));
+
+        if (!admin && !historico.getUsuario().getId().equals(usuarioId)) {
+            throw new RecursoNaoEncontradoException("Esse histórico não foi registrado");
+        }
+        return historico;
     }
 }

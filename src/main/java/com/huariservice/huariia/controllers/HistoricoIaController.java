@@ -2,11 +2,14 @@ package com.huariservice.huariia.controllers;
 
 import com.huariservice.huariia.DTOs.HistoricoIaRequest;
 import com.huariservice.huariia.DTOs.HistoricoIaResponse;
+import com.huariservice.huariia.security.DadosToken;
 import com.huariservice.huariia.services.HistoricoIaService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -26,33 +29,47 @@ public class HistoricoIaController {
     }
 
     @PostMapping
-    @Operation(summary = "Registra uma consulta à IA")
-    public ResponseEntity<HistoricoIaResponse> criar(@Valid @RequestBody HistoricoIaRequest request) {
-        HistoricoIaResponse response = historicoIaService.pubHistoricoIa(request);
+    @Operation(summary = "Registra uma consulta à IA no histórico do usuário logado (temporário)")
+    public ResponseEntity<HistoricoIaResponse> criar(
+            @Valid @RequestBody HistoricoIaRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal DadosToken usuarioLogado) {
+        HistoricoIaResponse response = historicoIaService.pubHistoricoIa(usuarioLogado.usuarioId(), request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 
     @GetMapping
-    @Operation(summary = "Lista o histórico (use usuarioId para filtrar, mais recentes primeiro)")
-    public ResponseEntity<List<HistoricoIaResponse>> listar(@RequestParam(required = false) Long usuarioId) {
-        List<HistoricoIaResponse> historico = (usuarioId != null)
-                ? historicoIaService.mostrarHistoricoDoUsuario(usuarioId)
-                : historicoIaService.mostrarHistoricoIa();
+    @Operation(summary = "Aluno vê o próprio histórico; admin vê todos (filtro opcional usuarioId)")
+    public ResponseEntity<List<HistoricoIaResponse>> listar(
+            @RequestParam(required = false) Long usuarioId,
+            @Parameter(hidden = true) @AuthenticationPrincipal DadosToken usuarioLogado) {
+        List<HistoricoIaResponse> historico;
+        if (!usuarioLogado.isAdmin()) {
+            historico = historicoIaService.mostrarHistoricoDoUsuario(usuarioLogado.usuarioId());
+        } else if (usuarioId != null) {
+            historico = historicoIaService.mostrarHistoricoDoUsuario(usuarioId);
+        } else {
+            historico = historicoIaService.mostrarHistoricoIa();
+        }
         return ResponseEntity.ok(historico);
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Busca um registro do histórico pelo id")
-    public ResponseEntity<HistoricoIaResponse> buscar(@PathVariable Long id) {
-        return ResponseEntity.ok(historicoIaService.buscarPorId(id));
+    @Operation(summary = "Busca um registro do histórico pelo id (aluno só acessa o próprio)")
+    public ResponseEntity<HistoricoIaResponse> buscar(
+            @PathVariable Long id,
+            @Parameter(hidden = true) @AuthenticationPrincipal DadosToken usuarioLogado) {
+        return ResponseEntity.ok(
+                historicoIaService.buscarPorId(id, usuarioLogado.usuarioId(), usuarioLogado.isAdmin()));
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Remove um registro do histórico")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        historicoIaService.deletarId(id);
+    @Operation(summary = "Remove um registro do histórico (aluno só remove o próprio)")
+    public ResponseEntity<Void> deletar(
+            @PathVariable Long id,
+            @Parameter(hidden = true) @AuthenticationPrincipal DadosToken usuarioLogado) {
+        historicoIaService.deletarId(id, usuarioLogado.usuarioId(), usuarioLogado.isAdmin());
         return ResponseEntity.noContent().build();
     }
 }
