@@ -9,7 +9,7 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "aulas", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"titulos", "modulo_id"})
+        @UniqueConstraint(columnNames = {"modulo_id", "ordem"})
 })
 @Data
 @AllArgsConstructor
