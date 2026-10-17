@@ -27,17 +27,25 @@ public class HistoricoIaService {
     }
 
     // O usuarioId vem do token, nunca do corpo da requisição.
-    public HistoricoIaResponse pubHistoricoIa(Long usuarioId, HistoricoIaRequest request) {
+
+    public HistoricoIaResponse registrarHistorico(
+            Long usuarioId,
+            String pergunta,
+            String resposta) {
+
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Esse usuário não foi cadastrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Esse usuário não foi cadastrado"));
 
         HistoricoIa historico = new HistoricoIa();
-        historico.setPergunta(request.pergunta());
-        historico.setResposta(request.resposta());
+        historico.setPergunta(pergunta);
+        historico.setResposta(resposta);
         historico.setUsuario(usuario);
 
-        return HistoricoIaResponse.from(historicoIaRepository.save(historico));
+        return HistoricoIaResponse.from(
+                historicoIaRepository.save(historico));
     }
+
 
     @Transactional(readOnly = true)
     public List<HistoricoIaResponse> mostrarHistoricoIa() {
