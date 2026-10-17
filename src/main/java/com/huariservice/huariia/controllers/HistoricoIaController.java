@@ -28,16 +28,16 @@ public class HistoricoIaController {
         this.historicoIaService = historicoIaService;
     }
 
+
     @PostMapping
-    @Operation(summary = "Registra uma consulta à IA no histórico do usuário logado (temporário)")
-    public ResponseEntity<HistoricoIaResponse> criar(
+    @Operation(summary = "Registra uma consulta à IA no histórico do usuário logado")
+    public ResponseEntity<Void> criar(
             @Valid @RequestBody HistoricoIaRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal DadosToken usuarioLogado) {
-        HistoricoIaResponse response = historicoIaService.pubHistoricoIa(usuarioLogado.usuarioId(), request);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(response.id()).toUri();
-        return ResponseEntity.created(location).body(response);
+
+        return ResponseEntity.status(501).build();
     }
+
 
     @GetMapping
     @Operation(summary = "Aluno vê o próprio histórico; admin vê todos (filtro opcional usuarioId)")
