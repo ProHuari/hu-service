@@ -12,6 +12,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
@@ -105,6 +106,25 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErroResponse> tratarMetodoNaoSuportado(HttpRequestMethodNotSupportedException ex) {
         return resposta(HttpStatus.METHOD_NOT_ALLOWED, "Método não permitido", ex.getMessage());
     }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErroResponse> tratarStatusException(
+            ResponseStatusException ex) {
+
+        int status = ex.getStatusCode().value();
+
+        String mensagem = ex.getReason() == null
+                ? "A operação não pode ser concluída."
+                : ex.getReason();
+
+        String erro = ex.getStatusCode().is5xxServerError()
+                ? "Serviço indisponível"
+                : "Requisição inválida";
+
+        return ResponseEntity.status(status)
+                .body(new ErroResponse(status, erro, mensagem));
+    }
+
 
     // 500: rede de segurança. SEMPRE loga o stack trace, senão o erro real some.
     @ExceptionHandler(Exception.class)

@@ -3,6 +3,7 @@ package com.huariservice.huariia.controllers;
 import com.huariservice.huariia.DTOs.HistoricoIaRequest;
 import com.huariservice.huariia.DTOs.HistoricoIaResponse;
 import com.huariservice.huariia.security.DadosToken;
+import com.huariservice.huariia.services.ConsultaIaService;
 import com.huariservice.huariia.services.HistoricoIaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,20 +24,38 @@ import java.util.List;
 public class HistoricoIaController {
 
     private final HistoricoIaService historicoIaService;
+    private final ConsultaIaService consultaIaService;
 
-    public HistoricoIaController(HistoricoIaService historicoIaService) {
+    public HistoricoIaController(
+            HistoricoIaService historicoIaService,
+            ConsultaIaService consultaIaService) {
         this.historicoIaService = historicoIaService;
+        this.consultaIaService = consultaIaService;
     }
+
 
 
     @PostMapping
-    @Operation(summary = "Registra uma consulta à IA no histórico do usuário logado")
-    public ResponseEntity<Void> criar(
+    @Operation(summary = "Envia pergunta à IA e salva no histórico")
+    public ResponseEntity<HistoricoIaResponse> criar(
             @Valid @RequestBody HistoricoIaRequest request,
-            @Parameter(hidden = true) @AuthenticationPrincipal DadosToken usuarioLogado) {
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal DadosToken usuarioLogado) {
 
-        return ResponseEntity.status(501).build();
+        HistoricoIaResponse response = consultaIaService.consultar(
+                usuarioLogado.usuarioId(),
+                request.pergunta()
+        );
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.id())
+                .toUri();
+
+        return ResponseEntity.created(location).body(response);
     }
+
 
 
     @GetMapping
