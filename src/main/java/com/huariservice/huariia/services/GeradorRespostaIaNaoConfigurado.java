@@ -1,19 +1,17 @@
-
 package com.huariservice.huariia.services;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 @Component
-public class GeradorRespostaIaNaoConfigurado
-        implements GeradorRespostaIa {
+@ConditionalOnProperty(name = "app.ia.enabled", havingValue = "false", matchIfMissing = true)
+public class GeradorRespostaIaNaoConfigurado implements GeradorRespostaIa {
 
     @Override
     public String gerarResposta(String pergunta) {
-        throw new ResponseStatusException(
-                HttpStatus.SERVICE_UNAVAILABLE,
-                "A integração com a IA ainda não foi configurada."
+        throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE,
+                "O serviço de IA não está habilitado no ambiente."
         );
     }
 }
