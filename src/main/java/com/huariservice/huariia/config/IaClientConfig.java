@@ -32,8 +32,6 @@ public class IaClientConfig {
         return RestClient.builder()
                 .baseUrl(baseUrl)
                 .requestFactory(factory)
-                .defaultHeader("x-api-key", apiKey)
-                .defaultHeader("anthropic-version", "2023-06-01")
                 .defaultHeader("content-type", "application/json")
                 .build();
     }
