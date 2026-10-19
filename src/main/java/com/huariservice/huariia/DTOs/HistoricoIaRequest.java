@@ -1,10 +1,10 @@
 package com.huariservice.huariia.DTOs;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-// TEMPORÁRIO: quando a IA for integrada, a resposta vem do service, não do cliente.
-// O usuário vem do token (login), não do corpo
 public record HistoricoIaRequest(
-        @NotBlank(message = "A pergunta é obrigatória")
+        @NotBlank(message = "A pergunta é obrigatória.")
+        @Size(max = 2000, message = "A pergunta deve ter no máximo 2000 caracteres.")
         String pergunta
 ) {}
