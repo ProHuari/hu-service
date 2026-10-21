@@ -40,6 +40,7 @@ public class Aula {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "modulo_id", nullable = false)
+    @ToString.Exclude
     private Modulo modulo;
 
     @Override
