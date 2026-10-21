@@ -33,6 +33,7 @@ public class Modulo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "curso_id", nullable = false)
+    @ToString.Exclude
     private Curso curso;
 
     @Override
