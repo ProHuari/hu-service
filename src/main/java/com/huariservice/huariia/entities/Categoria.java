@@ -17,7 +17,7 @@ public class Categoria {
     @ToString.Include
     private Long id;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100, nullable = false, unique = true)
     @ToString.Include
     private String nome;
 
