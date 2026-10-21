@@ -3,6 +3,7 @@ package com.huariservice.huariia.services;
 import com.huariservice.huariia.DTOs.CategoriaRequest;
 import com.huariservice.huariia.DTOs.CategoriaResponse;
 import com.huariservice.huariia.entities.Categoria;
+import com.huariservice.huariia.exceptions.ConflitoException;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.CategoriaRepository;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,10 @@ public class CategoriaService {
     }
 
     public CategoriaResponse pubCategoria(CategoriaRequest request) {
+        if (categoriaRepository.existsByNome(request.nome())) {
+            throw new ConflitoException("Já existe uma categoria com esse nome");
+        }
+
         Categoria categoria = new Categoria();
         categoria.setNome(request.nome());
         categoria.setDescricao(request.descricao());
@@ -40,6 +45,12 @@ public class CategoriaService {
 
     public CategoriaResponse mudarCategoria(Long id, CategoriaRequest request) {
         Categoria categoria = buscarCategoria(id);
+
+        if (!categoria.getNome().equals(request.nome())
+                && categoriaRepository.existsByNome(request.nome())) {
+            throw new ConflitoException("Já existe uma categoria com esse nome");
+        }
+
         categoria.setNome(request.nome());
         categoria.setDescricao(request.descricao());
 
