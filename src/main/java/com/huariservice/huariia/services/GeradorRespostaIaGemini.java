@@ -26,14 +26,11 @@ public class GeradorRespostaIaGemini implements GeradorRespostaIa {
 
     private final RestClient client;
     private final String modelo;
-    private final String apiKey;
 
     public GeradorRespostaIaGemini(RestClient iaRestClient,
-                                   @Value("${app.ia.model:gemini-1.5-flash}") String modelo,
-                                   @Value("${app.ia.api-key}") String apiKey) {
+                                   @Value("${app.ia.model:gemini-1.5-flash}") String modelo) {
         this.client = iaRestClient;
         this.modelo = modelo;
-        this.apiKey = apiKey;
     }
 
     @Override
@@ -45,7 +42,7 @@ public class GeradorRespostaIaGemini implements GeradorRespostaIa {
             );
 
             Resposta resposta = client.post()
-                    .uri("/v1beta/models/{modelo}:generateContent?key={key}", modelo, apiKey)
+                    .uri("/v1beta/models/{modelo}:generateContent", modelo)
                     .body(req)
                     .retrieve()
                     .body(Resposta.class);
