@@ -36,7 +36,7 @@ public class AdminInicializador implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        if (email.isBlank() || senha.isBlank()) {
+        if (email == null || email.isBlank() || senha == null || senha.isBlank()) {
             log.info("ADMIN_EMAIL/ADMIN_SENHA não definidos: nenhum admin inicial será criado.");
             return;
         }
