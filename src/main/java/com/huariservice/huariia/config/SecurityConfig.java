@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -20,7 +19,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private static final String[] CONTEUDO = {
-            "/cursos/**", "/categorias/**", "/autores/**", "/modulos/**", "/aulas/**"
+            "/cursos", "/cursos/**",
+            "/categorias", "/categorias/**",
+            "/autores", "/autores/**",
+            "/modulos", "/modulos/**",
+            "/aulas", "/aulas/**"
     };
 
     private final AuthFilter authFilter;
@@ -32,7 +35,18 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(e -> e
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("""
+                                    {"status":401,"erro":"Não autorizado","mensagem":"Token ausente, inválido ou expirado."}""");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpStatus.FORBIDDEN.value());
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("""
+                                    {"status":403,"erro":"Acesso negado","mensagem":"Você não tem permissão para acessar este recurso."}""");
+                        }))
                 .authorizeHttpRequests(auth -> auth
                         // públicas
                         .requestMatchers("/auth/login", "/error").permitAll()
