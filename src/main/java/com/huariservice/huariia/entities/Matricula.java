@@ -12,6 +12,8 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "matriculas", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"usuario_id", "curso_id"})
+}, indexes = {
+        @Index(name = "idx_matricula_usuario", columnList = "usuario_id")
 })
 @Data
 @AllArgsConstructor
@@ -32,10 +34,12 @@ public class Matricula {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
+    @ToString.Exclude
     private Usuario usuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "curso_id", nullable = false)
+    @ToString.Exclude
     private Curso curso;
 
     @PrePersist
