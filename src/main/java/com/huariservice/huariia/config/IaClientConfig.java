@@ -32,6 +32,7 @@ public class IaClientConfig {
         return RestClient.builder()
                 .baseUrl(baseUrl)
                 .requestFactory(factory)
+                .defaultHeader("x-goog-api-key", apiKey)
                 .defaultHeader("content-type", "application/json")
                 .build();
     }
