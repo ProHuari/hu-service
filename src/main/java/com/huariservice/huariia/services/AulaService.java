@@ -8,6 +8,7 @@ import com.huariservice.huariia.exceptions.ConflitoException;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.AulaRepository;
 import com.huariservice.huariia.repositories.ModuloRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,15 +16,12 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AulaService {
 
     private final AulaRepository aulaRepository;
     private final ModuloRepository moduloRepository;
 
-    public AulaService(AulaRepository aulaRepository, ModuloRepository moduloRepository) {
-        this.aulaRepository = aulaRepository;
-        this.moduloRepository = moduloRepository;
-    }
 
     public AulaResponse pubAula(AulaRequest request) {
         if (aulaRepository.existsByUrlVideo(request.urlVideo())) {

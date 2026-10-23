@@ -11,6 +11,7 @@ import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.CursoRepository;
 import com.huariservice.huariia.repositories.MatriculaRepository;
 import com.huariservice.huariia.repositories.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,19 +19,13 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class MatriculaService {
 
     private final MatriculaRepository matriculaRepository;
     private final CursoRepository cursoRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public MatriculaService(MatriculaRepository matriculaRepository,
-                            CursoRepository cursoRepository,
-                            UsuarioRepository usuarioRepository) {
-        this.matriculaRepository = matriculaRepository;
-        this.cursoRepository = cursoRepository;
-        this.usuarioRepository = usuarioRepository;
-    }
 
     // O usuarioId vem do token, nunca do corpo da requisição.
     public MatriculaResponse pubMatricula(Long usuarioId, MatriculaRequest request) {

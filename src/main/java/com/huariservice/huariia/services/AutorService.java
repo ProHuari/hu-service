@@ -6,6 +6,7 @@ import com.huariservice.huariia.entities.Autor;
 import com.huariservice.huariia.exceptions.ConflitoException;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.AutorRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,13 +14,11 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AutorService {
 
     private final AutorRepository autorRepository;
 
-    public AutorService(AutorRepository autorRepository) {
-        this.autorRepository = autorRepository;
-    }
 
     public AutorResponse pubAutor(AutorRequest request) {
         if (autorRepository.existsByNomeCanal(request.nomeCanal())) {

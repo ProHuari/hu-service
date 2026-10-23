@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -16,13 +17,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/modulos")
 @Tag(name = "Módulos")
+@RequiredArgsConstructor
 public class ModuloController {
 
     private final ModuloService moduloService;
 
-    public ModuloController(ModuloService moduloService) {
-        this.moduloService = moduloService;
-    }
 
     @PostMapping
     @Operation(summary = "Cadastra um módulo")

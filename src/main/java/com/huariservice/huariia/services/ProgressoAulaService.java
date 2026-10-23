@@ -13,6 +13,7 @@ import com.huariservice.huariia.repositories.AulaRepository;
 import com.huariservice.huariia.repositories.MatriculaRepository;
 import com.huariservice.huariia.repositories.ProgressoAulaRepository;
 import com.huariservice.huariia.repositories.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ProgressoAulaService {
 
     private final ProgressoAulaRepository progressoAulaRepository;
@@ -28,15 +30,6 @@ public class ProgressoAulaService {
     private final UsuarioRepository usuarioRepository;
     private final MatriculaRepository matriculaRepository;
 
-    public ProgressoAulaService(ProgressoAulaRepository progressoAulaRepository,
-                                AulaRepository aulaRepository,
-                                UsuarioRepository usuarioRepository,
-                                MatriculaRepository matriculaRepository) {
-        this.progressoAulaRepository = progressoAulaRepository;
-        this.aulaRepository = aulaRepository;
-        this.usuarioRepository = usuarioRepository;
-        this.matriculaRepository = matriculaRepository;
-    }
 
     // O usuarioId vem do token, nunca do corpo da requisição.
     public ProgressoAulaResponse pubProgressoAula(Long usuarioId, ProgressoAulaRequest request) {

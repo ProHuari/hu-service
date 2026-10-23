@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -20,13 +21,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/matriculas")
 @Tag(name = "Matrículas")
+@RequiredArgsConstructor
 public class MatriculaController {
 
     private final MatriculaService matriculaService;
 
-    public MatriculaController(MatriculaService matriculaService) {
-        this.matriculaService = matriculaService;
-    }
 
     @PostMapping
     @Operation(summary = "Matricula o usuário logado em um curso")

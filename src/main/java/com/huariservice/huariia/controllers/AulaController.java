@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -16,13 +17,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/aulas")
 @Tag(name = "Aulas")
+@RequiredArgsConstructor
 public class AulaController {
 
     private final AulaService aulaService;
 
-    public AulaController(AulaService aulaService) {
-        this.aulaService = aulaService;
-    }
 
     @PostMapping
     @Operation(summary = "Publica uma aula (somente ADMIN)")

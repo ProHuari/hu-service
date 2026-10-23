@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -21,17 +22,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/historico-ia")
 @Tag(name = "Histórico de IA")
+@RequiredArgsConstructor
 public class HistoricoIaController {
 
     private final HistoricoIaService historicoIaService;
     private final ConsultaIaService consultaIaService;
 
-    public HistoricoIaController(
-            HistoricoIaService historicoIaService,
-            ConsultaIaService consultaIaService) {
-        this.historicoIaService = historicoIaService;
-        this.consultaIaService = consultaIaService;
-    }
 
 
 

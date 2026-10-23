@@ -10,6 +10,7 @@ import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.AutorRepository;
 import com.huariservice.huariia.repositories.CategoriaRepository;
 import com.huariservice.huariia.repositories.CursoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,19 +18,13 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CursoService {
 
     private final CursoRepository cursoRepository;
     private final AutorRepository autorRepository;
     private final CategoriaRepository categoriaRepository;
 
-    public CursoService(CursoRepository cursoRepository,
-                        AutorRepository autorRepository,
-                        CategoriaRepository categoriaRepository) {
-        this.cursoRepository = cursoRepository;
-        this.autorRepository = autorRepository;
-        this.categoriaRepository = categoriaRepository;
-    }
 
     public CursoResponse pubCurso(CursoRequest request) {
         if (cursoRepository.existsByTitulo(request.titulo())) {

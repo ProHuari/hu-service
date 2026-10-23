@@ -8,6 +8,7 @@ import com.huariservice.huariia.exceptions.ConflitoException;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.CursoRepository;
 import com.huariservice.huariia.repositories.ModuloRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,15 +16,12 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ModuloService {
 
     private final ModuloRepository moduloRepository;
     private final CursoRepository cursoRepository;
 
-    public ModuloService(ModuloRepository moduloRepository, CursoRepository cursoRepository) {
-        this.moduloRepository = moduloRepository;
-        this.cursoRepository = cursoRepository;
-    }
 
     public ModuloResponse pubModulo(ModuloRequest request) {
         if (moduloRepository.existsByCursoIdAndOrdem(request.cursoId(), request.ordem())) {

@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -19,13 +20,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/progresso-aulas")
 @Tag(name = "Progresso das aulas")
+@RequiredArgsConstructor
 public class ProgressoAulaController {
 
     private final ProgressoAulaService progressoAulaService;
 
-    public ProgressoAulaController(ProgressoAulaService progressoAulaService) {
-        this.progressoAulaService = progressoAulaService;
-    }
 
     @PostMapping
     @Operation(summary = "Registra o progresso do usuário logado em uma aula (exige matrícula no curso)")

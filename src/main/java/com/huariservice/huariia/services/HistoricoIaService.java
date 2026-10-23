@@ -7,6 +7,7 @@ import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.repositories.HistoricoIaRepository;
 import com.huariservice.huariia.repositories.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,16 +16,12 @@ import java.util.List;
 // O histórico é um registro: não há atualização. dataConsulta é preenchida pela entidade.
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class HistoricoIaService {
 
     private final HistoricoIaRepository historicoIaRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public HistoricoIaService(HistoricoIaRepository historicoIaRepository,
-                              UsuarioRepository usuarioRepository) {
-        this.historicoIaRepository = historicoIaRepository;
-        this.usuarioRepository = usuarioRepository;
-    }
 
     // O usuarioId vem do token, nunca do corpo da requisição.
 
