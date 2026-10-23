@@ -7,7 +7,12 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(name = "cursos")
+// Índices adicionados nas chaves estrangeiras (categoria_id e autor_id) para otimizar
+// buscas e junções frequentes de cursos por categoria ou autor.
+@Table(name = "cursos", indexes = {
+        @Index(name = "idx_curso_categoria", columnList = "categoria_id"),
+        @Index(name = "idx_curso_autor", columnList = "autor_id")
+})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

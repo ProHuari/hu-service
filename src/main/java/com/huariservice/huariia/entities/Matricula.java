@@ -13,7 +13,9 @@ import java.time.LocalDate;
 @Table(name = "matriculas", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"usuario_id", "curso_id"})
 }, indexes = {
-        @Index(name = "idx_matricula_usuario", columnList = "usuario_id")
+        // Índices para acelerar consultas por usuário ("meus cursos") e por curso ("alunos matriculados")
+        @Index(name = "idx_matricula_usuario", columnList = "usuario_id"),
+        @Index(name = "idx_matricula_curso", columnList = "curso_id")
 })
 @Data
 @AllArgsConstructor
