@@ -9,7 +9,9 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "historico_ia")
+@Table(name = "historico_ia", indexes = {
+        @Index(name = "idx_historico_ia_usuario_data", columnList = "usuario_id, data_consulta")
+})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,6 +32,7 @@ public class HistoricoIa {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
+    @ToString.Exclude
     private Usuario usuario;
 
     @PrePersist
