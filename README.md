@@ -126,9 +126,125 @@ No Windows:
 
 Os testes devem ser utilizados para verificar as regras de negócio, a validação dos dados e o comportamento dos endpoints.
 
-*Ferramenta utilizada para controle de qualidade das api: postman
+*Ferramenta utilizada para controle de qualidade das api: swagger 
 
-métodos atuais 
+### métodos atuais
+*USUARIOS*
+
+GET ``/usuarios/{id}`` — Busca um usuário pelo ID (somente ADMIN)
+
+resultado esperado:
+<code>
+{
+  "id": 0,
+  "nome": "string",
+  "email": "string",
+  "tipoPerfil": "ADMIN"
+}
+</code>
+PUT ``/usuarios/{id}`` — Atualiza um usuário e redefine a senha (somente ADMIN)
+
+resultado esperado:
+
+<code>
+{
+  "nome": "string",
+  "email": "user@example.com",
+  "senha": "string"
+}
+</code>
+DELETE ``/usuarios/{id}`` — Remove um usuário (somente ADMIN)
+
+resultado esperado:
+<code>
+code  200 OK
+</code>
+GET ``/usuarios/me`` — Mostra o perfil do usuário logado
+
+resultado esperado:
+<code>
+{
+  "id": 0,
+  "nome": "string",
+  "email": "string",
+  "tipoPerfil": "ADMIN"
+}
+</code>
+PUT ``/usuarios/me`` — Atualiza nome e e-mail do usuário logado
+
+resultado esperado:
+<code>
+{
+  "id": 0,
+  "nome": "string",
+  "email": "string",
+  "tipoPerfil": "ADMIN"
+}
+</code>
+GET ``/usuarios`` — Lista os usuários (somente ADMIN)
+
+resultado esperado:
+<code>
+[
+  {
+    "id": 0,
+    "nome": "string",
+    "email": "string",
+    "tipoPerfil": "ADMIN"
+  }
+]
+</code>
+POST ``/usuarios`` — Cadastra um usuário (perfil ALUNO)
+
+resultado esperado:
+<code>
+{
+  "id": 0,
+  "nome": "string",
+  "email": "string",
+  "tipoPerfil": "ALUNO"
+}
+</code>
+POST ``/usuarios/admin`` — Cadastra um administrador (somente ADMIN)
+
+resultado esperado:
+<code>
+{
+  "id": 0,
+  "nome": "string",
+  "email": "string",
+  "tipoPerfil": "ADMIN"
+}
+</code>
+PATCH ``/usuarios/me/senha`` — Troca a senha do usuário logado (exige a senha atual)
+
+resultado esperado:
+<code>
+{
+  "senhaAtual": "string",
+  "novaSenha": "string"
+}
+</code>
+
+*PROGRESSO DAS AULAS*
+
+*MÓDULOS*
+
+*CURSOS*
+
+*CATEGORIAS*
+
+*AUTORES*
+
+*AULAS*
+
+*MATRICULAS*
+
+*HISTÓRICO DA IA*
+
+*AUTENTICAÇÃO*
+
+
 
 ## Segurança
 
