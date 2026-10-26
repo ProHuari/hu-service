@@ -227,6 +227,62 @@ resultado esperado:
 </code>
 
 *PROGRESSO DAS AULAS*
+Aqui está o texto exatamente como aparece na imagem:
+
+**GET** `/progresso-aulas/{id}` Busca um progresso pelo id (aluno só acessa o próprio)
+resultado esperado:
+<code>
+{
+  "id": 0,
+  "statusAula": "NAO_INICIADA",
+  "dataConclusao": "2026-10-26T13:16:05.259Z",
+  "usuarioId": 0,
+  "aulaId": 0
+}
+</code>
+
+**PUT** `/progresso-aulas/{id}` Atualiza o status do progresso (usuário e aula não mudam)
+resultado esperado:
+<code>
+{
+  "id": 0,
+  "statusAula": "NAO_INICIADA",
+  "dataConclusao": "2026-10-26T13:16:50.425Z",
+  "usuarioId": 0,
+  "aulaId": 0
+}
+<code/>
+
+**DELETE** `/progresso-aulas/{id}` Remove um progresso (aluno só remove o próprio)
+resutado esperado:
+<code>
+code 200 ok
+</code>
+
+**GET** `/progresso-aulas` Aluno vê o próprio progresso; admin vê todos (filtro opcional usuarioId)
+resultado esperado:
+<code>
+[
+  {
+    "id": 0,
+    "statusAula": "NAO_INICIADA",
+    "dataConclusao": "2026-10-26T13:18:01.750Z",
+    "usuarioId": 0,
+    "aulaId": 0
+  }
+]
+</code>
+**POST** `/progresso-aulas` Registra o progresso do usuário logado em uma aula (exige matrícula no curso)
+resultado esperado:
+<code>
+{
+  "id": 0,
+  "statusAula": "NAO_INICIADA",
+  "dataConclusao": "2026-10-26T13:18:34.492Z",
+  "usuarioId": 0,
+  "aulaId": 0
+}
+</code>
 
 *MÓDULOS*
 
