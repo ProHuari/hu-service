@@ -126,6 +126,10 @@ No Windows:
 
 Os testes devem ser utilizados para verificar as regras de negócio, a validação dos dados e o comportamento dos endpoints.
 
+*Ferramenta utilizada para controle de qualidade das api: postman
+
+métodos atuais 
+
 ## Segurança
 
 O projeto inclui componentes do Spring Security e dependências para trabalhar com JWT.
