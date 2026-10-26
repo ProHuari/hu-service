@@ -285,7 +285,34 @@ resultado esperado:
 </code>
 
 *MÓDULOS*
+GET ``/modulos/{id}`` Busca um módulo pelo id
+resultado esperado:
+<code>
+{
+  "id": 0,
+  "titulo": "string",
+  "descricao": "string",
+  "ordem": 0,
+  "cursoId": 0
+}
+</code>
 
+PUT ``/modulos/{id}`` Atualiza um módulo
+resultado esperado:
+<code>
+{
+  "titulo": "string",
+  "descricao": "string",
+  "ordem": 1,
+  "cursoId": 0
+}
+</code>
+
+**DELETE** `/modulos/{id}` Remove um módulo
+
+**GET** `/modulos` Lista os módulos (use cursoId para filtrar por curso, em ordem)
+
+**POST** `/modulos` Cadastra um módulo
 *CURSOS*
 
 *CATEGORIAS*
