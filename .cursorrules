@@ -1,0 +1,5 @@
+Arquitetura em camadas Spring Boot 4 / Java 25: Controllers REST (OpenAPI/Swagger), Services com regras e transações, Repositories Spring Data JPA e DTOs como records imutáveis.
+Autenticação stateless via JWT com AuthFilter e Spring Security, separando autorizações por perfil (ADMIN e ALUNO).
+Persistência relacional com JPA/Hibernate utilizando MySQL para ambiente produtivo e H2 em memória nos testes automatizados.
+Validação rigorosa de contratos via Jakarta Validation (@Valid em requisições e constraints em DTOs) com tratamento centralizado no GlobalExceptionHandler.
+Módulo de IA desacoplado via interface GeradorRespostaIa com integração HTTP RestClient para a API do Google Gemini.
