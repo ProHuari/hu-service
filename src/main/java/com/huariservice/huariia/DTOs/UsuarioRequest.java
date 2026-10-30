@@ -19,5 +19,5 @@ public record UsuarioRequest(
         @NotBlank(message = "A senha é obrigatória")
         @Size(min = 6, max = 72, message = "A senha deve ter entre 6 e 72 caracteres")
         String senha
-){}
+) {}
 

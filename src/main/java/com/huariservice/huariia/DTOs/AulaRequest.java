@@ -8,25 +8,25 @@ import org.hibernate.validator.constraints.URL;
 
 
 public record AulaRequest(
-@NotBlank(message = "O título é obrigatório")
-@Size(max = 155)
-String titulo,
+        @NotBlank(message = "O título é obrigatório")
+        @Size(max = 155)
+        String titulo,
 
-@NotBlank(message = "A descrição é obrigatória")
-String descricao,
+        @NotBlank(message = "A descrição é obrigatória")
+        String descricao,
 
-@NotBlank(message = "A URL do vídeo é obrigatória")
-@Size(max = 254)
-@URL(message = "URL do vídeo inválida")
-String urlVideo,
+        @NotBlank(message = "A URL do vídeo é obrigatória")
+        @Size(max = 254)
+        @URL(message = "URL do vídeo inválida")
+        String urlVideo,
 
-@NotNull(message = "A ordem é obrigatória")
-@Min(value = 1, message = "A ordem deve ser no mínimo 1")
-Integer ordem,
+        @NotNull(message = "A ordem é obrigatória")
+        @Min(value = 1, message = "A ordem deve ser no mínimo 1")
+        Integer ordem,
 
-@Min(value = 0, message = "A duração não pode ser negativa")
-Integer duracaoEmMinutos,
+        @Min(value = 0, message = "A duração não pode ser negativa")
+        Integer duracaoEmMinutos,
 
-@NotNull(message = "O módulo é obrigatório")
-Long moduloId
+        @NotNull(message = "O módulo é obrigatório")
+        Long moduloId
 ) {}

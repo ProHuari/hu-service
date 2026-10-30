@@ -6,7 +6,7 @@ import com.huariservice.huariia.entities.enums.StatusAula;
 import java.time.LocalDateTime;
 
 
-public record ProgressoAulaResponse (
+public record ProgressoAulaResponse(
         Long id,
         StatusAula statusAula,
         LocalDateTime dataConclusao,

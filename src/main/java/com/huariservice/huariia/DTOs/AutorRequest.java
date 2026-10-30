@@ -6,10 +6,9 @@ import org.hibernate.validator.constraints.URL;
 
 
 public record AutorRequest(
-
         @NotBlank(message = "O nome do canal é obrigatório")
         @Size(max = 100)
-                String nomeCanal,
+        String nomeCanal,
 
         @NotBlank(message = "O link do canal é obrigatório")
         @Size(max = 254)
