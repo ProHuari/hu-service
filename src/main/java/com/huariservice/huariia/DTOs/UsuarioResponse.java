@@ -2,9 +2,6 @@ package com.huariservice.huariia.DTOs;
 
 import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.entities.enums.TipoPerfil;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 
 public record UsuarioResponse(

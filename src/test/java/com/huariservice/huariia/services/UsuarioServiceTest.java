@@ -6,7 +6,6 @@ import com.huariservice.huariia.DTOs.UsuarioResponse;
 import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.entities.enums.TipoPerfil;
 import com.huariservice.huariia.exceptions.ConflitoException;
-import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
 import com.huariservice.huariia.exceptions.RegraNegocioException;
 import com.huariservice.huariia.repositories.UsuarioRepository;
 import org.junit.jupiter.api.DisplayName;

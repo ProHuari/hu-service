@@ -1,6 +1,5 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.HistoricoIaRequest;
 import com.huariservice.huariia.DTOs.HistoricoIaResponse;
 import com.huariservice.huariia.entities.HistoricoIa;
 import com.huariservice.huariia.entities.Usuario;
