@@ -1,6 +1,30 @@
-# Maven
+# =========================================================================
+# Build & Artifacts
+# =========================================================================
 target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
 
+# =========================================================================
+# Logs, Traces & Crash Dumps
+# =========================================================================
+logs/
+*.log
+*.log.*
+hs_err_pid*
+replay_pid*
+*.hprof
+
+# =========================================================================
+# IDEs & Text Editors
+# =========================================================================
 # IntelliJ IDEA
 .idea/
 *.iml
@@ -10,14 +34,45 @@ out/
 
 # VS Code
 .vscode/
+*.code-workspace
+.history/
 
-# Sistema operacional
-.DS_Store
-Thumbs.db
+# Eclipse / STS
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
 
-# Logs
-*.log
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
 
-# Segredos locais (nunca versionar)
+# =========================================================================
+# Environment Variables & Secrets
+# =========================================================================
 .env
 *.env
+.env.*
+!.env.example
+
+# =========================================================================
+# Operating System & Temporary Files
+# =========================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+*.tmp
+*.bak
+*~
