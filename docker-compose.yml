@@ -1,0 +1,51 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: huari-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_DATABASE: huari
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - huari-net
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: huari-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://db:3306/huari?createDatabaseIfNotExist=true&serverTimezone=America/Sao_Paulo
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      JWT_SECRET: ${JWT_SECRET:-chave-de-desenvolvimento-troque-em-producao-minimo-32-caracteres}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      IA_ENABLED: ${IA_ENABLED:-false}
+      IA_API_KEY: ${IA_API_KEY:-}
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/huari?createDatabaseIfNotExist=true&serverTimezone=America/Sao_Paulo
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - huari-net
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  huari-net:
+    driver: bridge
