@@ -1,56 +1,73 @@
 # Huari Backend
 
-**API REST para transparência pública, análise de dados políticos e educação cidadã.**
+**API REST para plataforma de cursos, educação cidadã e assistência com Inteligência Artificial.**
 
-O Huari é um projeto acadêmico que busca facilitar o acesso à informação política por meio da organização de dados públicos, indicadores e recursos de educação cidadã.
+O Huari é uma plataforma educacional e de capacitação cidadã que busca facilitar o acesso ao conhecimento e ao aprendizado guiado por meio de cursos estruturados, trilhas em módulos e aulas, acompanhamento de progresso e tira-dúvidas com IA generativa (Google Gemini).
 
-Este repositório contém o backend da plataforma, responsável pelas regras de negócio, persistência de dados e disponibilização de recursos por meio de uma API.
+Este repositório contém o backend da aplicação, desenvolvido com Java e Spring Boot, responsável pelas regras de negócio, controle de acesso baseado em papéis (RBAC com JWT), persistência de dados e integração com IA.
 
-## Objetivos do projeto
+---
 
-- **Transparência pública:** facilitar o acesso e a compreensão de informações políticas.
-- **Análise de dados:** criar uma base para cruzamento de informações e geração de indicadores.
-- **Educação cidadã:** apoiar o aprendizado sobre política, instituições públicas e participação democrática.
-- **Acessibilidade da informação:** tornar dados complexos mais compreensíveis para diferentes públicos.
+## Objetivos do Projeto
 
-## Tecnologias utilizadas
+- **Educação Cidadã & Capacitação:** estruturar cursos, módulos e aulas multimídia de forma acessível e organizada.
+- **Acompanhamento de Aprendizado:** controle individual de matrículas e progresso de conclusão de aulas por aluno.
+- **Assistência com Inteligência Artificial:** tira-dúvidas inteligente integrado ao Gemini para auxiliar estudantes durante as aulas.
+- **Segurança e Transparência:** arquitetura segura com autenticação stateless via JWT e controle refinado de permissões para alunos e administradores.
+
+---
+
+## Tecnologias Utilizadas
 
 | Tecnologia | Finalidade |
 |---|---|
-| Java 25 | Linguagem de programação |
-| Spring Boot 4.1.0 | Estrutura da aplicação backend |
-| Spring Web MVC | Desenvolvimento de endpoints HTTP |
-| Spring Data JPA | Persistência e acesso a dados |
-| MySQL | Banco de dados relacional |
-| Spring Security | Recursos de segurança |
-| Bean Validation | Validação de dados |
-| JWT | Suporte à autenticação baseada em tokens |
-| Springdoc OpenAPI | Documentação da API |
-| Maven | Gerenciamento de dependências e build |
-| Lombok | Redução de código repetitivo |
+| **Java 25** | Linguagem de programação principal |
+| **Spring Boot 3.4.x / 4.x** | Framework base para a aplicação backend |
+| **Spring Web MVC** | Desenvolvimento de endpoints RESTful |
+| **Spring Data JPA & Hibernate** | Mapeamento objeto-relacional e persistência de dados |
+| **MySQL** | Banco de dados relacional principal |
+| **H2 Database** | Banco de dados em memória para testes automatizados |
+| **Spring Security** | Autenticação stateless, autorização RBAC e filtros de segurança |
+| **JJWT (io.jsonwebtoken)** | Criação, assinatura (HMAC-SHA) e validação de tokens JWT |
+| **Bean Validation (Hibernate Validator)** | Validação de entradas e payloads HTTP |
+| **Springdoc OpenAPI (Swagger UI)** | Documentação interativa e especificação da API |
+| **RestClient & Google Gemini API** | Integração HTTP resiliente com modelos de IA Generativa |
+| **Lombok** | Produtividade e redução de código boilerplate |
+| **Maven** | Gerenciamento de ciclo de vida e dependências do projeto |
 
-## Arquitetura
+---
 
-O projeto utiliza uma organização em camadas para separar responsabilidades e facilitar a manutenção.
+## Arquitetura do Sistema
 
-- **Entities:** representam as entidades do domínio e seu mapeamento para o banco de dados.
-- **DTOs:** definem os dados utilizados na comunicação entre a API e seus consumidores.
-- **Repositories:** abstraem as operações de persistência.
-- **Services:** concentram as regras de negócio.
-- **Controllers:** recebem as requisições HTTP e disponibilizam os recursos da API.
+O projeto adota uma arquitetura em camadas bem delimitada e padronizada em inglês, com mensagens de feedback ao usuário final localizadas em português:
 
-Essa separação ajuda a manter o código organizado, testável e preparado para evoluções futuras.
+```
+src/main/java/com/huariservice/huariia/
+├── config/         # Configurações de segurança, CORS, Swagger, clientes HTTP e inicializadores
+├── controllers/    # Controladores REST expondo os endpoints HTTP
+├── DTOs/           # Data Transfer Objects (Records imutáveis para requests e responses)
+├── entities/       # Entidades JPA de domínio e seus mapeamentos de banco de dados
+│   └── enums/      # Enumerações de domínio (Role, EnrollmentStatus, LessonStatus)
+├── exceptions/     # Exceções customizadas e GlobalExceptionHandler unificado
+├── repositories/   # Interfaces Spring Data JPA para acesso aos dados
+├── security/       # Filtros JWT, modelo de usuário autenticado e emissão de tokens
+└── services/       # Regras de negócio, casos de uso e integração com IA
+```
+
+---
 
 ## Pré-requisitos
 
-Antes de executar o projeto, instale:
+Para executar o projeto localmente, certifique-se de possuir:
 
-- [Java JDK 25](https://jdk.java.net/25/)
-- [MySQL](https://dev.mysql.com/downloads/)
-- [Git](https://git-scm.com/)
-- Um terminal ou IDE de sua preferência.
+- [Java JDK 25](https://jdk.java.net/25/) instalado e configurado no `JAVA_HOME`.
+- [MySQL 8+](https://dev.mysql.com/downloads/) em execução (ou container Docker).
+- [Git](https://git-scm.com/) para versionamento.
+- Chave de API do Google Gemini (opcional, caso queira testar a IA localmente).
 
-## Como executar localmente
+---
+
+## Como Executar Localmente
 
 ### 1. Clone o repositório
 
@@ -59,325 +76,225 @@ git clone https://github.com/ProHuari/hu-service.git
 cd hu-service
 ```
 
-### 2. Configure o banco de dados
+### 2. Configure as variáveis de ambiente
 
-Crie um banco de dados MySQL para a aplicação:
-
-```sql
-CREATE DATABASE huari;
-```
-
-Configure a conexão no arquivo `src/main/resources/application.properties`, utilizando as propriedades exigidas pela aplicação.
-
-Exemplo de configuração para desenvolvimento:
+Você pode configurar suas variáveis no arquivo `src/main/resources/application.properties` ou definir variáveis de ambiente no sistema:
 
 ```properties
-spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/huari}
-spring.datasource.username=${DB_USERNAME:root}
-spring.datasource.password=${DB_PASSWORD}
+# Banco de Dados
+DB_URL=jdbc:mysql://localhost:3306/huari
+DB_USERNAME=root
+DB_PASSWORD=sua_senha_aqui
+
+# JWT
+JWT_SECRET=sua-chave-secreta-com-pelo-menos-32-caracteres-para-hmac-sha
+
+# Administrador Inicial (Opcional - criado no primeiro boot)
+ADMIN_NOME=Administrador
+ADMIN_EMAIL=admin@huari.com
+ADMIN_SENHA=senhaAdminForte123
+
+# Integração com IA (Google Gemini)
+IA_ENABLED=false
+IA_API_KEY=sua_chave_gemini_aqui
+IA_MODEL=gemini-3.5-flash-lite
 ```
 
-Defina as credenciais de acordo com seu ambiente. Não publique senhas, tokens ou outras informações confidenciais no repositório.
+### 3. Crie o banco de dados
 
-> A configuração acima é um exemplo de conexão. Ajuste-a às configurações existentes do projeto e confirme como o esquema do banco de dados é criado antes de executar a aplicação.
+No MySQL:
 
-### 3. Execute o backend
-
-No Linux ou macOS:
-
-```bash
-./mvnw spring-boot:run
+```sql
+CREATE DATABASE huari CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-No Windows:
+### 4. Execute a aplicação
+
+No Windows (PowerShell):
 
 ```powershell
 .\mvnw.cmd spring-boot:run
 ```
 
-A aplicação será iniciada conforme a configuração de porta definida no projeto. Se nenhuma porta diferente estiver configurada, o Spring Boot utiliza a porta `8080`.
-
-## Documentação da API
-
-O projeto inclui a dependência Springdoc OpenAPI para documentação dos endpoints.
-
-Após iniciar a aplicação, verifique:
-
-- **Swagger UI:** http://localhost:8080/swagger-ui/index.html
-- **Especificação OpenAPI:** http://localhost:8080/v3/api-docs
-
-Esses endereços dependem da configuração da aplicação e da disponibilidade dos respectivos endpoints.
-
-A documentação permite consultar os recursos expostos, os parâmetros das requisições e os formatos das respostas.
-
-## Testes
-
-Para executar os testes automatizados com Maven:
+No Linux / macOS:
 
 ```bash
-./mvnw test
+./mvnw spring-boot:run
 ```
 
-No Windows:
+A API estará disponível por padrão em: `http://localhost:8080`.
+
+---
+
+## Documentação Interativa da API (Swagger)
+
+Com a aplicação em execução, acesse a documentação interativa para visualizar esquemas, exemplos de requisição e testar os endpoints:
+
+- **Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **OpenAPI JSON:** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+
+> Para testar rotas protegidas no Swagger UI, faça login em `/auth/login`, copie o token JWT gerado e clique no botão **Authorize** no topo da página informando `Bearer <seu-token>`.
+
+---
+
+## Visão Geral dos Endpoints da API
+
+Todas as rotas foram padronizadas em inglês:
+
+### 1. Autenticação (`/auth`)
+
+| Método | Endpoint | Descrição | Acesso |
+|---|---|---|---|
+| `POST` | `/auth/login` | Autentica usuário e retorna token JWT | Público |
+
+**Exemplo de Payload de Login:**
+```json
+{
+  "email": "aluno@huari.com",
+  "password": "senhaSegura123"
+}
+```
+
+---
+
+### 2. Usuários (`/users`)
+
+| Método | Endpoint | Descrição | Acesso |
+|---|---|---|---|
+| `POST` | `/users` | Cadastro público de novo aluno (`STUDENT`) | Público |
+| `POST` | `/users/admin` | Cadastro de novo administrador | `ADMIN` |
+| `GET` | `/users/me` | Obtém o perfil do usuário logado | Autenticado |
+| `PUT` | `/users/me` | Atualiza dados do perfil (nome e e-mail) | Autenticado |
+| `PATCH` | `/users/me/password` | Altera a senha (exige a senha atual) | Autenticado |
+| `GET` | `/users` | Lista todos os usuários cadastrados | `ADMIN` |
+| `GET` | `/users/{id}` | Busca usuário por ID | `ADMIN` |
+| `PUT` | `/users/{id}` | Atualiza usuário e redefine senha | `ADMIN` |
+| `DELETE` | `/users/{id}` | Exclui usuário | `ADMIN` |
+
+---
+
+### 3. Autores (`/authors`)
+
+| Método | Endpoint | Descrição | Acesso |
+|---|---|---|---|
+| `GET` | `/authors` | Lista todos os autores | Autenticado |
+| `GET` | `/authors/{id}` | Busca autor por ID | Autenticado |
+| `POST` | `/authors` | Cadastra novo autor | `ADMIN` |
+| `PUT` | `/authors/{id}` | Atualiza autor | `ADMIN` |
+| `DELETE` | `/authors/{id}` | Exclui autor | `ADMIN` |
+
+---
+
+### 4. Categorias (`/categories`)
+
+| Método | Endpoint | Descrição | Acesso |
+|---|---|---|---|
+| `GET` | `/categories` | Lista todas as categorias | Autenticado |
+| `GET` | `/categories/{id}` | Busca categoria por ID | Autenticado |
+| `POST` | `/categories` | Cadastra nova categoria | `ADMIN` |
+| `PUT` | `/categories/{id}` | Atualiza categoria | `ADMIN` |
+| `DELETE` | `/categories/{id}` | Exclui categoria | `ADMIN` |
+
+---
+
+### 5. Cursos (`/courses`)
+
+| Método | Endpoint | Descrição | Acesso |
+|---|---|---|---|
+| `GET` | `/courses` | Lista todos os cursos publicados | Autenticado |
+| `GET` | `/courses/{id}` | Busca curso por ID | Autenticado |
+| `POST` | `/courses` | Publica um novo curso | `ADMIN` |
+| `PUT` | `/courses/{id}` | Atualiza curso existente | `ADMIN` |
+| `DELETE` | `/courses/{id}` | Exclui curso | `ADMIN` |
+
+---
+
+### 6. Módulos (`/modules`)
+
+| Método | Endpoint | Descrição | Acesso |
+|---|---|---|---|
+| `GET` | `/modules` | Lista módulos (permite filtro `?courseId=1`) | Autenticado |
+| `GET` | `/modules/{id}` | Busca módulo por ID | Autenticado |
+| `POST` | `/modules` | Cria novo módulo no curso | `ADMIN` |
+| `PUT` | `/modules/{id}` | Atualiza módulo | `ADMIN` |
+| `DELETE` | `/modules/{id}` | Exclui módulo | `ADMIN` |
+
+---
+
+### 7. Aulas (`/lessons`)
+
+| Método | Endpoint | Descrição | Acesso |
+|---|---|---|---|
+| `GET` | `/lessons` | Lista aulas (permite filtro `?moduleId=1`) | Autenticado |
+| `GET` | `/lessons/{id}` | Busca aula por ID | Autenticado |
+| `POST` | `/lessons` | Cadastra nova aula no módulo | `ADMIN` |
+| `PUT` | `/lessons/{id}` | Atualiza aula existente | `ADMIN` |
+| `DELETE` | `/lessons/{id}` | Exclui aula | `ADMIN` |
+
+---
+
+### 8. Matrículas (`/enrollments`)
+
+| Método | Endpoint | Descrição | Acesso |
+|---|---|---|---|
+| `POST` | `/enrollments` | Matricula o usuário logado em um curso | Autenticado |
+| `GET` | `/enrollments` | Lista matrículas do aluno (ou todas para `ADMIN`) | Autenticado |
+| `GET` | `/enrollments/{id}` | Busca detalhes da matrícula por ID | Autenticado |
+| `PATCH` | `/enrollments/{id}/status` | Altera status da matrícula (`ACTIVE`, `COMPLETED`, `CANCELLED`) | `ADMIN` |
+| `DELETE` | `/enrollments/{id}` | Remove matrícula | `ADMIN` |
+
+---
+
+### 9. Progresso de Aulas (`/lesson-progresses`)
+
+| Método | Endpoint | Descrição | Acesso |
+|---|---|---|---|
+| `POST` | `/lesson-progresses` | Registra início ou conclusão de aula pelo aluno logado | Autenticado |
+| `GET` | `/lesson-progresses` | Lista progressos do aluno logado (ou todos para `ADMIN`) | Autenticado |
+| `GET` | `/lesson-progresses/{id}` | Detalhes do progresso por ID | Autenticado |
+| `PUT` | `/lesson-progresses/{id}` | Atualiza status (`NOT_STARTED`, `IN_PROGRESS`, `COMPLETED`) | Autenticado |
+| `DELETE` | `/lesson-progresses/{id}` | Remove registro de progresso | Autenticado |
+
+---
+
+### 10. Consulta e Histórico de IA (`/ai-history`)
+
+| Método | Endpoint | Descrição | Acesso |
+|---|---|---|---|
+| `POST` | `/ai-history` | Envia pergunta à IA Gemini e registra resposta no histórico | Autenticado |
+| `GET` | `/ai-history` | Lista histórico de perguntas do aluno (ou todos para `ADMIN`) | Autenticado |
+| `GET` | `/ai-history/{id}` | Busca pergunta/resposta por ID | Autenticado |
+| `DELETE` | `/ai-history/{id}` | Exclui registro do histórico | Autenticado |
+
+---
+
+## Executando os Testes
+
+Para rodar os testes unitários e de integração com cobertura de perfis e rotas:
 
 ```powershell
 .\mvnw.cmd test
 ```
 
-Os testes devem ser utilizados para verificar as regras de negócio, a validação dos dados e o comportamento dos endpoints.
-
-*Ferramenta utilizada para controle de qualidade das api: swagger 
-
-### métodos atuais
-*USUARIOS*
-
-GET ``/usuarios/{id}`` — Busca um usuário pelo ID (somente ADMIN)
-
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "nome": "string",
-  "email": "string",
-  "tipoPerfil": "ADMIN"
-}
-</code>
-PUT ``/usuarios/{id}`` — Atualiza um usuário e redefine a senha (somente ADMIN)
-
-resultado esperado:
-
-<code>
-{
-  "nome": "string",
-  "email": "user@example.com",
-  "senha": "string"
-}
-</code>
-DELETE ``/usuarios/{id}`` — Remove um usuário (somente ADMIN)
-
-resultado esperado:
-<code>
-code  200 OK
-</code>
-GET ``/usuarios/me`` — Mostra o perfil do usuário logado
-
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "nome": "string",
-  "email": "string",
-  "tipoPerfil": "ADMIN"
-}
-</code>
-PUT ``/usuarios/me`` — Atualiza nome e e-mail do usuário logado
-
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "nome": "string",
-  "email": "string",
-  "tipoPerfil": "ADMIN"
-}
-</code>
-GET ``/usuarios`` — Lista os usuários (somente ADMIN)
-
-resultado esperado:
-<code>
-[
-  {
-    "id": 0,
-    "nome": "string",
-    "email": "string",
-    "tipoPerfil": "ADMIN"
-  }
-]
-</code>
-POST ``/usuarios`` — Cadastra um usuário (perfil ALUNO)
-
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "nome": "string",
-  "email": "string",
-  "tipoPerfil": "ALUNO"
-}
-</code>
-POST ``/usuarios/admin`` — Cadastra um administrador (somente ADMIN)
-
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "nome": "string",
-  "email": "string",
-  "tipoPerfil": "ADMIN"
-}
-</code>
-PATCH ``/usuarios/me/senha`` — Troca a senha do usuário logado (exige a senha atual)
-
-resultado esperado:
-<code>
-{
-  "senhaAtual": "string",
-  "novaSenha": "string"
-}
-</code>
-
-*PROGRESSO DAS AULAS*
-Aqui está o texto exatamente como aparece na imagem:
-
-**GET** `/progresso-aulas/{id}` Busca um progresso pelo id (aluno só acessa o próprio)
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "statusAula": "NAO_INICIADA",
-  "dataConclusao": "2026-10-26T13:16:05.259Z",
-  "usuarioId": 0,
-  "aulaId": 0
-}
-</code>
-
-**PUT** `/progresso-aulas/{id}` Atualiza o status do progresso (usuário e aula não mudam)
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "statusAula": "NAO_INICIADA",
-  "dataConclusao": "2026-10-26T13:16:50.425Z",
-  "usuarioId": 0,
-  "aulaId": 0
-}
-<code/>
-
-**DELETE** `/progresso-aulas/{id}` Remove um progresso (aluno só remove o próprio)
-resutado esperado:
-<code>
-code 200 ok
-</code>
-
-**GET** `/progresso-aulas` Aluno vê o próprio progresso; admin vê todos (filtro opcional usuarioId)
-resultado esperado:
-<code>
-[
-  {
-    "id": 0,
-    "statusAula": "NAO_INICIADA",
-    "dataConclusao": "2026-10-26T13:18:01.750Z",
-    "usuarioId": 0,
-    "aulaId": 0
-  }
-]
-</code>
-**POST** `/progresso-aulas` Registra o progresso do usuário logado em uma aula (exige matrícula no curso)
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "statusAula": "NAO_INICIADA",
-  "dataConclusao": "2026-10-26T13:18:34.492Z",
-  "usuarioId": 0,
-  "aulaId": 0
-}
-</code>
-
-*MÓDULOS*
-GET ``/modulos/{id}`` Busca um módulo pelo id
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "titulo": "string",
-  "descricao": "string",
-  "ordem": 0,
-  "cursoId": 0
-}
-</code>
-
-PUT ``/modulos/{id}`` Atualiza um módulo
-resultado esperado:
-<code>
-{
-  "titulo": "string",
-  "descricao": "string",
-  "ordem": 1,
-  "cursoId": 0
-}
-</code>
-
-**DELETE** `/modulos/{id}` Remove um módulo
-
-**GET** `/modulos` Lista os módulos (use cursoId para filtrar por curso, em ordem)
-
-**POST** `/modulos` Cadastra um módulo
-*CURSOS*
-
-*CATEGORIAS*
-
-*AUTORES*
-
-*AULAS*
-
-*MATRICULAS*
-
-*HISTÓRICO DA IA*
-
-*AUTENTICAÇÃO*
-
-
-
-## Segurança
-
-O projeto inclui componentes do Spring Security e dependências para trabalhar com JWT.
-
-As regras de autorização, os fluxos de autenticação e a proteção dos endpoints devem ser verificados na implementação antes de serem considerados concluídos.
-
-Boas práticas recomendadas:
-
-- Não versionar credenciais ou tokens.
-- Utilizar variáveis de ambiente para configurações sensíveis.
-- Validar os dados recebidos pela API.
-- Proteger endpoints conforme suas permissões.
-- Evitar expor informações confidenciais em respostas e logs.
-
-## Roadmap
-
-As próximas etapas podem incluir:
-
-- [ ] Consolidar os recursos de consulta e gerenciamento de dados.
-- [ ] Documentar os endpoints e seus exemplos de uso.
-- [ ] Integrar fontes oficiais de dados públicos.
-- [ ] Desenvolver recursos de análise e cruzamento de informações.
-- [ ] Expandir os recursos de educação cidadã.
-- [ ] Ampliar a cobertura de testes automatizados.
-- [ ] Documentar o processo de implantação.
-
-*O roadmap representa possibilidades de evolução e não necessariamente funcionalidades já implementadas.*
-
-## Contribuição
-
-Contribuições são bem-vindas.
-
-1. Faça um fork do repositório.
-2. Crie uma branch para sua alteração.
-3. Implemente e teste as modificações.
-4. Envie um pull request com uma descrição objetiva das mudanças.
-
-Mantenha o código consistente com a arquitetura existente e evite incluir credenciais ou dados sensíveis nos commits.
-
-## Contexto acadêmico
-
-O Huari é desenvolvido com finalidade acadêmica, buscando explorar o uso de tecnologia para ampliar a transparência pública, facilitar a análise de informações e incentivar a educação política.
-
-As análises devem priorizar fontes verificáveis, critérios transparentes e apresentação imparcial dos dados.
-
-## Licença
-
-Consulte as informações de licença do repositório. Caso ainda não exista uma licença definida, estabeleça uma antes de autorizar formalmente o uso, a distribuição ou a modificação do código por terceiros.
+Os testes cobrem:
+- Emissão e validação de JWTs (`TokenServiceTest`).
+- Fluxo de login e credenciais inválidas (`AuthServiceTest`).
+- Criação de usuários, checagem de e-mail duplicado e regras de troca de senha (`UserServiceTest`).
+- Proteção de rotas e status HTTP 401 para requisições não autorizadas (`SecurityConfigTest`).
+- Inicialização do contexto condicional da IA (`IaAtivadaContextTest`).
 
 ---
 
-**Huari — tecnologia e informação a serviço da transparência pública.**
+## Contribuição
+
+1. Faça um Fork do repositório.
+2. Crie uma branch para sua funcionalidade (`git checkout -b feature/minha-feature`).
+3. Commit suas alterações seguindo o padrão Conventional Commits (`git commit -m 'feat: adiciona nova funcionalidade'`).
+4. Envie para o branch remoto (`git push origin feature/minha-feature`).
+5. Abra um Pull Request detalhado.
+
+---
+
+## Licença
+
+Este projeto está licenciado sob os termos da licença especificada no repositório.
