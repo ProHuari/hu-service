@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.CategoriaRequest;
-import com.huariservice.huariia.DTOs.CategoriaResponse;
+import com.huariservice.huariia.dto.CategoriaRequest;
+import com.huariservice.huariia.dto.CategoriaResponse;
 import com.huariservice.huariia.services.CategoriaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

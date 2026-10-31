@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.HistoricoIaRequest;
-import com.huariservice.huariia.DTOs.HistoricoIaResponse;
+import com.huariservice.huariia.dto.HistoricoIaRequest;
+import com.huariservice.huariia.dto.HistoricoIaResponse;
 import com.huariservice.huariia.security.DadosToken;
 import com.huariservice.huariia.services.ConsultaIaService;
 import com.huariservice.huariia.services.HistoricoIaService;

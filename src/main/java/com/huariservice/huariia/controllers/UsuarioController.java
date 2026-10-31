@@ -1,9 +1,9 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.PerfilRequest;
-import com.huariservice.huariia.DTOs.SenhaRequest;
-import com.huariservice.huariia.DTOs.UsuarioRequest;
-import com.huariservice.huariia.DTOs.UsuarioResponse;
+import com.huariservice.huariia.dto.PerfilRequest;
+import com.huariservice.huariia.dto.SenhaRequest;
+import com.huariservice.huariia.dto.UsuarioRequest;
+import com.huariservice.huariia.dto.UsuarioResponse;
 import com.huariservice.huariia.security.DadosToken;
 import com.huariservice.huariia.services.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;

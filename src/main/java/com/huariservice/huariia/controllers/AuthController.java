@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.LoginRequest;
-import com.huariservice.huariia.DTOs.LoginResponse;
+import com.huariservice.huariia.dto.LoginRequest;
+import com.huariservice.huariia.dto.LoginResponse;
 import com.huariservice.huariia.services.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
