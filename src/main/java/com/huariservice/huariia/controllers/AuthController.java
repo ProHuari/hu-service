@@ -13,16 +13,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller for user authentication endpoints.
+ */
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Tag(name = "Autenticação")
+@Tag(name = "Authentication")
 public class AuthController {
 
     private final AuthService authService;
 
+    /**
+     * Authenticates a user and returns a JWT token.
+     *
+     * @param request credentials (email and password)
+     * @return login response containing the token and user details
+     */
     @PostMapping("/login")
-    @Operation(summary = "Autentica o usuário e devolve o token JWT")
+    @Operation(summary = "Authenticates a user and returns a JWT token")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
