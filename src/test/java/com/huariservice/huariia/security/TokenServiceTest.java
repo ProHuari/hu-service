@@ -1,7 +1,7 @@
 package com.huariservice.huariia.security;
 
-import com.huariservice.huariia.entities.Usuario;
-import com.huariservice.huariia.entities.enums.TipoPerfil;
+import com.huariservice.huariia.entities.User;
+import com.huariservice.huariia.entities.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,8 +11,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Testes unitários para o TokenService.
- * Valida a geração de JWT e a extração segura de claims/sujeito.
+ * Unit tests for TokenService.
+ * Validates JWT generation and safe claims/subject extraction.
  */
 class TokenServiceTest {
 
@@ -20,7 +20,6 @@ class TokenServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Segredo com pelo menos 32 caracteres (256 bits) exigido pelo algoritmo HMAC-SHA
         tokenService = new TokenService(
                 "chave-secreta-de-teste-com-mais-de-32-caracteres-para-hmac-sha",
                 60
@@ -30,47 +29,47 @@ class TokenServiceTest {
     @Test
     @DisplayName("Deve gerar token JWT válido e extrair os dados do usuário corretamente")
     void deveGerarEValidarTokenComSucesso() {
-        Usuario usuario = new Usuario();
-        usuario.setId(42L);
-        usuario.setNome("Aluno Teste");
-        usuario.setEmail("aluno@huari.com");
-        usuario.setTipoPerfil(TipoPerfil.ALUNO);
+        User user = new User();
+        user.setId(42L);
+        user.setName("Aluno Teste");
+        user.setEmail("aluno@huari.com");
+        user.setRole(Role.STUDENT);
 
-        String token = tokenService.gerarToken(usuario);
+        String token = tokenService.generateToken(user);
 
         assertNotNull(token);
         assertFalse(token.isBlank());
 
-        Optional<DadosToken> dadosOpt = tokenService.validar(token);
-        assertTrue(dadosOpt.isPresent());
+        Optional<AuthenticatedUser> authUserOpt = tokenService.validate(token);
+        assertTrue(authUserOpt.isPresent());
 
-        DadosToken dados = dadosOpt.get();
-        assertEquals(42L, dados.usuarioId());
-        assertEquals("aluno@huari.com", dados.email());
-        assertEquals("ALUNO", dados.perfil());
-        assertFalse(dados.isAdmin());
+        AuthenticatedUser authUser = authUserOpt.get();
+        assertEquals(42L, authUser.userId());
+        assertEquals("aluno@huari.com", authUser.email());
+        assertEquals("STUDENT", authUser.role());
+        assertFalse(authUser.isAdmin());
     }
 
     @Test
     @DisplayName("Deve identificar corretamente quando o usuário possui perfil ADMIN")
     void deveIdentificarUsuarioAdmin() {
-        Usuario admin = new Usuario();
+        User admin = new User();
         admin.setId(1L);
-        admin.setNome("Admin Teste");
+        admin.setName("Admin Teste");
         admin.setEmail("admin@huari.com");
-        admin.setTipoPerfil(TipoPerfil.ADMIN);
+        admin.setRole(Role.ADMIN);
 
-        String token = tokenService.gerarToken(admin);
-        Optional<DadosToken> dadosOpt = tokenService.validar(token);
+        String token = tokenService.generateToken(admin);
+        Optional<AuthenticatedUser> authUserOpt = tokenService.validate(token);
 
-        assertTrue(dadosOpt.isPresent());
-        assertTrue(dadosOpt.get().isAdmin());
+        assertTrue(authUserOpt.isPresent());
+        assertTrue(authUserOpt.get().isAdmin());
     }
 
     @Test
     @DisplayName("Deve retornar vazio ao validar token inválido ou malformado")
     void deveRetornarVazioParaTokenInvalido() {
-        Optional<DadosToken> dadosOpt = tokenService.validar("token-invalido-qualquer");
-        assertTrue(dadosOpt.isEmpty());
+        Optional<AuthenticatedUser> authUserOpt = tokenService.validate("token-invalido-qualquer");
+        assertTrue(authUserOpt.isEmpty());
     }
 }
