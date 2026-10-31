@@ -17,134 +17,218 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 
+/**
+ * Translates exceptions thrown by controllers and services into a consistent
+ * {@link ErrorResponse} payload with the appropriate HTTP status.
+ * User-facing texts are kept in Portuguese.
+ */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 404: service não achou o recurso (id do path ou id enviado no corpo)
-    @ExceptionHandler(RecursoNaoEncontradoException.class)
-    public ResponseEntity<ErroResponse> tratarRecursoNaoEncontrado(RecursoNaoEncontradoException ex) {
-        return resposta(HttpStatus.NOT_FOUND, "Recurso não encontrado", ex.getMessage());
+    /**
+     * 404: the service could not find the resource (path id or id sent in the body).
+     *
+     * @param ex the exception
+     * @return 404 response
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
+        return response(HttpStatus.NOT_FOUND, "Recurso não encontrado", ex.getMessage());
     }
 
-    // 409: duplicidade detectada pelo service (existsBy...)
-    @ExceptionHandler(ConflitoException.class)
-    public ResponseEntity<ErroResponse> tratarConflito(ConflitoException ex) {
-        return resposta(HttpStatus.CONFLICT, "Conflito", ex.getMessage());
+    /**
+     * 409: duplicate detected by the service (existsBy... checks).
+     *
+     * @param ex the exception
+     * @return 409 response
+     */
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(ConflictException ex) {
+        return response(HttpStatus.CONFLICT, "Conflito", ex.getMessage());
     }
 
-    // 409: última linha de defesa, quando o banco barra (unique, FK) e o service não pegou antes
+    /**
+     * 409: last line of defense, when the database rejects the write (unique, FK)
+     * and the service did not catch it before.
+     *
+     * @param ex the exception
+     * @return 409 response
+     */
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErroResponse> tratarIntegridade(DataIntegrityViolationException ex) {
-        log.warn("Violação de integridade no banco: {}", ex.getMostSpecificCause().getMessage());
-        return resposta(HttpStatus.CONFLICT, "Conflito",
+    public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex) {
+        log.warn("Database integrity violation: {}", ex.getMostSpecificCause().getMessage());
+        return response(HttpStatus.CONFLICT, "Conflito",
                 "A operação viola uma restrição de dados (registro duplicado ou em uso).");
     }
 
-    // 422: regra de negócio
-    @ExceptionHandler(RegraNegocioException.class)
-    public ResponseEntity<ErroResponse> tratarRegraNegocio(RegraNegocioException ex) {
-        return resposta(HttpStatus.UNPROCESSABLE_ENTITY, "Regra de negócio violada", ex.getMessage());
+    /**
+     * 422: business rule violation.
+     *
+     * @param ex the exception
+     * @return 422 response
+     */
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessRule(BusinessRuleException ex) {
+        return response(HttpStatus.UNPROCESSABLE_ENTITY, "Regra de negócio violada", ex.getMessage());
     }
 
-    // 400: @Valid no corpo da requisição
+    /**
+     * 400: {@code @Valid} failed on the request body.
+     *
+     * @param ex the exception
+     * @return 400 response listing each invalid field
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErroResponse> tratarValidacao(MethodArgumentNotValidException ex) {
-        List<String> detalhes = ex.getBindingResult()
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+        List<String> details = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                 .toList();
 
-        return ResponseEntity.badRequest().body(new ErroResponse(
+        return ResponseEntity.badRequest().body(new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Erro de validação",
                 "Um ou mais campos estão inválidos",
-                detalhes
+                details
         ));
     }
 
-    // 400: @Validated em @PathVariable / @RequestParam
+    /**
+     * 400: {@code @Validated} failed on a {@code @PathVariable} / {@code @RequestParam}.
+     *
+     * @param ex the exception
+     * @return 400 response listing each invalid parameter
+     */
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErroResponse> tratarConstraint(ConstraintViolationException ex) {
-        List<String> detalhes = ex.getConstraintViolations()
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
+        List<String> details = ex.getConstraintViolations()
                 .stream()
                 .map(v -> v.getPropertyPath() + ": " + v.getMessage())
                 .toList();
 
-        return ResponseEntity.badRequest().body(new ErroResponse(
+        return ResponseEntity.badRequest().body(new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Erro de validação",
                 "Um ou mais parâmetros estão inválidos",
-                detalhes
+                details
         ));
     }
 
-    // 400: JSON malformado, enum inexistente, tipo errado no corpo
+    /**
+     * 400: malformed JSON, unknown enum value or wrong type in the body.
+     *
+     * @param ex the exception
+     * @return 400 response
+     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErroResponse> tratarCorpoInvalido(HttpMessageNotReadableException ex) {
-        return resposta(HttpStatus.BAD_REQUEST, "Requisição inválida",
+    public ResponseEntity<ErrorResponse> handleUnreadableBody(HttpMessageNotReadableException ex) {
+        return response(HttpStatus.BAD_REQUEST, "Requisição inválida",
                 "Corpo da requisição ausente, malformado ou com valores inválidos.");
     }
 
-    // 400: /cursos/abc quando o id é Long
+    /**
+     * 400: path/query parameter with the wrong type (e.g. {@code /courses/abc} when the id is a Long).
+     *
+     * @param ex the exception
+     * @return 400 response naming the offending parameter
+     */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErroResponse> tratarTipoParametro(MethodArgumentTypeMismatchException ex) {
-        return resposta(HttpStatus.BAD_REQUEST, "Requisição inválida",
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        return response(HttpStatus.BAD_REQUEST, "Requisição inválida",
                 "Valor inválido para o parâmetro '" + ex.getName() + "'.");
     }
 
-    // 400: parâmetro obrigatório ausente
+    /**
+     * 400: required request parameter is missing.
+     *
+     * @param ex the exception
+     * @return 400 response naming the missing parameter
+     */
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ErroResponse> tratarParametroAusente(MissingServletRequestParameterException ex) {
-        return resposta(HttpStatus.BAD_REQUEST, "Requisição inválida",
+    public ResponseEntity<ErrorResponse> handleMissingParameter(MissingServletRequestParameterException ex) {
+        return response(HttpStatus.BAD_REQUEST, "Requisição inválida",
                 "O parâmetro '" + ex.getParameterName() + "' é obrigatório.");
     }
 
-    // 405: método HTTP errado
+    /**
+     * 405: wrong HTTP method for the route.
+     *
+     * @param ex the exception
+     * @return 405 response
+     */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<ErroResponse> tratarMetodoNaoSuportado(HttpRequestMethodNotSupportedException ex) {
-        return resposta(HttpStatus.METHOD_NOT_ALLOWED, "Método não permitido", ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        return response(HttpStatus.METHOD_NOT_ALLOWED, "Método não permitido", ex.getMessage());
     }
 
+    /**
+     * Propagates the status of a {@link ResponseStatusException} (used mainly by the AI integration).
+     *
+     * @param ex the exception
+     * @return response with the exception's status code and reason
+     */
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<ErroResponse> tratarStatusException(
-            ResponseStatusException ex) {
-
+    public ResponseEntity<ErrorResponse> handleResponseStatus(ResponseStatusException ex) {
         int status = ex.getStatusCode().value();
 
-        String mensagem = ex.getReason() == null
+        String message = ex.getReason() == null
                 ? "A operação não pode ser concluída."
                 : ex.getReason();
 
-        String erro = ex.getStatusCode().is5xxServerError()
+        String error = ex.getStatusCode().is5xxServerError()
                 ? "Serviço indisponível"
                 : "Requisição inválida";
 
         return ResponseEntity.status(status)
-                .body(new ErroResponse(status, erro, mensagem));
+                .body(new ErrorResponse(status, error, message));
     }
 
+    /**
+     * 401: wrong e-mail or password on login.
+     *
+     * @param ex the exception
+     * @return 401 response
+     */
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex) {
+        return response(HttpStatus.UNAUTHORIZED, "Não autorizado", ex.getMessage());
+    }
 
-    // 500: rede de segurança. SEMPRE loga o stack trace, senão o erro real some.
+    /**
+     * 404: unknown route (without this handler it would fall into the generic handler and become a 500).
+     *
+     * @param ex the exception
+     * @return 404 response
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException ex) {
+        return response(HttpStatus.NOT_FOUND, "Recurso não encontrado", "A rota solicitada não existe.");
+    }
+
+    /**
+     * 500: safety net. ALWAYS logs the stack trace, otherwise the real error is lost.
+     *
+     * @param ex the exception
+     * @return 500 response with a generic message
+     */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErroResponse> tratarErroGenerico(Exception ex) {
-        log.error("Erro inesperado", ex);
-        return resposta(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno",
+    public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex) {
+        log.error("Unexpected error", ex);
+        return response(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno",
                 "Ocorreu um erro inesperado. Tente novamente mais tarde.");
     }
 
-    private ResponseEntity<ErroResponse> resposta(HttpStatus status, String erro, String mensagem) {
-        return ResponseEntity.status(status).body(new ErroResponse(status.value(), erro, mensagem));
-    }
-    // 401: e-mail ou senha incorretos no login
-    @ExceptionHandler(CredenciaisInvalidasException.class)
-    public ResponseEntity<ErroResponse> tratarCredenciaisInvalidas(CredenciaisInvalidasException ex) {
-        return resposta(HttpStatus.UNAUTHORIZED, "Não autorizado", ex.getMessage());
-    }
-    // 404: rota inexistente (sem este handler cairia no handler genérico e viraria 500)
-    @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ErroResponse> tratarRotaInexistente(NoResourceFoundException ex) {
-        return resposta(HttpStatus.NOT_FOUND, "Recurso não encontrado", "A rota solicitada não existe.");
+    /**
+     * Builds an error response without details.
+     *
+     * @param status  HTTP status
+     * @param error   short error title
+     * @param message error description
+     * @return the response entity
+     */
+    private ResponseEntity<ErrorResponse> response(HttpStatus status, String error, String message) {
+        return ResponseEntity.status(status).body(new ErrorResponse(status.value(), error, message));
     }
 }
