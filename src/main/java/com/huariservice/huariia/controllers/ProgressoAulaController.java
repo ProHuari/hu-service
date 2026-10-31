@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.ProgressoAulaRequest;
-import com.huariservice.huariia.DTOs.ProgressoAulaResponse;
+import com.huariservice.huariia.dto.ProgressoAulaRequest;
+import com.huariservice.huariia.dto.ProgressoAulaResponse;
 import com.huariservice.huariia.security.DadosToken;
 import com.huariservice.huariia.services.ProgressoAulaService;
 import io.swagger.v3.oas.annotations.Operation;

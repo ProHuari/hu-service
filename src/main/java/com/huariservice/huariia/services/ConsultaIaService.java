@@ -1,7 +1,7 @@
 
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.HistoricoIaResponse;
+import com.huariservice.huariia.dto.HistoricoIaResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;

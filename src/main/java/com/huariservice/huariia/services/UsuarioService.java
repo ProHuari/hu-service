@@ -1,9 +1,9 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.PerfilRequest;
-import com.huariservice.huariia.DTOs.SenhaRequest;
-import com.huariservice.huariia.DTOs.UsuarioRequest;
-import com.huariservice.huariia.DTOs.UsuarioResponse;
+import com.huariservice.huariia.dto.PerfilRequest;
+import com.huariservice.huariia.dto.SenhaRequest;
+import com.huariservice.huariia.dto.UsuarioRequest;
+import com.huariservice.huariia.dto.UsuarioResponse;
 import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.entities.enums.TipoPerfil;
 import com.huariservice.huariia.exceptions.ConflitoException;

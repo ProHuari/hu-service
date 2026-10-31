@@ -1,7 +1,7 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.ProgressoAulaRequest;
-import com.huariservice.huariia.DTOs.ProgressoAulaResponse;
+import com.huariservice.huariia.dto.ProgressoAulaRequest;
+import com.huariservice.huariia.dto.ProgressoAulaResponse;
 import com.huariservice.huariia.entities.Aula;
 import com.huariservice.huariia.entities.ProgressoAula;
 import com.huariservice.huariia.entities.Usuario;

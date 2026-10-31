@@ -1,4 +1,4 @@
-package com.huariservice.huariia.DTOs;
+package com.huariservice.huariia.dto;
 
 import com.huariservice.huariia.entities.Enrollment;
 import com.huariservice.huariia.entities.enums.EnrollmentStatus;

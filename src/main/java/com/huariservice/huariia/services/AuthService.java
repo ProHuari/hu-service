@@ -1,7 +1,7 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.LoginRequest;
-import com.huariservice.huariia.DTOs.LoginResponse;
+import com.huariservice.huariia.dto.LoginRequest;
+import com.huariservice.huariia.dto.LoginResponse;
 import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.exceptions.CredenciaisInvalidasException;
 import com.huariservice.huariia.repositories.UsuarioRepository;

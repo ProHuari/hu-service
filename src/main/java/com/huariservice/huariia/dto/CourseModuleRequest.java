@@ -1,4 +1,4 @@
-package com.huariservice.huariia.DTOs;
+package com.huariservice.huariia.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

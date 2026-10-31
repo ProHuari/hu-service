@@ -1,4 +1,4 @@
-package com.huariservice.huariia.DTOs;
+package com.huariservice.huariia.dto;
 
 /**
  * Response returned after a successful login.

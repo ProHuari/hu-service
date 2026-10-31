@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.ModuloRequest;
-import com.huariservice.huariia.DTOs.ModuloResponse;
+import com.huariservice.huariia.dto.ModuloRequest;
+import com.huariservice.huariia.dto.ModuloResponse;
 import com.huariservice.huariia.services.ModuloService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

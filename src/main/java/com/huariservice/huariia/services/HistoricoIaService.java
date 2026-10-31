@@ -1,6 +1,6 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.HistoricoIaResponse;
+import com.huariservice.huariia.dto.HistoricoIaResponse;
 import com.huariservice.huariia.entities.HistoricoIa;
 import com.huariservice.huariia.entities.Usuario;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;

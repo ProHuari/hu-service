@@ -1,4 +1,4 @@
-package com.huariservice.huariia.DTOs;
+package com.huariservice.huariia.dto;
 
 import com.huariservice.huariia.entities.LessonProgress;
 import com.huariservice.huariia.entities.enums.LessonStatus;

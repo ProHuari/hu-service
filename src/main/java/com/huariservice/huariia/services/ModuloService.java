@@ -1,7 +1,7 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.ModuloRequest;
-import com.huariservice.huariia.DTOs.ModuloResponse;
+import com.huariservice.huariia.dto.ModuloRequest;
+import com.huariservice.huariia.dto.ModuloResponse;
 import com.huariservice.huariia.entities.Curso;
 import com.huariservice.huariia.entities.Modulo;
 import com.huariservice.huariia.exceptions.ConflitoException;

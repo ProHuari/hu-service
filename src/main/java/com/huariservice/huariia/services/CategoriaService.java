@@ -1,7 +1,7 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.CategoriaRequest;
-import com.huariservice.huariia.DTOs.CategoriaResponse;
+import com.huariservice.huariia.dto.CategoriaRequest;
+import com.huariservice.huariia.dto.CategoriaResponse;
 import com.huariservice.huariia.entities.Categoria;
 import com.huariservice.huariia.exceptions.ConflitoException;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;

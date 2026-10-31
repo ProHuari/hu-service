@@ -1,7 +1,7 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.MatriculaRequest;
-import com.huariservice.huariia.DTOs.MatriculaResponse;
+import com.huariservice.huariia.dto.MatriculaRequest;
+import com.huariservice.huariia.dto.MatriculaResponse;
 import com.huariservice.huariia.entities.Curso;
 import com.huariservice.huariia.entities.Matricula;
 import com.huariservice.huariia.entities.Usuario;

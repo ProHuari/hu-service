@@ -1,7 +1,7 @@
 package com.huariservice.huariia.services;
 
-import com.huariservice.huariia.DTOs.AutorRequest;
-import com.huariservice.huariia.DTOs.AutorResponse;
+import com.huariservice.huariia.dto.AutorRequest;
+import com.huariservice.huariia.dto.AutorResponse;
 import com.huariservice.huariia.entities.Autor;
 import com.huariservice.huariia.exceptions.ConflitoException;
 import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;

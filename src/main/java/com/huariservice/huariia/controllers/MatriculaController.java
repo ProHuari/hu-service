@@ -1,7 +1,7 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.DTOs.MatriculaRequest;
-import com.huariservice.huariia.DTOs.MatriculaResponse;
+import com.huariservice.huariia.dto.MatriculaRequest;
+import com.huariservice.huariia.dto.MatriculaResponse;
 import com.huariservice.huariia.entities.enums.StatusMatricula;
 import com.huariservice.huariia.security.DadosToken;
 import com.huariservice.huariia.services.MatriculaService;
