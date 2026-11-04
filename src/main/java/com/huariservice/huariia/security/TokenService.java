@@ -1,6 +1,6 @@
 package com.huariservice.huariia.security;
 
-import com.huariservice.huariia.entities.Usuario;
+import com.huariservice.huariia.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -28,12 +28,12 @@ public class TokenService {
         this.expiracaoMinutos = expiracaoMinutos;
     }
 
-    public String gerarToken(Usuario usuario) {
+    public String gerarToken(User usuario) {
         Instant agora = Instant.now();
         return Jwts.builder()
                 .subject(String.valueOf(usuario.getId()))
                 .claim("email", usuario.getEmail())
-                .claim("perfil", usuario.getTipoPerfil().name())
+                .claim("perfil", usuario.getRole().name())
                 .issuedAt(Date.from(agora))
                 .expiration(Date.from(agora.plus(expiracaoMinutos, ChronoUnit.MINUTES)))
                 .signWith(chave)
