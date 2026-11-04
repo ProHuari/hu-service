@@ -1,13 +1,13 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.dto.CategoriaRequest;
-import com.huariservice.huariia.dto.CategoriaResponse;
-import com.huariservice.huariia.services.CategoriaService;
+import com.huariservice.huariia.dto.CategoryRequest;
+import com.huariservice.huariia.dto.CategoryResponse;
+import com.huariservice.huariia.services.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -20,13 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoriaController {
 
-    private final CategoriaService categoriaService;
-
+    private final CategoryService categoryService;
 
     @PostMapping
     @Operation(summary = "Cadastra uma categoria")
-    public ResponseEntity<CategoriaResponse> criar(@Valid @RequestBody CategoriaRequest request) {
-        CategoriaResponse response = categoriaService.pubCategoria(request);
+    public ResponseEntity<CategoryResponse> criar(@Valid @RequestBody CategoryRequest request) {
+        CategoryResponse response = categoryService.createCategory(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(location).body(response);
@@ -34,27 +33,27 @@ public class CategoriaController {
 
     @GetMapping
     @Operation(summary = "Lista as categorias")
-    public ResponseEntity<List<CategoriaResponse>> listar() {
-        return ResponseEntity.ok(categoriaService.mostrarCategorias());
+    public ResponseEntity<List<CategoryResponse>> listar() {
+        return ResponseEntity.ok(categoryService.listCategories());
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Busca uma categoria pelo id")
-    public ResponseEntity<CategoriaResponse> buscar(@PathVariable Long id) {
-        return ResponseEntity.ok(categoriaService.buscarPorId(id));
+    public ResponseEntity<CategoryResponse> buscar(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.findById(id));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza uma categoria")
-    public ResponseEntity<CategoriaResponse> atualizar(@PathVariable Long id,
-                                                       @Valid @RequestBody CategoriaRequest request) {
-        return ResponseEntity.ok(categoriaService.mudarCategoria(id, request));
+    public ResponseEntity<CategoryResponse> atualizar(@PathVariable Long id,
+                                                      @Valid @RequestBody CategoryRequest request) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, request));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Remove uma categoria")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        categoriaService.deletarId(id);
+        categoryService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }
