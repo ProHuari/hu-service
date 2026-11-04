@@ -1,13 +1,13 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.dto.ModuloRequest;
-import com.huariservice.huariia.dto.ModuloResponse;
-import com.huariservice.huariia.services.ModuloService;
+import com.huariservice.huariia.dto.CourseModuleRequest;
+import com.huariservice.huariia.dto.CourseModuleResponse;
+import com.huariservice.huariia.services.CourseModuleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -20,13 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ModuloController {
 
-    private final ModuloService moduloService;
-
+    private final CourseModuleService courseModuleService;
 
     @PostMapping
     @Operation(summary = "Cadastra um módulo")
-    public ResponseEntity<ModuloResponse> criar(@Valid @RequestBody ModuloRequest request) {
-        ModuloResponse response = moduloService.pubModulo(request);
+    public ResponseEntity<CourseModuleResponse> criar(@Valid @RequestBody CourseModuleRequest request) {
+        CourseModuleResponse response = courseModuleService.createModule(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(response.id()).toUri();
         return ResponseEntity.created(location).body(response);
@@ -34,30 +33,30 @@ public class ModuloController {
 
     @GetMapping
     @Operation(summary = "Lista os módulos (use cursoId para filtrar por curso, em ordem)")
-    public ResponseEntity<List<ModuloResponse>> listar(@RequestParam(required = false) Long cursoId) {
-        List<ModuloResponse> modulos = (cursoId != null)
-                ? moduloService.mostrarModulosDoCurso(cursoId)
-                : moduloService.mostrarModulos();
+    public ResponseEntity<List<CourseModuleResponse>> listar(@RequestParam(required = false) Long cursoId) {
+        List<CourseModuleResponse> modulos = (cursoId != null)
+                ? courseModuleService.listModulesByCourse(cursoId)
+                : courseModuleService.listModules();
         return ResponseEntity.ok(modulos);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Busca um módulo pelo id")
-    public ResponseEntity<ModuloResponse> buscar(@PathVariable Long id) {
-        return ResponseEntity.ok(moduloService.buscarPorId(id));
+    public ResponseEntity<CourseModuleResponse> buscar(@PathVariable Long id) {
+        return ResponseEntity.ok(courseModuleService.findById(id));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza um módulo")
-    public ResponseEntity<ModuloResponse> atualizar(@PathVariable Long id,
-                                                    @Valid @RequestBody ModuloRequest request) {
-        return ResponseEntity.ok(moduloService.mudarModulo(id, request));
+    public ResponseEntity<CourseModuleResponse> atualizar(@PathVariable Long id,
+                                                          @Valid @RequestBody CourseModuleRequest request) {
+        return ResponseEntity.ok(courseModuleService.updateModule(id, request));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Remove um módulo")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        moduloService.deletarId(id);
+        courseModuleService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }
