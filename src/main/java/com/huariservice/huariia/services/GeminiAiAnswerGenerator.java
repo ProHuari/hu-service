@@ -34,7 +34,7 @@ public class GeminiAiAnswerGenerator implements AiAnswerGenerator {
     private final String model;
 
     public GeminiAiAnswerGenerator(RestClient iaRestClient,
-                                   @Value("${app.ia.model:gemini-3.5-flash-lite}") String model) {
+                                   @Value("${app.ia.model:gemini-1.5-flash}") String model) {
         this.client = iaRestClient;
         this.model = model;
     }
