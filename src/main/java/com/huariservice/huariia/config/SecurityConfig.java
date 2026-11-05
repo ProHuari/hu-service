@@ -23,7 +23,8 @@ public class SecurityConfig {
             "/categorias", "/categorias/**",
             "/autores", "/autores/**",
             "/modulos", "/modulos/**",
-            "/aulas", "/aulas/**"
+            "/aulas", "/aulas/**",
+            "/transparencia", "/transparencia/**"
     };
 
     private final AuthFilter authFilter;
