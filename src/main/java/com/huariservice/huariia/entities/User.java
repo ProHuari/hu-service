@@ -1,6 +1,7 @@
 package com.huariservice.huariia.entities;
 
 import com.huariservice.huariia.entities.enums.Role;
+import com.huariservice.huariia.entities.enums.RoleConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,8 +46,8 @@ public class User {
     private String passwordHash;
 
     /** Authorization role; new accounts are students by default. */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_perfil", nullable = false)
+    @Convert(converter = RoleConverter.class)
+    @Column(name = "tipo_perfil", length = 20, columnDefinition = "varchar(20)", nullable = false)
     private Role role = Role.STUDENT;
 
     /** Timestamp of account creation; set once and never updated. */
