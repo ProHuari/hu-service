@@ -7,3 +7,4 @@ public enum ParliamentarianChamber {
     CHAMBER_OF_DEPUTIES,
     FEDERAL_SENATE
 }
+

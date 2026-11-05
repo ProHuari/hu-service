@@ -9,3 +9,4 @@ public interface ParliamentarianExpenseRepository extends JpaRepository<Parliame
 
     List<ParliamentarianExpense> findByParliamentarianIdOrderByExpenseDateDesc(Long parliamentarianId);
 }
+

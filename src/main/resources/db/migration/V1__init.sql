@@ -119,3 +119,4 @@ CREATE TABLE IF NOT EXISTS historico_ia (
     CONSTRAINT fk_historico_ia_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
     INDEX idx_historico_ia_usuario_data (usuario_id, data_consulta)
 );
+

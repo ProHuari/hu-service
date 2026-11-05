@@ -15,3 +15,4 @@ public interface LegislativeBillRepository extends JpaRepository<LegislativeBill
     List<LegislativeBill> findByTitleContainingIgnoreCaseOrSummaryContainingIgnoreCaseOrCodeContainingIgnoreCase(
             String title, String summary, String code);
 }
+

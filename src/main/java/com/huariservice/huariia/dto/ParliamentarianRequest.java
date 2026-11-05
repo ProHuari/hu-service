@@ -20,3 +20,4 @@ public record ParliamentarianRequest(
         @Size(max = 60)
         String externalId
 ) {}
+

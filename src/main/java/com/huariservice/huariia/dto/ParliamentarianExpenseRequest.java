@@ -25,3 +25,4 @@ public record ParliamentarianExpenseRequest(
         @Size(max = 254)
         String documentUrl
 ) {}
+

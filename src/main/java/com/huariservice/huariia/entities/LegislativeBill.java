@@ -59,3 +59,4 @@ public class LegislativeBill extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
+

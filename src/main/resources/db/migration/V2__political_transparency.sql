@@ -43,3 +43,4 @@ CREATE TABLE IF NOT EXISTS despesas_parlamentares (
     CONSTRAINT fk_despesa_parlamentar FOREIGN KEY (parlamentar_id) REFERENCES parlamentares(id),
     INDEX idx_despesa_parlamentar (parlamentar_id)
 );
+

@@ -32,3 +32,4 @@ public abstract class BaseAuditableEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 }
+

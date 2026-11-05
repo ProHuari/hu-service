@@ -62,3 +62,4 @@ public class ParliamentarianExpense extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
+

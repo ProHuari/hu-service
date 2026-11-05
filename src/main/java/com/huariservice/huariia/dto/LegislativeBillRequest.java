@@ -18,3 +18,4 @@ public record LegislativeBillRequest(
         String status,
         Long authorId
 ) {}
+

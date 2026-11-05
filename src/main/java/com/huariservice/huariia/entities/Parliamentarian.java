@@ -57,3 +57,4 @@ public class Parliamentarian extends BaseAuditableEntity {
         return getClass().hashCode();
     }
 }
+

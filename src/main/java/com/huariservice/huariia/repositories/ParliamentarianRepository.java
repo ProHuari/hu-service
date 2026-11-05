@@ -12,3 +12,4 @@ public interface ParliamentarianRepository extends JpaRepository<Parliamentarian
 
     List<Parliamentarian> findByPartyIgnoreCase(String party);
 }
+

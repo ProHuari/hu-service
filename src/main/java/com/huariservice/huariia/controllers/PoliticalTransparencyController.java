@@ -117,3 +117,4 @@ public class PoliticalTransparencyController {
         return ResponseEntity.noContent().build();
     }
 }
+
