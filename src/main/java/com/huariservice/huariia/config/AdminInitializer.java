@@ -77,3 +77,4 @@ public class AdminInitializer implements ApplicationRunner {
         log.info("Initial admin created: {}", normalizedEmail);
     }
 }
+

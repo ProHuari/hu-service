@@ -97,3 +97,4 @@ class UserServiceTest {
         assertThrows(BusinessRuleException.class, () -> userService.changePassword(userId, request));
     }
 }
+

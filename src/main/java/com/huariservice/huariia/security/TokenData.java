@@ -6,3 +6,4 @@ public record TokenData(Long userId, String email, String role) {
         return "ADMIN".equals(role);
     }
 }
+

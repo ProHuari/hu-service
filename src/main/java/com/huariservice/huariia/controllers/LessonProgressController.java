@@ -110,3 +110,4 @@ public class LessonProgressController {
         return ResponseEntity.noContent().build();
     }
 }
+

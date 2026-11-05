@@ -119,3 +119,4 @@ public class AiHistoryController {
         return ResponseEntity.noContent().build();
     }
 }
+

@@ -20,3 +20,4 @@ public record ErrorResponse(LocalDateTime timestamp,
         this(LocalDateTime.now(), status, error, message, details);
     }
 }
+

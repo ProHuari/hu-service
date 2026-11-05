@@ -36,3 +36,4 @@ class AiEnabledContextTest {
         assertThat(aiAnswerGenerator).isInstanceOf(GeminiAiAnswerGenerator.class);
     }
 }
+

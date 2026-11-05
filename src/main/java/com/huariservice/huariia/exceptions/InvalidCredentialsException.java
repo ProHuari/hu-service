@@ -5,3 +5,4 @@ public class InvalidCredentialsException extends RuntimeException {
         super("Invalid e-mail or password");
     }
 }
+
