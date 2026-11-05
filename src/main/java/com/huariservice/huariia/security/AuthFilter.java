@@ -19,6 +19,7 @@ import java.util.List;
 public class AuthFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -30,13 +31,15 @@ public class AuthFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
 
-            tokenService.validar(token).ifPresent(dados -> {
-                var autenticacao = new UsernamePasswordAuthenticationToken(
-                        dados,
-                        null,
-                        List.of(new SimpleGrantedAuthority("ROLE_" + dados.perfil())));
-                SecurityContextHolder.getContext().setAuthentication(autenticacao);
-            });
+            if (!tokenBlacklistService.isRevoked(token)) {
+                tokenService.validar(token).ifPresent(dados -> {
+                    var autenticacao = new UsernamePasswordAuthenticationToken(
+                            dados,
+                            null,
+                            List.of(new SimpleGrantedAuthority("ROLE_" + dados.perfil())));
+                    SecurityContextHolder.getContext().setAuthentication(autenticacao);
+                });
+            }
         }
 
         chain.doFilter(request, response);
