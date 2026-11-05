@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private static final String[] CONTEUDO = {
+    private static final String[] CONTENT_ENDPOINTS = {
             "/cursos", "/cursos/**",
             "/categorias", "/categorias/**",
             "/autores", "/autores/**",
@@ -44,41 +44,36 @@ public class SecurityConfig {
                             response.setStatus(HttpStatus.UNAUTHORIZED.value());
                             response.setContentType("application/json;charset=UTF-8");
                             response.getWriter().write("""
-                                    {"status":401,"erro":"Não autorizado","mensagem":"Token ausente, inválido ou expirado."}""");
+                                    {"status":401,"error":"Unauthorized","message":"Missing, invalid, or expired token."}""");
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(HttpStatus.FORBIDDEN.value());
                             response.setContentType("application/json;charset=UTF-8");
                             response.getWriter().write("""
-                                    {"status":403,"erro":"Acesso negado","mensagem":"Você não tem permissão para acessar este recurso."}""");
+                                    {"status":403,"error":"Forbidden","message":"You do not have permission to access this resource."}""");
                         }))
                 .authorizeHttpRequests(auth -> auth
-                        // públicas
                         .requestMatchers(
                                 "/auth/login",
                                 "/auth/refresh",
                                 "/auth/forgot-password",
                                 "/auth/reset-password",
+                                "/actuator/health",
+                                "/actuator/info",
                                 "/error"
                         ).permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
 
-                        // perfil do próprio usuário: qualquer usuário logado
                         .requestMatchers("/usuarios/me", "/usuarios/me/**").authenticated()
-
-                        // usuários: só ADMIN (cadastro público acima é a exceção)
                         .requestMatchers("/usuarios", "/usuarios/**").hasRole("ADMIN")
 
-                        // conteúdo: qualquer logado lê, só ADMIN escreve
-                        .requestMatchers(HttpMethod.GET, CONTEUDO).authenticated()
-                        .requestMatchers(CONTEUDO).hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, CONTENT_ENDPOINTS).authenticated()
+                        .requestMatchers(CONTENT_ENDPOINTS).hasRole("ADMIN")
 
-                        // matrículas: alterar status e apagar só ADMIN
                         .requestMatchers(HttpMethod.PATCH, "/matriculas/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/matriculas/**").hasRole("ADMIN")
 
-                        // o resto (matrícula, progresso, histórico, logout): qualquer logado
                         .anyRequest().authenticated())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
 
