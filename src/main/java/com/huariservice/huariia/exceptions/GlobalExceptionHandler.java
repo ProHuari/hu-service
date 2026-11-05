@@ -44,7 +44,13 @@ public class GlobalExceptionHandler {
     // 422: regra de negócio
     @ExceptionHandler(RegraNegocioException.class)
     public ResponseEntity<ErroResponse> tratarRegraNegocio(RegraNegocioException ex) {
-        return resposta(HttpStatus.UNPROCESSABLE_ENTITY, "Regra de negócio violada", ex.getMessage());
+        return ResponseEntity.status(422).body(new ErroResponse(422, "Regra de negócio violada", ex.getMessage()));
+    }
+
+    // 429: muitas tentativas (rate limit / força bruta)
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ErroResponse> tratarMuitasTentativas(TooManyRequestsException ex) {
+        return resposta(HttpStatus.TOO_MANY_REQUESTS, "Muitas requisições", ex.getMessage());
     }
 
     // 400: @Valid no corpo da requisição
@@ -125,7 +131,6 @@ public class GlobalExceptionHandler {
                 .body(new ErroResponse(status, erro, mensagem));
     }
 
-
     // 500: rede de segurança. SEMPRE loga o stack trace, senão o erro real some.
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErroResponse> tratarErroGenerico(Exception ex) {
@@ -137,11 +142,13 @@ public class GlobalExceptionHandler {
     private ResponseEntity<ErroResponse> resposta(HttpStatus status, String erro, String mensagem) {
         return ResponseEntity.status(status).body(new ErroResponse(status.value(), erro, mensagem));
     }
+
     // 401: e-mail ou senha incorretos no login
     @ExceptionHandler(CredenciaisInvalidasException.class)
     public ResponseEntity<ErroResponse> tratarCredenciaisInvalidas(CredenciaisInvalidasException ex) {
         return resposta(HttpStatus.UNAUTHORIZED, "Não autorizado", ex.getMessage());
     }
+
     // 404: rota inexistente (sem este handler cairia no handler genérico e viraria 500)
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErroResponse> tratarRotaInexistente(NoResourceFoundException ex) {
