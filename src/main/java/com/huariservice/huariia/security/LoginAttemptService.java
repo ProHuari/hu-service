@@ -68,3 +68,4 @@ public class LoginAttemptService {
         return key.trim().toLowerCase(Locale.ROOT);
     }
 }
+

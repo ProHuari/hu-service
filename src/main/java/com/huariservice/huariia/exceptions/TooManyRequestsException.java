@@ -9,3 +9,4 @@ public class TooManyRequestsException extends RuntimeException {
         super(message);
     }
 }
+
