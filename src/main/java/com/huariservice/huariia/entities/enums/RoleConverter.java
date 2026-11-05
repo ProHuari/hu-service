@@ -29,3 +29,4 @@ public class RoleConverter implements AttributeConverter<Role, String> {
         return Role.valueOf(normalized);
     }
 }
+
