@@ -8,18 +8,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
-    private final String[] origensPermitidas;
+    private final String[] allowedOrigins;
 
-    // Origens do front-end, separadas por vírgula, configuráveis em application-*.properties
     public CorsConfig(
-            @Value("${app.cors.allowed-origins:http://localhost:3000,http://localhost:5173}") String[] origensPermitidas) {
-        this.origensPermitidas = origensPermitidas;
+            @Value("${app.cors.allowed-origins:http://localhost:3000,http://localhost:5173}") String[] allowedOrigins) {
+        this.allowedOrigins = allowedOrigins;
     }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(origensPermitidas)
+                .allowedOrigins(allowedOrigins)
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .maxAge(3600);

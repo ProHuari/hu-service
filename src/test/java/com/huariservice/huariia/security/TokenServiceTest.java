@@ -10,10 +10,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Testes unitários para o TokenService.
- * Valida a geração de JWT (Access e Refresh) e a extração segura de claims/sujeito.
- */
 class TokenServiceTest {
 
     private TokenService tokenService;
@@ -21,73 +17,73 @@ class TokenServiceTest {
     @BeforeEach
     void setUp() {
         tokenService = new TokenService(
-                "chave-secreta-de-teste-com-mais-de-32-caracteres-para-hmac-sha",
+                "test-secret-key-with-more-than-32-characters-for-hmac-sha256",
                 60,
                 10080
         );
     }
 
     @Test
-    @DisplayName("Deve gerar token JWT válido e extrair os dados do usuário corretamente")
-    void deveGerarEValidarTokenComSucesso() {
-        User usuario = new User();
-        usuario.setId(42L);
-        usuario.setName("Aluno Teste");
-        usuario.setEmail("aluno@huari.com");
-        usuario.setRole(Role.STUDENT);
+    @DisplayName("Should generate valid JWT token and extract user data accurately")
+    void shouldGenerateAndValidateTokenSuccessfully() {
+        User user = new User();
+        user.setId(42L);
+        user.setName("Student Test");
+        user.setEmail("student@huari.com");
+        user.setRole(Role.STUDENT);
 
-        String token = tokenService.gerarToken(usuario);
+        String token = tokenService.generateToken(user);
 
         assertNotNull(token);
         assertFalse(token.isBlank());
 
-        Optional<DadosToken> dadosOpt = tokenService.validar(token);
-        assertTrue(dadosOpt.isPresent());
+        Optional<TokenData> tokenDataOpt = tokenService.validateToken(token);
+        assertTrue(tokenDataOpt.isPresent());
 
-        DadosToken dados = dadosOpt.get();
-        assertEquals(42L, dados.usuarioId());
-        assertEquals("aluno@huari.com", dados.email());
-        assertEquals("STUDENT", dados.perfil());
-        assertFalse(dados.isAdmin());
+        TokenData tokenData = tokenDataOpt.get();
+        assertEquals(42L, tokenData.userId());
+        assertEquals("student@huari.com", tokenData.email());
+        assertEquals("STUDENT", tokenData.role());
+        assertFalse(tokenData.isAdmin());
     }
 
     @Test
-    @DisplayName("Deve gerar e validar Refresh Token e impedir seu uso como Access Token")
-    void deveGerarEValidarRefreshToken() {
-        User usuario = new User();
-        usuario.setId(99L);
-        usuario.setName("Aluno Refresh");
-        usuario.setEmail("refresh@huari.com");
-        usuario.setRole(Role.STUDENT);
+    @DisplayName("Should generate and validate Refresh Token and prevent its use as an Access Token")
+    void shouldGenerateAndValidateRefreshToken() {
+        User user = new User();
+        user.setId(99L);
+        user.setName("Student Refresh");
+        user.setEmail("refresh@huari.com");
+        user.setRole(Role.STUDENT);
 
-        String refreshToken = tokenService.gerarRefreshToken(usuario);
+        String refreshToken = tokenService.generateRefreshToken(user);
 
         assertNotNull(refreshToken);
-        assertTrue(tokenService.validar(refreshToken).isEmpty());
-        assertEquals(Optional.of(99L), tokenService.validarRefreshToken(refreshToken));
-        assertTrue(tokenService.extrairExpiracao(refreshToken).isPresent());
+        assertTrue(tokenService.validateToken(refreshToken).isEmpty());
+        assertEquals(Optional.of(99L), tokenService.validateRefreshToken(refreshToken));
+        assertTrue(tokenService.extractExpiration(refreshToken).isPresent());
     }
 
     @Test
-    @DisplayName("Deve identificar corretamente quando o usuário possui perfil ADMIN")
-    void deveIdentificarUsuarioAdmin() {
+    @DisplayName("Should accurately identify when user has ADMIN role")
+    void shouldIdentifyAdminUser() {
         User admin = new User();
         admin.setId(1L);
-        admin.setName("Admin Teste");
+        admin.setName("Admin Test");
         admin.setEmail("admin@huari.com");
         admin.setRole(Role.ADMIN);
 
-        String token = tokenService.gerarToken(admin);
-        Optional<DadosToken> dadosOpt = tokenService.validar(token);
+        String token = tokenService.generateToken(admin);
+        Optional<TokenData> tokenDataOpt = tokenService.validateToken(token);
 
-        assertTrue(dadosOpt.isPresent());
-        assertTrue(dadosOpt.get().isAdmin());
+        assertTrue(tokenDataOpt.isPresent());
+        assertTrue(tokenDataOpt.get().isAdmin());
     }
 
     @Test
-    @DisplayName("Deve retornar vazio ao validar token inválido ou malformado")
-    void deveRetornarVazioParaTokenInvalido() {
-        Optional<DadosToken> dadosOpt = tokenService.validar("token-invalido-qualquer");
-        assertTrue(dadosOpt.isEmpty());
+    @DisplayName("Should return empty when validating invalid or malformed token")
+    void shouldReturnEmptyForInvalidToken() {
+        Optional<TokenData> tokenDataOpt = tokenService.validateToken("invalid-token-string");
+        assertTrue(tokenDataOpt.isEmpty());
     }
 }

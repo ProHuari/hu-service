@@ -12,23 +12,23 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
-    private static final String ESQUEMA_SEGURANCA = "bearerAuth";
+    private static final String SECURITY_SCHEME = "bearerAuth";
 
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
                         .title("Huari.ia REST API")
-                        .description("Documentação da API Huari.ia")
+                        .description("Huari.ia Civic & Educational Platform API Documentation")
                         .version("1.0.0")
                         .license(new License()
                                 .name("Apache License Version 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0")))
                 .components(new Components()
-                        .addSecuritySchemes(ESQUEMA_SEGURANCA, new SecurityScheme()
+                        .addSecuritySchemes(SECURITY_SCHEME, new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
                                 .bearerFormat("JWT")))
-                .addSecurityItem(new SecurityRequirement().addList(ESQUEMA_SEGURANCA));
+                .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME));
     }
 }

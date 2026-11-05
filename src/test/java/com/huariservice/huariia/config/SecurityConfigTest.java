@@ -19,7 +19,7 @@ class SecurityConfigTest {
     private MockMvc mockMvc;
 
     @Test
-    void semToken_cursos_retorna401() throws Exception {
+    void withoutToken_courses_returns401() throws Exception {
         mockMvc.perform(get("/cursos"))
                 .andExpect(status().isUnauthorized());
     }

@@ -15,15 +15,15 @@ import java.time.Duration;
 
 @Configuration
 @ConditionalOnProperty(name = "app.ia.enabled", havingValue = "true")
-public class IaClientConfig {
+public class AiClientConfig {
 
-    @Bean
-    public RestClient iaRestClient(
+    @Bean(name = {"aiRestClient", "iaRestClient"})
+    public RestClient aiRestClient(
             @Value("${app.ia.base-url}") String baseUrl,
             @Value("${app.ia.api-key}") String apiKey) {
 
         if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("app.ia.enabled=true mas IA_API_KEY não foi definida.");
+            throw new IllegalStateException("app.ia.enabled=true but IA_API_KEY was not configured.");
         }
 
         ClientHttpRequestFactory factory = createRequestFactory();

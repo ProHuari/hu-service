@@ -53,8 +53,8 @@ public class AuthService {
             loginAttemptService.recordSuccess(normalizedEmail);
         }
 
-        String token = tokenService.gerarToken(user);
-        String refreshToken = tokenService.gerarRefreshToken(user);
+        String token = tokenService.generateToken(user);
+        String refreshToken = tokenService.generateRefreshToken(user);
         return LoginResponse.of(token, refreshToken, user.getId(), user.getRole().name());
     }
 
@@ -66,19 +66,19 @@ public class AuthService {
             throw new InvalidCredentialsException();
         }
 
-        Long userId = tokenService.validarRefreshToken(rawRefreshToken)
+        Long userId = tokenService.validateRefreshToken(rawRefreshToken)
                 .orElseThrow(InvalidCredentialsException::new);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(InvalidCredentialsException::new);
 
         if (tokenBlacklistService != null) {
-            Instant expiry = tokenService.extrairExpiracao(rawRefreshToken).orElse(null);
+            Instant expiry = tokenService.extractExpiration(rawRefreshToken).orElse(null);
             tokenBlacklistService.revokeToken(rawRefreshToken, expiry);
         }
 
-        String newAccessToken = tokenService.gerarToken(user);
-        String newRefreshToken = tokenService.gerarRefreshToken(user);
+        String newAccessToken = tokenService.generateToken(user);
+        String newRefreshToken = tokenService.generateRefreshToken(user);
         return LoginResponse.of(newAccessToken, newRefreshToken, user.getId(), user.getRole().name());
     }
 
@@ -88,7 +88,7 @@ public class AuthService {
         }
         String token = authorizationHeader.substring(7).trim();
         if (tokenBlacklistService != null && !token.isEmpty()) {
-            Instant expiry = tokenService.extrairExpiracao(token).orElse(null);
+            Instant expiry = tokenService.extractExpiration(token).orElse(null);
             tokenBlacklistService.revokeToken(token, expiry);
         }
     }

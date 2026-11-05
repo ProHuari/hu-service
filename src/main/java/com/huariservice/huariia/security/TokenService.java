@@ -19,52 +19,52 @@ import java.util.Optional;
 @Service
 public class TokenService {
 
-    private final SecretKey chave;
-    private final long expiracaoMinutos;
-    private final long refreshExpiracaoMinutos;
+    private final SecretKey secretKey;
+    private final long expirationMinutes;
+    private final long refreshExpirationMinutes;
 
-    public TokenService(String secret, long expiracaoMinutos) {
-        this(secret, expiracaoMinutos, 10080L);
+    public TokenService(String secret, long expirationMinutes) {
+        this(secret, expirationMinutes, 10080L);
     }
 
     @Autowired
     public TokenService(
             @Value("${app.jwt.secret}") String secret,
-            @Value("${app.jwt.expiration-minutes:120}") long expiracaoMinutos,
-            @Value("${app.jwt.refresh-expiration-minutes:10080}") long refreshExpiracaoMinutos) {
-        this.chave = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.expiracaoMinutos = expiracaoMinutos;
-        this.refreshExpiracaoMinutos = refreshExpiracaoMinutos;
+            @Value("${app.jwt.expiration-minutes:120}") long expirationMinutes,
+            @Value("${app.jwt.refresh-expiration-minutes:10080}") long refreshExpirationMinutes) {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.expirationMinutes = expirationMinutes;
+        this.refreshExpirationMinutes = refreshExpirationMinutes;
     }
 
-    public String gerarToken(User usuario) {
-        Instant agora = Instant.now();
+    public String generateToken(User user) {
+        Instant now = Instant.now();
         return Jwts.builder()
-                .subject(String.valueOf(usuario.getId()))
-                .claim("email", usuario.getEmail())
-                .claim("perfil", usuario.getRole().name())
+                .subject(String.valueOf(user.getId()))
+                .claim("email", user.getEmail())
+                .claim("role", user.getRole().name())
                 .claim("type", "access")
-                .issuedAt(Date.from(agora))
-                .expiration(Date.from(agora.plus(expiracaoMinutos, ChronoUnit.MINUTES)))
-                .signWith(chave)
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plus(expirationMinutes, ChronoUnit.MINUTES)))
+                .signWith(secretKey)
                 .compact();
     }
 
-    public String gerarRefreshToken(User usuario) {
-        Instant agora = Instant.now();
+    public String generateRefreshToken(User user) {
+        Instant now = Instant.now();
         return Jwts.builder()
-                .subject(String.valueOf(usuario.getId()))
+                .subject(String.valueOf(user.getId()))
                 .claim("type", "refresh")
-                .issuedAt(Date.from(agora))
-                .expiration(Date.from(agora.plus(refreshExpiracaoMinutos, ChronoUnit.MINUTES)))
-                .signWith(chave)
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plus(refreshExpirationMinutes, ChronoUnit.MINUTES)))
+                .signWith(secretKey)
                 .compact();
     }
 
-    public Optional<DadosToken> validar(String token) {
+    public Optional<TokenData> validateToken(String token) {
         try {
             Claims claims = Jwts.parser()
-                    .verifyWith(chave)
+                    .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -73,19 +73,24 @@ public class TokenService {
                 return Optional.empty();
             }
 
-            return Optional.of(new DadosToken(
+            String role = claims.get("role", String.class);
+            if (role == null) {
+                role = claims.get("perfil", String.class);
+            }
+
+            return Optional.of(new TokenData(
                     Long.valueOf(claims.getSubject()),
                     claims.get("email", String.class),
-                    claims.get("perfil", String.class)));
+                    role));
         } catch (JwtException | IllegalArgumentException e) {
             return Optional.empty();
         }
     }
 
-    public Optional<Long> validarRefreshToken(String refreshToken) {
+    public Optional<Long> validateRefreshToken(String refreshToken) {
         try {
             Claims claims = Jwts.parser()
-                    .verifyWith(chave)
+                    .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(refreshToken)
                     .getPayload();
@@ -100,10 +105,10 @@ public class TokenService {
         }
     }
 
-    public Optional<Instant> extrairExpiracao(String token) {
+    public Optional<Instant> extractExpiration(String token) {
         try {
             Claims claims = Jwts.parser()
-                    .verifyWith(chave)
+                    .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();

@@ -32,12 +32,12 @@ public class AuthFilter extends OncePerRequestFilter {
             String token = header.substring(7);
 
             if (!tokenBlacklistService.isRevoked(token)) {
-                tokenService.validar(token).ifPresent(dados -> {
-                    var autenticacao = new UsernamePasswordAuthenticationToken(
-                            dados,
+                tokenService.validateToken(token).ifPresent(tokenData -> {
+                    var authentication = new UsernamePasswordAuthenticationToken(
+                            tokenData,
                             null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + dados.perfil())));
-                    SecurityContextHolder.getContext().setAuthentication(autenticacao);
+                            List.of(new SimpleGrantedAuthority("ROLE_" + tokenData.role())));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 });
             }
         }

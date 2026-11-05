@@ -35,9 +35,9 @@ public class GeminiAiAnswerGenerator implements AiAnswerGenerator {
     private final RestClient client;
     private final String model;
 
-    public GeminiAiAnswerGenerator(RestClient iaRestClient,
+    public GeminiAiAnswerGenerator(RestClient aiRestClient,
                                    @Value("${app.ia.model:gemini-1.5-flash}") String model) {
-        this.client = iaRestClient;
+        this.client = aiRestClient;
         this.model = model;
     }
 
@@ -62,7 +62,7 @@ public class GeminiAiAnswerGenerator implements AiAnswerGenerator {
             );
 
             GeminiResponse response = client.post()
-                    .uri("/v1beta/models/{modelo}:generateContent", model)
+                    .uri("/v1beta/models/{model}:generateContent", model)
                     .body(request)
                     .retrieve()
                     .body(GeminiResponse.class);

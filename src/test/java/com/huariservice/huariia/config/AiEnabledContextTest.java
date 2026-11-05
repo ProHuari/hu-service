@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "app.ia.api-key=dummy-test-key",
         "app.ia.model=gemini-1.5-flash"
 })
-class IaAtivadaContextTest {
+class AiEnabledContextTest {
 
     @Autowired
     private ApplicationContext context;
@@ -29,10 +29,10 @@ class IaAtivadaContextTest {
     private AiAnswerGenerator aiAnswerGenerator;
 
     @Test
-    @DisplayName("Garante que o bean RestClient e a implementação Gemini sobem quando a IA está ativada")
-    void deveSubirContextoComIaAtivada() {
-        assertThat(context.containsBean("iaRestClient")).isTrue();
-        assertThat(context.getBean("iaRestClient", RestClient.class)).isNotNull();
+    @DisplayName("Ensures RestClient bean and Gemini implementation load when AI is enabled")
+    void shouldLoadContextWithAiEnabled() {
+        assertThat(context.containsBean("aiRestClient")).isTrue();
+        assertThat(context.getBean("aiRestClient", RestClient.class)).isNotNull();
         assertThat(aiAnswerGenerator).isInstanceOf(GeminiAiAnswerGenerator.class);
     }
 }

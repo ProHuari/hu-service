@@ -26,9 +26,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Testes unitários para o fluxo de autenticação, rate limiting, refresh token e logout no AuthService.
- */
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
@@ -51,19 +48,19 @@ class AuthServiceTest {
     private AuthService authService;
 
     @Test
-    @DisplayName("Deve autenticar com sucesso quando email e senha forem válidos")
-    void deveAutenticarComSucesso() {
-        LoginRequest request = new LoginRequest("aluno@huari.com", "senhaCorreta123");
-        User usuario = new User();
-        usuario.setId(10L);
-        usuario.setEmail("aluno@huari.com");
-        usuario.setPasswordHash("hashBcrypted");
-        usuario.setRole(Role.STUDENT);
+    @DisplayName("Should authenticate successfully when e-mail and password are valid")
+    void shouldAuthenticateSuccessfully() {
+        LoginRequest request = new LoginRequest("student@huari.com", "validPassword123");
+        User user = new User();
+        user.setId(10L);
+        user.setEmail("student@huari.com");
+        user.setPasswordHash("bcryptHash");
+        user.setRole(Role.STUDENT);
 
-        when(userRepository.findByEmail("aluno@huari.com")).thenReturn(Optional.of(usuario));
-        when(passwordEncoder.matches("senhaCorreta123", "hashBcrypted")).thenReturn(true);
-        when(tokenService.gerarToken(usuario)).thenReturn("mocked.jwt.token");
-        when(tokenService.gerarRefreshToken(usuario)).thenReturn("mocked.refresh.token");
+        when(userRepository.findByEmail("student@huari.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("validPassword123", "bcryptHash")).thenReturn(true);
+        when(tokenService.generateToken(user)).thenReturn("mocked.jwt.token");
+        when(tokenService.generateRefreshToken(user)).thenReturn("mocked.refresh.token");
 
         LoginResponse response = authService.login(request);
 
@@ -75,36 +72,36 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lançar CredenciaisInvalidasException quando a senha não conferir")
-    void deveLancarExcecaoQuandoSenhaInvalida() {
-        LoginRequest request = new LoginRequest("aluno@huari.com", "senhaIncorreta");
-        User usuario = new User();
-        usuario.setId(10L);
-        usuario.setEmail("aluno@huari.com");
-        usuario.setPasswordHash("hashBcrypted");
+    @DisplayName("Should throw InvalidCredentialsException when password does not match")
+    void shouldThrowExceptionWhenPasswordIsInvalid() {
+        LoginRequest request = new LoginRequest("student@huari.com", "wrongPassword");
+        User user = new User();
+        user.setId(10L);
+        user.setEmail("student@huari.com");
+        user.setPasswordHash("bcryptHash");
 
-        when(userRepository.findByEmail("aluno@huari.com")).thenReturn(Optional.of(usuario));
-        when(passwordEncoder.matches("senhaIncorreta", "hashBcrypted")).thenReturn(false);
+        when(userRepository.findByEmail("student@huari.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrongPassword", "bcryptHash")).thenReturn(false);
 
         assertThrows(InvalidCredentialsException.class, () -> authService.login(request));
-        verify(tokenService, never()).gerarToken(any());
+        verify(tokenService, never()).generateToken(any());
     }
 
     @Test
-    @DisplayName("Deve lançar InvalidCredentialsException quando o e-mail não existir")
-    void deveLancarExcecaoQuandoEmailNaoCadastrado() {
-        LoginRequest request = new LoginRequest("inexistente@huari.com", "senha123");
+    @DisplayName("Should throw InvalidCredentialsException when e-mail is not registered")
+    void shouldThrowExceptionWhenEmailIsNotRegistered() {
+        LoginRequest request = new LoginRequest("missing@huari.com", "password123");
 
-        when(userRepository.findByEmail("inexistente@huari.com")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("missing@huari.com")).thenReturn(Optional.empty());
 
         assertThrows(InvalidCredentialsException.class, () -> authService.login(request));
-        verify(tokenService, never()).gerarToken(any());
+        verify(tokenService, never()).generateToken(any());
     }
 
     @Test
-    @DisplayName("Deve bloquear login com TooManyRequestsException após 5 tentativas falhas")
-    void deveBloquearAposCincoTentativasFalhas() {
-        LoginRequest request = new LoginRequest("bruteforce@huari.com", "errada");
+    @DisplayName("Should block login with TooManyRequestsException after 5 failed attempts")
+    void shouldLockAfterFiveFailedAttempts() {
+        LoginRequest request = new LoginRequest("bruteforce@huari.com", "wrong");
         when(userRepository.findByEmail("bruteforce@huari.com")).thenReturn(Optional.empty());
 
         for (int i = 0; i < 5; i++) {
@@ -115,15 +112,15 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Deve revogar token no logout e rejeitar refresh de token revogado")
-    void deveRevogarTokenNoLogoutERefresh() {
-        when(tokenService.extrairExpiracao("meu.token.jwt"))
+    @DisplayName("Should revoke token on logout and reject refresh of revoked token")
+    void shouldRevokeTokenOnLogoutAndRejectRefresh() {
+        when(tokenService.extractExpiration("my.jwt.token"))
                 .thenReturn(Optional.of(Instant.now().plusSeconds(3600)));
 
-        authService.logout("Bearer meu.token.jwt");
+        authService.logout("Bearer my.jwt.token");
 
-        assertTrue(tokenBlacklistService.isRevoked("meu.token.jwt"));
+        assertTrue(tokenBlacklistService.isRevoked("my.jwt.token"));
         assertThrows(InvalidCredentialsException.class,
-                () -> authService.refresh(new RefreshTokenRequest("meu.token.jwt")));
+                () -> authService.refresh(new RefreshTokenRequest("my.jwt.token")));
     }
 }
