@@ -1,17 +1,17 @@
 package com.huariservice.huariia.controllers;
 
-import com.huariservice.huariia.dto.HistoricoIaRequest;
-import com.huariservice.huariia.dto.HistoricoIaResponse;
+import com.huariservice.huariia.dto.AiHistoryRequest;
+import com.huariservice.huariia.dto.AiHistoryResponse;
 import com.huariservice.huariia.security.DadosToken;
-import com.huariservice.huariia.services.ConsultaIaService;
-import com.huariservice.huariia.services.HistoricoIaService;
+import com.huariservice.huariia.services.AiHistoryService;
+import com.huariservice.huariia.services.AiQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -25,22 +25,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HistoricoIaController {
 
-    private final HistoricoIaService historicoIaService;
-    private final ConsultaIaService consultaIaService;
-
-
-
+    private final AiHistoryService aiHistoryService;
+    private final AiQueryService aiQueryService;
 
     @PostMapping
     @Operation(summary = "Envia pergunta à IA e salva no histórico")
-    public ResponseEntity<HistoricoIaResponse> criar(
-            @Valid @RequestBody HistoricoIaRequest request,
+    public ResponseEntity<AiHistoryResponse> criar(
+            @Valid @RequestBody AiHistoryRequest request,
             @Parameter(hidden = true)
             @AuthenticationPrincipal DadosToken usuarioLogado) {
 
-        HistoricoIaResponse response = consultaIaService.consultar(
+        AiHistoryResponse response = aiQueryService.query(
                 usuarioLogado.usuarioId(),
-                request.pergunta()
+                request.question()
         );
 
         URI location = ServletUriComponentsBuilder
@@ -52,31 +49,29 @@ public class HistoricoIaController {
         return ResponseEntity.created(location).body(response);
     }
 
-
-
     @GetMapping
     @Operation(summary = "Aluno vê o próprio histórico; admin vê todos (filtro opcional usuarioId)")
-    public ResponseEntity<List<HistoricoIaResponse>> listar(
+    public ResponseEntity<List<AiHistoryResponse>> listar(
             @RequestParam(required = false) Long usuarioId,
             @Parameter(hidden = true) @AuthenticationPrincipal DadosToken usuarioLogado) {
-        List<HistoricoIaResponse> historico;
+        List<AiHistoryResponse> historico;
         if (!usuarioLogado.isAdmin()) {
-            historico = historicoIaService.mostrarHistoricoDoUsuario(usuarioLogado.usuarioId());
+            historico = aiHistoryService.listHistoryByUser(usuarioLogado.usuarioId());
         } else if (usuarioId != null) {
-            historico = historicoIaService.mostrarHistoricoDoUsuario(usuarioId);
+            historico = aiHistoryService.listHistoryByUser(usuarioId);
         } else {
-            historico = historicoIaService.mostrarHistoricoIa();
+            historico = aiHistoryService.listAllHistory();
         }
         return ResponseEntity.ok(historico);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Busca um registro do histórico pelo id (aluno só acessa o próprio)")
-    public ResponseEntity<HistoricoIaResponse> buscar(
+    public ResponseEntity<AiHistoryResponse> buscar(
             @PathVariable Long id,
             @Parameter(hidden = true) @AuthenticationPrincipal DadosToken usuarioLogado) {
         return ResponseEntity.ok(
-                historicoIaService.buscarPorId(id, usuarioLogado.usuarioId(), usuarioLogado.isAdmin()));
+                aiHistoryService.findById(id, usuarioLogado.usuarioId(), usuarioLogado.isAdmin()));
     }
 
     @DeleteMapping("/{id}")
@@ -84,7 +79,7 @@ public class HistoricoIaController {
     public ResponseEntity<Void> deletar(
             @PathVariable Long id,
             @Parameter(hidden = true) @AuthenticationPrincipal DadosToken usuarioLogado) {
-        historicoIaService.deletarId(id, usuarioLogado.usuarioId(), usuarioLogado.isAdmin());
+        aiHistoryService.deleteById(id, usuarioLogado.usuarioId(), usuarioLogado.isAdmin());
         return ResponseEntity.noContent().build();
     }
 }
