@@ -2,26 +2,32 @@ package com.huariservice.huariia.services;
 
 import com.huariservice.huariia.dto.LoginRequest;
 import com.huariservice.huariia.dto.LoginResponse;
+import com.huariservice.huariia.dto.RefreshTokenRequest;
 import com.huariservice.huariia.entities.User;
 import com.huariservice.huariia.entities.enums.Role;
 import com.huariservice.huariia.exceptions.CredenciaisInvalidasException;
+import com.huariservice.huariia.exceptions.TooManyRequestsException;
 import com.huariservice.huariia.repositories.UserRepository;
+import com.huariservice.huariia.security.LoginAttemptService;
+import com.huariservice.huariia.security.TokenBlacklistService;
 import com.huariservice.huariia.security.TokenService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Testes unitários para o fluxo de autenticação e validação de credenciais no AuthService.
+ * Testes unitários para o fluxo de autenticação, rate limiting, refresh token e logout no AuthService.
  */
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -34,6 +40,12 @@ class AuthServiceTest {
 
     @Mock
     private TokenService tokenService;
+
+    @Spy
+    private LoginAttemptService loginAttemptService = new LoginAttemptService();
+
+    @Spy
+    private TokenBlacklistService tokenBlacklistService = new TokenBlacklistService();
 
     @InjectMocks
     private AuthService authService;
@@ -51,11 +63,13 @@ class AuthServiceTest {
         when(userRepository.findByEmail("aluno@huari.com")).thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("senhaCorreta123", "hashBcrypted")).thenReturn(true);
         when(tokenService.gerarToken(usuario)).thenReturn("mocked.jwt.token");
+        when(tokenService.gerarRefreshToken(usuario)).thenReturn("mocked.refresh.token");
 
         LoginResponse response = authService.login(request);
 
         assertNotNull(response);
         assertEquals("mocked.jwt.token", response.token());
+        assertEquals("mocked.refresh.token", response.refreshToken());
         assertEquals(10L, response.userId());
         assertEquals("STUDENT", response.role());
     }
@@ -85,5 +99,31 @@ class AuthServiceTest {
 
         assertThrows(CredenciaisInvalidasException.class, () -> authService.login(request));
         verify(tokenService, never()).gerarToken(any());
+    }
+
+    @Test
+    @DisplayName("Deve bloquear login com TooManyRequestsException após 5 tentativas falhas")
+    void deveBloquearAposCincoTentativasFalhas() {
+        LoginRequest request = new LoginRequest("bruteforce@huari.com", "errada");
+        when(userRepository.findByEmail("bruteforce@huari.com")).thenReturn(Optional.empty());
+
+        for (int i = 0; i < 5; i++) {
+            assertThrows(CredenciaisInvalidasException.class, () -> authService.login(request));
+        }
+
+        assertThrows(TooManyRequestsException.class, () -> authService.login(request));
+    }
+
+    @Test
+    @DisplayName("Deve revogar token no logout e rejeitar refresh de token revogado")
+    void deveRevogarTokenNoLogoutERefresh() {
+        when(tokenService.extrairExpiracao("meu.token.jwt"))
+                .thenReturn(Optional.of(Instant.now().plusSeconds(3600)));
+
+        authService.logout("Bearer meu.token.jwt");
+
+        assertTrue(tokenBlacklistService.isRevoked("meu.token.jwt"));
+        assertThrows(CredenciaisInvalidasException.class,
+                () -> authService.refresh(new RefreshTokenRequest("meu.token.jwt")));
     }
 }

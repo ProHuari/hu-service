@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Testes unitários para o TokenService.
- * Valida a geração de JWT e a extração segura de claims/sujeito.
+ * Valida a geração de JWT (Access e Refresh) e a extração segura de claims/sujeito.
  */
 class TokenServiceTest {
 
@@ -20,10 +20,10 @@ class TokenServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Segredo com pelo menos 32 caracteres (256 bits) exigido pelo algoritmo HMAC-SHA
         tokenService = new TokenService(
                 "chave-secreta-de-teste-com-mais-de-32-caracteres-para-hmac-sha",
-                60
+                60,
+                10080
         );
     }
 
@@ -49,6 +49,23 @@ class TokenServiceTest {
         assertEquals("aluno@huari.com", dados.email());
         assertEquals("STUDENT", dados.perfil());
         assertFalse(dados.isAdmin());
+    }
+
+    @Test
+    @DisplayName("Deve gerar e validar Refresh Token e impedir seu uso como Access Token")
+    void deveGerarEValidarRefreshToken() {
+        User usuario = new User();
+        usuario.setId(99L);
+        usuario.setName("Aluno Refresh");
+        usuario.setEmail("refresh@huari.com");
+        usuario.setRole(Role.STUDENT);
+
+        String refreshToken = tokenService.gerarRefreshToken(usuario);
+
+        assertNotNull(refreshToken);
+        assertTrue(tokenService.validar(refreshToken).isEmpty());
+        assertEquals(Optional.of(99L), tokenService.validarRefreshToken(refreshToken));
+        assertTrue(tokenService.extrairExpiracao(refreshToken).isPresent());
     }
 
     @Test
