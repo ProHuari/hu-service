@@ -11,6 +11,8 @@ import com.huariservice.huariia.exceptions.ConflictException;
 import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,6 +67,11 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<UserResponse> listUsers() {
         return userRepository.findAll().stream().map(UserResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserResponse> listUsers(Pageable pageable) {
+        return userRepository.findAll(pageable).map(UserResponse::from);
     }
 
     /**

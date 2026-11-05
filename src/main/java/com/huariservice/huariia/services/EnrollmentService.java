@@ -12,6 +12,8 @@ import com.huariservice.huariia.repositories.CourseRepository;
 import com.huariservice.huariia.repositories.EnrollmentRepository;
 import com.huariservice.huariia.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +75,11 @@ public class EnrollmentService {
         return enrollmentRepository.findAll().stream().map(EnrollmentResponse::from).toList();
     }
 
+    @Transactional(readOnly = true)
+    public Page<EnrollmentResponse> listEnrollments(Pageable pageable) {
+        return enrollmentRepository.findAll(pageable).map(EnrollmentResponse::from);
+    }
+
     /**
      * Lists the enrollments of one user ("my courses").
      *
@@ -83,6 +90,12 @@ public class EnrollmentService {
     public List<EnrollmentResponse> listEnrollmentsByUser(Long userId) {
         return enrollmentRepository.findByUserId(userId).stream()
                 .map(EnrollmentResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<EnrollmentResponse> listEnrollmentsByUser(Long userId, Pageable pageable) {
+        return enrollmentRepository.findByUserId(userId, pageable)
+                .map(EnrollmentResponse::from);
     }
 
     /**

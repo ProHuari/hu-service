@@ -7,6 +7,8 @@ import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.AiHistoryRepository;
 import com.huariservice.huariia.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +59,11 @@ public class AiHistoryService {
         return historyRepository.findAll().stream().map(AiHistoryResponse::from).toList();
     }
 
+    @Transactional(readOnly = true)
+    public Page<AiHistoryResponse> listAllHistory(Pageable pageable) {
+        return historyRepository.findAll(pageable).map(AiHistoryResponse::from);
+    }
+
     /**
      * Lists the history of a specific user, sorted from most recent to oldest.
      *
@@ -67,6 +74,12 @@ public class AiHistoryService {
     public List<AiHistoryResponse> listHistoryByUser(Long userId) {
         return historyRepository.findByUserIdOrderByQueriedAtDesc(userId).stream()
                 .map(AiHistoryResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AiHistoryResponse> listHistoryByUser(Long userId, Pageable pageable) {
+        return historyRepository.findByUserIdOrderByQueriedAtDesc(userId, pageable)
+                .map(AiHistoryResponse::from);
     }
 
     /**

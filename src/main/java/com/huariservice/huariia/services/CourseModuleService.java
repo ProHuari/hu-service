@@ -9,6 +9,8 @@ import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.CourseModuleRepository;
 import com.huariservice.huariia.repositories.CourseRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,6 +62,11 @@ public class CourseModuleService {
         return moduleRepository.findAll().stream().map(CourseModuleResponse::from).toList();
     }
 
+    @Transactional(readOnly = true)
+    public Page<CourseModuleResponse> listModules(Pageable pageable) {
+        return moduleRepository.findAll(pageable).map(CourseModuleResponse::from);
+    }
+
     /**
      * Lists the modules of one course, ordered by position.
      *
@@ -70,6 +77,12 @@ public class CourseModuleService {
     public List<CourseModuleResponse> listModulesByCourse(Long courseId) {
         return moduleRepository.findByCourseIdOrderByPositionAsc(courseId).stream()
                 .map(CourseModuleResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CourseModuleResponse> listModulesByCourse(Long courseId, Pageable pageable) {
+        return moduleRepository.findByCourseIdOrderByPositionAsc(courseId, pageable)
+                .map(CourseModuleResponse::from);
     }
 
     /**

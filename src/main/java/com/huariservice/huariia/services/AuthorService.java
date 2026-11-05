@@ -7,6 +7,8 @@ import com.huariservice.huariia.exceptions.ConflictException;
 import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.AuthorRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +63,11 @@ public class AuthorService {
     @Transactional(readOnly = true)
     public List<AuthorResponse> listAuthors() {
         return authorRepository.findAll().stream().map(AuthorResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AuthorResponse> listAuthors(Pageable pageable) {
+        return authorRepository.findAll(pageable).map(AuthorResponse::from);
     }
 
     /**

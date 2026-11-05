@@ -14,6 +14,8 @@ import com.huariservice.huariia.repositories.LessonProgressRepository;
 import com.huariservice.huariia.repositories.LessonRepository;
 import com.huariservice.huariia.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,6 +88,11 @@ public class LessonProgressService {
         return progressRepository.findAll().stream().map(LessonProgressResponse::from).toList();
     }
 
+    @Transactional(readOnly = true)
+    public Page<LessonProgressResponse> listProgress(Pageable pageable) {
+        return progressRepository.findAll(pageable).map(LessonProgressResponse::from);
+    }
+
     /**
      * Lists the progress records of one user.
      *
@@ -96,6 +103,12 @@ public class LessonProgressService {
     public List<LessonProgressResponse> listProgressByUser(Long userId) {
         return progressRepository.findByUserId(userId).stream()
                 .map(LessonProgressResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<LessonProgressResponse> listProgressByUser(Long userId, Pageable pageable) {
+        return progressRepository.findByUserId(userId, pageable)
+                .map(LessonProgressResponse::from);
     }
 
     /**

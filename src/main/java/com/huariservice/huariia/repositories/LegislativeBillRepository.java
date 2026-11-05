@@ -1,6 +1,8 @@
 package com.huariservice.huariia.repositories;
 
 import com.huariservice.huariia.entities.LegislativeBill;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,5 +16,8 @@ public interface LegislativeBillRepository extends JpaRepository<LegislativeBill
 
     List<LegislativeBill> findByTitleContainingIgnoreCaseOrSummaryContainingIgnoreCaseOrCodeContainingIgnoreCase(
             String title, String summary, String code);
+
+    Page<LegislativeBill> findByTitleContainingIgnoreCaseOrSummaryContainingIgnoreCaseOrCodeContainingIgnoreCase(
+            String title, String summary, String code, Pageable pageable);
 }
 

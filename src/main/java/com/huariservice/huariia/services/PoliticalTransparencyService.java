@@ -16,6 +16,8 @@ import com.huariservice.huariia.repositories.LegislativeBillRepository;
 import com.huariservice.huariia.repositories.ParliamentarianExpenseRepository;
 import com.huariservice.huariia.repositories.ParliamentarianRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +56,14 @@ public class PoliticalTransparencyService {
                 ? parliamentarianRepository.findByChamber(chamber)
                 : parliamentarianRepository.findAll();
         return list.stream().map(ParliamentarianResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ParliamentarianResponse> listParliamentarians(ParliamentarianChamber chamber, Pageable pageable) {
+        Page<Parliamentarian> page = (chamber != null)
+                ? parliamentarianRepository.findByChamber(chamber, pageable)
+                : parliamentarianRepository.findAll(pageable);
+        return page.map(ParliamentarianResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -102,6 +112,16 @@ public class PoliticalTransparencyService {
     }
 
     @Transactional(readOnly = true)
+    public Page<LegislativeBillResponse> listBills(String query, Pageable pageable) {
+        Page<LegislativeBill> bills = (query != null && !query.isBlank())
+                ? legislativeBillRepository
+                        .findByTitleContainingIgnoreCaseOrSummaryContainingIgnoreCaseOrCodeContainingIgnoreCase(
+                                query.trim(), query.trim(), query.trim(), pageable)
+                : legislativeBillRepository.findAll(pageable);
+        return bills.map(LegislativeBillResponse::from);
+    }
+
+    @Transactional(readOnly = true)
     public LegislativeBillResponse findBillById(Long id) {
         LegislativeBill bill = legislativeBillRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Legislative bill not found"));
@@ -137,6 +157,14 @@ public class PoliticalTransparencyService {
                 ? expenseRepository.findByParliamentarianIdOrderByExpenseDateDesc(parliamentarianId)
                 : expenseRepository.findAll();
         return expenses.stream().map(ParliamentarianExpenseResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ParliamentarianExpenseResponse> listExpenses(Long parliamentarianId, Pageable pageable) {
+        Page<ParliamentarianExpense> expenses = (parliamentarianId != null)
+                ? expenseRepository.findByParliamentarianIdOrderByExpenseDateDesc(parliamentarianId, pageable)
+                : expenseRepository.findAll(pageable);
+        return expenses.map(ParliamentarianExpenseResponse::from);
     }
 
     public void deleteExpense(Long id) {

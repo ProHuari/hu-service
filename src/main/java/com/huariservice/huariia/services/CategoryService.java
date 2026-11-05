@@ -7,6 +7,8 @@ import com.huariservice.huariia.exceptions.ConflictException;
 import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +57,11 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public List<CategoryResponse> listCategories() {
         return categoryRepository.findAll().stream().map(CategoryResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CategoryResponse> listCategories(Pageable pageable) {
+        return categoryRepository.findAll(pageable).map(CategoryResponse::from);
     }
 
     /**

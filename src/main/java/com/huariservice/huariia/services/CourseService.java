@@ -11,6 +11,8 @@ import com.huariservice.huariia.repositories.AuthorRepository;
 import com.huariservice.huariia.repositories.CategoryRepository;
 import com.huariservice.huariia.repositories.CourseRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +69,11 @@ public class CourseService {
     @Transactional(readOnly = true)
     public List<CourseResponse> listCourses() {
         return courseRepository.findAll().stream().map(CourseResponse::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CourseResponse> listCourses(Pageable pageable) {
+        return courseRepository.findAll(pageable).map(CourseResponse::from);
     }
 
     /**
