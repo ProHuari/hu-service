@@ -33,6 +33,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; frame-ancestors 'none'"))
+                        .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
+                        .frameOptions(frame -> frame.deny()))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -49,7 +53,13 @@ public class SecurityConfig {
                         }))
                 .authorizeHttpRequests(auth -> auth
                         // públicas
-                        .requestMatchers("/auth/login", "/error").permitAll()
+                        .requestMatchers(
+                                "/auth/login",
+                                "/auth/refresh",
+                                "/auth/forgot-password",
+                                "/auth/reset-password",
+                                "/error"
+                        ).permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
 
@@ -67,7 +77,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/matriculas/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/matriculas/**").hasRole("ADMIN")
 
-                        // o resto (matrícula, progresso, histórico): qualquer logado
+                        // o resto (matrícula, progresso, histórico, logout): qualquer logado
                         .anyRequest().authenticated())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
 
