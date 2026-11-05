@@ -1,7 +1,7 @@
 package com.huariservice.huariia.config;
 
-import com.huariservice.huariia.services.GeradorRespostaIa;
-import com.huariservice.huariia.services.GeradorRespostaIaGemini;
+import com.huariservice.huariia.services.AiAnswerGenerator;
+import com.huariservice.huariia.services.GeminiAiAnswerGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = {
         "app.ia.enabled=true",
         "app.ia.api-key=dummy-test-key",
-        "app.ia.model=gemini-2.5-flash"
+        "app.ia.model=gemini-1.5-flash"
 })
 class IaAtivadaContextTest {
 
@@ -26,13 +26,13 @@ class IaAtivadaContextTest {
     private ApplicationContext context;
 
     @Autowired
-    private GeradorRespostaIa geradorRespostaIa;
+    private AiAnswerGenerator aiAnswerGenerator;
 
     @Test
     @DisplayName("Garante que o bean RestClient e a implementação Gemini sobem quando a IA está ativada")
     void deveSubirContextoComIaAtivada() {
         assertThat(context.containsBean("iaRestClient")).isTrue();
         assertThat(context.getBean("iaRestClient", RestClient.class)).isNotNull();
-        assertThat(geradorRespostaIa).isInstanceOf(GeradorRespostaIaGemini.class);
+        assertThat(aiAnswerGenerator).isInstanceOf(GeminiAiAnswerGenerator.class);
     }
 }
