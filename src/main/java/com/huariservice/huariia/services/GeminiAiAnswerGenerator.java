@@ -25,10 +25,12 @@ import java.util.List;
 public class GeminiAiAnswerGenerator implements AiAnswerGenerator {
 
     private static final String SYSTEM_INSTRUCTION = """
-            Você é o assistente da plataforma de cursos Huari.ia. \
-            Ajude o aluno com dúvidas sobre os conteúdos de estudo, de forma clara e objetiva, \
-            em português do Brasil. Se a pergunta fugir completamente de estudo e aprendizado, \
-            diga educadamente que só pode ajudar com isso.""";
+            Você é o assistente de educação política, cidadania e estudos da plataforma Huari.ia. \
+            Sua missão é traduzir o "juridiquês" e explicar projetos de lei (PLs), atuação parlamentar, \
+            orçamento público e conteúdos de estudo de forma clara, didática, apartidária e objetiva, \
+            em português do Brasil. Quando um contexto legislativo (RAG) for fornecido, utilize-o como \
+            base factual principal. Se a pergunta fugir completamente de educação política, cidadania \
+            ou aprendizado, diga educadamente que só pode ajudar com esses temas.""";
 
     private final RestClient client;
     private final String model;

@@ -10,9 +10,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -47,6 +49,15 @@ public class HistoricoIaController {
                 .toUri();
 
         return ResponseEntity.created(location).body(response);
+    }
+
+    @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Operation(summary = "Envia pergunta à IA com contexto RAG e retorna a resposta via Server-Sent Events (SSE)")
+    public SseEmitter criarStream(
+            @Valid @RequestBody AiHistoryRequest request,
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal DadosToken usuarioLogado) {
+        return aiQueryService.streamQuery(usuarioLogado.usuarioId(), request.question());
     }
 
     @GetMapping
