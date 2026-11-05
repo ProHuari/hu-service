@@ -1,7 +1,7 @@
 package com.huariservice.huariia.security;
 
-import com.huariservice.huariia.entities.Usuario;
-import com.huariservice.huariia.entities.enums.TipoPerfil;
+import com.huariservice.huariia.entities.User;
+import com.huariservice.huariia.entities.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,11 +30,11 @@ class TokenServiceTest {
     @Test
     @DisplayName("Deve gerar token JWT válido e extrair os dados do usuário corretamente")
     void deveGerarEValidarTokenComSucesso() {
-        Usuario usuario = new Usuario();
+        User usuario = new User();
         usuario.setId(42L);
-        usuario.setNome("Aluno Teste");
+        usuario.setName("Aluno Teste");
         usuario.setEmail("aluno@huari.com");
-        usuario.setTipoPerfil(TipoPerfil.ALUNO);
+        usuario.setRole(Role.STUDENT);
 
         String token = tokenService.gerarToken(usuario);
 
@@ -47,18 +47,18 @@ class TokenServiceTest {
         DadosToken dados = dadosOpt.get();
         assertEquals(42L, dados.usuarioId());
         assertEquals("aluno@huari.com", dados.email());
-        assertEquals("ALUNO", dados.perfil());
+        assertEquals("STUDENT", dados.perfil());
         assertFalse(dados.isAdmin());
     }
 
     @Test
     @DisplayName("Deve identificar corretamente quando o usuário possui perfil ADMIN")
     void deveIdentificarUsuarioAdmin() {
-        Usuario admin = new Usuario();
+        User admin = new User();
         admin.setId(1L);
-        admin.setNome("Admin Teste");
+        admin.setName("Admin Teste");
         admin.setEmail("admin@huari.com");
-        admin.setTipoPerfil(TipoPerfil.ADMIN);
+        admin.setRole(Role.ADMIN);
 
         String token = tokenService.gerarToken(admin);
         Optional<DadosToken> dadosOpt = tokenService.validar(token);
