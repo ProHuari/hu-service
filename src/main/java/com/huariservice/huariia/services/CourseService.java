@@ -5,8 +5,8 @@ import com.huariservice.huariia.dto.CourseResponse;
 import com.huariservice.huariia.entities.Author;
 import com.huariservice.huariia.entities.Category;
 import com.huariservice.huariia.entities.Course;
-import com.huariservice.huariia.exceptions.ConflitoException;
-import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
+import com.huariservice.huariia.exceptions.ConflictException;
+import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.AuthorRepository;
 import com.huariservice.huariia.repositories.CategoryRepository;
 import com.huariservice.huariia.repositories.CourseRepository;
@@ -48,10 +48,10 @@ public class CourseService {
      */
     public CourseResponse createCourse(CourseRequest request) {
         if (courseRepository.existsByTitle(request.title())) {
-            throw new ConflitoException("A course with this title already exists");
+            throw new ConflictException("A course with this title already exists");
         }
         if (courseRepository.existsByVideoUrl(request.videoUrl())) {
-            throw new ConflitoException("A course with this video URL already exists");
+            throw new ConflictException("A course with this video URL already exists");
         }
 
         Course course = new Course();
@@ -74,7 +74,7 @@ public class CourseService {
      *
      * @param id course identifier
      * @return the course as a response DTO
-     * @throws RecursoNaoEncontradoException if no course has this id
+     * @throws ResourceNotFoundException if no course has this id
      */
     @Transactional(readOnly = true)
     public CourseResponse findById(Long id) {
@@ -93,19 +93,19 @@ public class CourseService {
      * @param id      course identifier
      * @param request validated payload with the new values
      * @return the updated course
-     * @throws RecursoNaoEncontradoException if the course, category or author does not exist
-     * @throws ConflitoException             if the new title or video URL belongs to another course
+     * @throws ResourceNotFoundException if the course, category or author does not exist
+     * @throws ConflictException         if the new title or video URL belongs to another course
      */
     public CourseResponse updateCourse(Long id, CourseRequest request) {
         Course course = findCourseOrThrow(id);
 
         if (!course.getTitle().equals(request.title())
                 && courseRepository.existsByTitle(request.title())) {
-            throw new ConflitoException("A course with this title already exists");
+            throw new ConflictException("A course with this title already exists");
         }
         if (!course.getVideoUrl().equals(request.videoUrl())
                 && courseRepository.existsByVideoUrl(request.videoUrl())) {
-            throw new ConflitoException("A course with this video URL already exists");
+            throw new ConflictException("A course with this video URL already exists");
         }
 
         applyRequest(course, request);
@@ -116,7 +116,7 @@ public class CourseService {
      * Deletes a course by id.
      *
      * @param id course identifier
-     * @throws RecursoNaoEncontradoException if no course has this id
+     * @throws ResourceNotFoundException if no course has this id
      */
     public void deleteById(Long id) {
         courseRepository.delete(findCourseOrThrow(id));
@@ -127,13 +127,13 @@ public class CourseService {
      *
      * @param course  the entity to fill (new or managed)
      * @param request the source payload
-     * @throws RecursoNaoEncontradoException if the category or the author does not exist
+     * @throws ResourceNotFoundException if the category or the author does not exist
      */
     private void applyRequest(Course course, CourseRequest request) {
         Category category = categoryRepository.findById(request.categoryId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Author author = authorRepository.findById(request.authorId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Author not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Author not found"));
 
         course.setTitle(request.title());
         course.setDescription(request.description());
@@ -150,6 +150,6 @@ public class CourseService {
      */
     private Course findCourseOrThrow(Long id) {
         return courseRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
     }
 }

@@ -3,8 +3,8 @@ package com.huariservice.huariia.services;
 import com.huariservice.huariia.dto.CategoryRequest;
 import com.huariservice.huariia.dto.CategoryResponse;
 import com.huariservice.huariia.entities.Category;
-import com.huariservice.huariia.exceptions.ConflitoException;
-import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
+import com.huariservice.huariia.exceptions.ConflictException;
+import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class CategoryService {
      */
     public CategoryResponse createCategory(CategoryRequest request) {
         if (categoryRepository.existsByName(request.name())) {
-            throw new ConflitoException("A category with this name already exists");
+            throw new ConflictException("A category with this name already exists");
         }
 
         Category category = new Category();
@@ -62,7 +62,7 @@ public class CategoryService {
      *
      * @param id category identifier
      * @return the category as a response DTO
-     * @throws RecursoNaoEncontradoException if no category has this id
+     * @throws ResourceNotFoundException if no category has this id
      */
     @Transactional(readOnly = true)
     public CategoryResponse findById(Long id) {
@@ -80,15 +80,15 @@ public class CategoryService {
      * @param id      category identifier
      * @param request validated payload with the new values
      * @return the updated category
-     * @throws RecursoNaoEncontradoException if no category has this id
-     * @throws ConflitoException             if the new name belongs to another category
+     * @throws ResourceNotFoundException if no category has this id
+     * @throws ConflictException         if the new name belongs to another category
      */
     public CategoryResponse updateCategory(Long id, CategoryRequest request) {
         Category category = findCategoryOrThrow(id);
 
         if (!category.getName().equals(request.name())
                 && categoryRepository.existsByName(request.name())) {
-            throw new ConflitoException("A category with this name already exists");
+            throw new ConflictException("A category with this name already exists");
         }
 
         category.setName(request.name());
@@ -100,7 +100,7 @@ public class CategoryService {
      * Deletes a category by id.
      *
      * @param id category identifier
-     * @throws RecursoNaoEncontradoException if no category has this id
+     * @throws ResourceNotFoundException if no category has this id
      */
     public void deleteById(Long id) {
         categoryRepository.delete(findCategoryOrThrow(id));
@@ -114,6 +114,6 @@ public class CategoryService {
      */
     private Category findCategoryOrThrow(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
     }
 }

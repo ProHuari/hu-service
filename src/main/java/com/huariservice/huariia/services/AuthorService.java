@@ -3,8 +3,8 @@ package com.huariservice.huariia.services;
 import com.huariservice.huariia.dto.AuthorRequest;
 import com.huariservice.huariia.dto.AuthorResponse;
 import com.huariservice.huariia.entities.Author;
-import com.huariservice.huariia.exceptions.ConflitoException;
-import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
+import com.huariservice.huariia.exceptions.ConflictException;
+import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.AuthorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,10 +41,10 @@ public class AuthorService {
      */
     public AuthorResponse createAuthor(AuthorRequest request) {
         if (authorRepository.existsByChannelName(request.channelName())) {
-            throw new ConflitoException("An author with this channel name already exists");
+            throw new ConflictException("An author with this channel name already exists");
         }
         if (authorRepository.existsByChannelUrl(request.channelUrl())) {
-            throw new ConflitoException("An author with this channel URL already exists");
+            throw new ConflictException("An author with this channel URL already exists");
         }
 
         Author author = new Author();
@@ -68,7 +68,7 @@ public class AuthorService {
      *
      * @param id author identifier
      * @return the author as a response DTO
-     * @throws RecursoNaoEncontradoException if no author has this id
+     * @throws ResourceNotFoundException if no author has this id
      */
     @Transactional(readOnly = true)
     public AuthorResponse findById(Long id) {
@@ -88,19 +88,19 @@ public class AuthorService {
      * @param id      author identifier
      * @param request validated payload with the new values
      * @return the updated author
-     * @throws RecursoNaoEncontradoException if no author has this id
-     * @throws ConflitoException             if the new name or URL belongs to another author
+     * @throws ResourceNotFoundException if no author has this id
+     * @throws ConflictException         if the new name or URL belongs to another author
      */
     public AuthorResponse updateAuthor(Long id, AuthorRequest request) {
         Author author = findAuthorOrThrow(id);
 
         if (!author.getChannelName().equals(request.channelName())
                 && authorRepository.existsByChannelName(request.channelName())) {
-            throw new ConflitoException("An author with this channel name already exists");
+            throw new ConflictException("An author with this channel name already exists");
         }
         if (!author.getChannelUrl().equals(request.channelUrl())
                 && authorRepository.existsByChannelUrl(request.channelUrl())) {
-            throw new ConflitoException("An author with this channel URL already exists");
+            throw new ConflictException("An author with this channel URL already exists");
         }
 
         author.setChannelName(request.channelName());
@@ -112,7 +112,7 @@ public class AuthorService {
      * Deletes an author by id.
      *
      * @param id author identifier
-     * @throws RecursoNaoEncontradoException if no author has this id
+     * @throws ResourceNotFoundException if no author has this id
      */
     public void deleteById(Long id) {
         authorRepository.delete(findAuthorOrThrow(id));
@@ -126,6 +126,6 @@ public class AuthorService {
      */
     private Author findAuthorOrThrow(Long id) {
         return authorRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Author not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Author not found"));
     }
 }

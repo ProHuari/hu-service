@@ -6,9 +6,9 @@ import com.huariservice.huariia.entities.Lesson;
 import com.huariservice.huariia.entities.LessonProgress;
 import com.huariservice.huariia.entities.User;
 import com.huariservice.huariia.entities.enums.LessonStatus;
-import com.huariservice.huariia.exceptions.ConflitoException;
-import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
-import com.huariservice.huariia.exceptions.RegraNegocioException;
+import com.huariservice.huariia.exceptions.BusinessRuleException;
+import com.huariservice.huariia.exceptions.ConflictException;
+import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.EnrollmentRepository;
 import com.huariservice.huariia.repositories.LessonProgressRepository;
 import com.huariservice.huariia.repositories.LessonRepository;
@@ -57,16 +57,16 @@ public class LessonProgressService {
      */
     public LessonProgressResponse createProgress(Long userId, LessonProgressRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         Lesson lesson = lessonRepository.findById(request.lessonId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Lesson not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
 
         Long courseId = lesson.getModule().getCourse().getId();
         if (!enrollmentRepository.existsByUserIdAndCourseId(user.getId(), courseId)) {
-            throw new RegraNegocioException("The user is not enrolled in the course of this lesson");
+            throw new BusinessRuleException("The user is not enrolled in the course of this lesson");
         }
         if (progressRepository.findByUserIdAndLessonId(user.getId(), lesson.getId()).isPresent()) {
-            throw new ConflitoException("Progress already exists for this lesson; update the existing record");
+            throw new ConflictException("Progress already exists for this lesson; update the existing record");
         }
 
         LessonProgress progress = new LessonProgress();
@@ -174,10 +174,10 @@ public class LessonProgressService {
      */
     private LessonProgress findProgressOrThrow(Long id, Long userId, boolean admin) {
         LessonProgress progress = progressRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Lesson progress not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson progress not found"));
 
         if (!admin && !progress.getUser().getId().equals(userId)) {
-            throw new RecursoNaoEncontradoException("Lesson progress not found");
+            throw new ResourceNotFoundException("Lesson progress not found");
         }
         return progress;
     }

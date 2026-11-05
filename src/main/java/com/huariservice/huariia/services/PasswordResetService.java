@@ -4,8 +4,8 @@ import com.huariservice.huariia.dto.ForgotPasswordRequest;
 import com.huariservice.huariia.dto.ForgotPasswordResponse;
 import com.huariservice.huariia.dto.ResetPasswordRequest;
 import com.huariservice.huariia.entities.User;
-import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
-import com.huariservice.huariia.exceptions.RegraNegocioException;
+import com.huariservice.huariia.exceptions.BusinessRuleException;
+import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,13 +40,13 @@ public class PasswordResetService {
     public ForgotPasswordResponse requestPasswordReset(ForgotPasswordRequest request) {
         String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
         User user = userRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("User not found for the given e-mail"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found for the given e-mail"));
 
         String resetToken = generateShortToken();
         activeTokens.put(resetToken, new ResetTokenEntry(user.getId(), Instant.now().plus(TOKEN_VALIDITY)));
 
         return new ForgotPasswordResponse(
-                "Token de redefinição gerado com sucesso (válido por 15 minutos).",
+                "Password reset token generated successfully (valid for 15 minutes).",
                 resetToken
         );
     }
@@ -57,11 +57,11 @@ public class PasswordResetService {
         ResetTokenEntry entry = activeTokens.remove(token);
 
         if (entry == null || Instant.now().isAfter(entry.expiresAt())) {
-            throw new RegraNegocioException("Invalid or expired password reset token");
+            throw new BusinessRuleException("Invalid or expired password reset token");
         }
 
         User user = userRepository.findById(entry.userId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);

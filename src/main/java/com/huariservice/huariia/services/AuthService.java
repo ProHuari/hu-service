@@ -4,7 +4,7 @@ import com.huariservice.huariia.dto.LoginRequest;
 import com.huariservice.huariia.dto.LoginResponse;
 import com.huariservice.huariia.dto.RefreshTokenRequest;
 import com.huariservice.huariia.entities.User;
-import com.huariservice.huariia.exceptions.CredenciaisInvalidasException;
+import com.huariservice.huariia.exceptions.InvalidCredentialsException;
 import com.huariservice.huariia.repositories.UserRepository;
 import com.huariservice.huariia.security.LoginAttemptService;
 import com.huariservice.huariia.security.TokenBlacklistService;
@@ -46,7 +46,7 @@ public class AuthService {
                     if (loginAttemptService != null) {
                         loginAttemptService.recordFailedAttempt(normalizedEmail);
                     }
-                    throw new CredenciaisInvalidasException();
+                    throw new InvalidCredentialsException();
                 });
 
         if (loginAttemptService != null) {
@@ -63,14 +63,14 @@ public class AuthService {
         String rawRefreshToken = request.refreshToken().trim();
 
         if (tokenBlacklistService != null && tokenBlacklistService.isRevoked(rawRefreshToken)) {
-            throw new CredenciaisInvalidasException();
+            throw new InvalidCredentialsException();
         }
 
         Long userId = tokenService.validarRefreshToken(rawRefreshToken)
-                .orElseThrow(CredenciaisInvalidasException::new);
+                .orElseThrow(InvalidCredentialsException::new);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(CredenciaisInvalidasException::new);
+                .orElseThrow(InvalidCredentialsException::new);
 
         if (tokenBlacklistService != null) {
             Instant expiry = tokenService.extrairExpiracao(rawRefreshToken).orElse(null);

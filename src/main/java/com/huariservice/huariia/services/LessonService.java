@@ -4,8 +4,8 @@ import com.huariservice.huariia.dto.LessonRequest;
 import com.huariservice.huariia.dto.LessonResponse;
 import com.huariservice.huariia.entities.CourseModule;
 import com.huariservice.huariia.entities.Lesson;
-import com.huariservice.huariia.exceptions.ConflitoException;
-import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
+import com.huariservice.huariia.exceptions.ConflictException;
+import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.CourseModuleRepository;
 import com.huariservice.huariia.repositories.LessonRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +43,10 @@ public class LessonService {
      */
     public LessonResponse createLesson(LessonRequest request) {
         if (lessonRepository.existsByVideoUrl(request.videoUrl())) {
-            throw new ConflitoException("A lesson with this video URL already exists");
+            throw new ConflictException("A lesson with this video URL already exists");
         }
         if (lessonRepository.existsByModuleIdAndPosition(request.moduleId(), request.position())) {
-            throw new ConflitoException("A lesson with this position already exists in the module");
+            throw new ConflictException("A lesson with this position already exists in the module");
         }
 
         Lesson lesson = new Lesson();
@@ -81,7 +81,7 @@ public class LessonService {
      *
      * @param id lesson identifier
      * @return the lesson as a response DTO
-     * @throws RecursoNaoEncontradoException if no lesson has this id
+     * @throws ResourceNotFoundException if no lesson has this id
      */
     @Transactional(readOnly = true)
     public LessonResponse findById(Long id) {
@@ -100,22 +100,22 @@ public class LessonService {
      * @param id      lesson identifier
      * @param request validated payload with the new values
      * @return the updated lesson
-     * @throws RecursoNaoEncontradoException if the lesson or the module does not exist
-     * @throws ConflitoException             if the URL or the target position is already used
+     * @throws ResourceNotFoundException if the lesson or the module does not exist
+     * @throws ConflictException         if the URL or the target position is already used
      */
     public LessonResponse updateLesson(Long id, LessonRequest request) {
         Lesson lesson = findLessonOrThrow(id);
 
         if (!lesson.getVideoUrl().equals(request.videoUrl())
                 && lessonRepository.existsByVideoUrl(request.videoUrl())) {
-            throw new ConflitoException("A lesson with this video URL already exists");
+            throw new ConflictException("A lesson with this video URL already exists");
         }
 
         boolean positionChanged = !lesson.getModule().getId().equals(request.moduleId())
                 || !lesson.getPosition().equals(request.position());
         if (positionChanged
                 && lessonRepository.existsByModuleIdAndPosition(request.moduleId(), request.position())) {
-            throw new ConflitoException("A lesson with this position already exists in the module");
+            throw new ConflictException("A lesson with this position already exists in the module");
         }
 
         applyRequest(lesson, request);
@@ -126,7 +126,7 @@ public class LessonService {
      * Deletes a lesson by id.
      *
      * @param id lesson identifier
-     * @throws RecursoNaoEncontradoException if no lesson has this id
+     * @throws ResourceNotFoundException if no lesson has this id
      */
     public void deleteById(Long id) {
         lessonRepository.delete(findLessonOrThrow(id));
@@ -137,11 +137,11 @@ public class LessonService {
      *
      * @param lesson  the entity to fill (new or managed)
      * @param request the source payload
-     * @throws RecursoNaoEncontradoException if the module does not exist
+     * @throws ResourceNotFoundException if the module does not exist
      */
     private void applyRequest(Lesson lesson, LessonRequest request) {
         CourseModule module = moduleRepository.findById(request.moduleId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Module not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Module not found"));
 
         lesson.setTitle(request.title());
         lesson.setDescription(request.description());
@@ -159,6 +159,6 @@ public class LessonService {
      */
     private Lesson findLessonOrThrow(Long id) {
         return lessonRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Lesson not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
     }
 }

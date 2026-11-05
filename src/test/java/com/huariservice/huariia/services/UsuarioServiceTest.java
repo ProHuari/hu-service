@@ -5,8 +5,8 @@ import com.huariservice.huariia.dto.UserRequest;
 import com.huariservice.huariia.dto.UserResponse;
 import com.huariservice.huariia.entities.User;
 import com.huariservice.huariia.entities.enums.Role;
-import com.huariservice.huariia.exceptions.ConflitoException;
-import com.huariservice.huariia.exceptions.RegraNegocioException;
+import com.huariservice.huariia.exceptions.BusinessRuleException;
+import com.huariservice.huariia.exceptions.ConflictException;
 import com.huariservice.huariia.repositories.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,12 +66,12 @@ class UsuarioServiceTest {
 
         when(userRepository.existsByEmail("maria@huari.com")).thenReturn(true);
 
-        assertThrows(ConflitoException.class, () -> userService.registerStudent(request));
+        assertThrows(ConflictException.class, () -> userService.registerStudent(request));
         verify(userRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Deve lançar RegraNegocioException ao tentar trocar senha com a senha atual incorreta")
+    @DisplayName("Deve lançar BusinessRuleException ao tentar trocar senha com a senha atual incorreta")
     void deveLancarExcecaoQuandoSenhaAtualIncorreta() {
         Long usuarioId = 1L;
         ChangePasswordRequest request = new ChangePasswordRequest("senhaErrada", "novaSenha123");
@@ -82,11 +82,11 @@ class UsuarioServiceTest {
         when(userRepository.findById(usuarioId)).thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("senhaErrada", "hashCorreto")).thenReturn(false);
 
-        assertThrows(RegraNegocioException.class, () -> userService.changePassword(usuarioId, request));
+        assertThrows(BusinessRuleException.class, () -> userService.changePassword(usuarioId, request));
     }
 
     @Test
-    @DisplayName("Deve lançar RegraNegocioException quando a nova senha for igual à senha atual")
+    @DisplayName("Deve lançar BusinessRuleException quando a nova senha for igual à senha atual")
     void deveLancarExcecaoQuandoNovaSenhaIgualAtual() {
         Long usuarioId = 1L;
         ChangePasswordRequest request = new ChangePasswordRequest("mesmaSenha", "mesmaSenha");
@@ -97,6 +97,6 @@ class UsuarioServiceTest {
         when(userRepository.findById(usuarioId)).thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("mesmaSenha", "hashMesmaSenha")).thenReturn(true);
 
-        assertThrows(RegraNegocioException.class, () -> userService.changePassword(usuarioId, request));
+        assertThrows(BusinessRuleException.class, () -> userService.changePassword(usuarioId, request));
     }
 }

@@ -5,7 +5,7 @@ import com.huariservice.huariia.dto.LoginResponse;
 import com.huariservice.huariia.dto.RefreshTokenRequest;
 import com.huariservice.huariia.entities.User;
 import com.huariservice.huariia.entities.enums.Role;
-import com.huariservice.huariia.exceptions.CredenciaisInvalidasException;
+import com.huariservice.huariia.exceptions.InvalidCredentialsException;
 import com.huariservice.huariia.exceptions.TooManyRequestsException;
 import com.huariservice.huariia.repositories.UserRepository;
 import com.huariservice.huariia.security.LoginAttemptService;
@@ -86,18 +86,18 @@ class AuthServiceTest {
         when(userRepository.findByEmail("aluno@huari.com")).thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("senhaIncorreta", "hashBcrypted")).thenReturn(false);
 
-        assertThrows(CredenciaisInvalidasException.class, () -> authService.login(request));
+        assertThrows(InvalidCredentialsException.class, () -> authService.login(request));
         verify(tokenService, never()).gerarToken(any());
     }
 
     @Test
-    @DisplayName("Deve lançar CredenciaisInvalidasException quando o e-mail não existir")
+    @DisplayName("Deve lançar InvalidCredentialsException quando o e-mail não existir")
     void deveLancarExcecaoQuandoEmailNaoCadastrado() {
         LoginRequest request = new LoginRequest("inexistente@huari.com", "senha123");
 
         when(userRepository.findByEmail("inexistente@huari.com")).thenReturn(Optional.empty());
 
-        assertThrows(CredenciaisInvalidasException.class, () -> authService.login(request));
+        assertThrows(InvalidCredentialsException.class, () -> authService.login(request));
         verify(tokenService, never()).gerarToken(any());
     }
 
@@ -108,7 +108,7 @@ class AuthServiceTest {
         when(userRepository.findByEmail("bruteforce@huari.com")).thenReturn(Optional.empty());
 
         for (int i = 0; i < 5; i++) {
-            assertThrows(CredenciaisInvalidasException.class, () -> authService.login(request));
+            assertThrows(InvalidCredentialsException.class, () -> authService.login(request));
         }
 
         assertThrows(TooManyRequestsException.class, () -> authService.login(request));
@@ -123,7 +123,7 @@ class AuthServiceTest {
         authService.logout("Bearer meu.token.jwt");
 
         assertTrue(tokenBlacklistService.isRevoked("meu.token.jwt"));
-        assertThrows(CredenciaisInvalidasException.class,
+        assertThrows(InvalidCredentialsException.class,
                 () -> authService.refresh(new RefreshTokenRequest("meu.token.jwt")));
     }
 }

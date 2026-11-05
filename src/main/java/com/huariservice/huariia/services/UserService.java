@@ -6,9 +6,9 @@ import com.huariservice.huariia.dto.UserRequest;
 import com.huariservice.huariia.dto.UserResponse;
 import com.huariservice.huariia.entities.User;
 import com.huariservice.huariia.entities.enums.Role;
-import com.huariservice.huariia.exceptions.ConflitoException;
-import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
-import com.huariservice.huariia.exceptions.RegraNegocioException;
+import com.huariservice.huariia.exceptions.BusinessRuleException;
+import com.huariservice.huariia.exceptions.ConflictException;
+import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,7 +39,7 @@ public class UserService {
      *
      * @param request validated registration payload
      * @return the created user (without password data)
-     * @throws ConflitoException if the e-mail is already registered
+     * @throws ConflictException if the e-mail is already registered
      */
     public UserResponse registerStudent(UserRequest request) {
         return createUser(request, Role.STUDENT);
@@ -51,7 +51,7 @@ public class UserService {
      *
      * @param request validated registration payload
      * @return the created user (without password data)
-     * @throws ConflitoException if the e-mail is already registered
+     * @throws ConflictException if the e-mail is already registered
      */
     public UserResponse registerAdmin(UserRequest request) {
         return createUser(request, Role.ADMIN);
@@ -72,7 +72,7 @@ public class UserService {
      *
      * @param id user identifier
      * @return the user as a response DTO
-     * @throws RecursoNaoEncontradoException if no user has this id
+     * @throws ResourceNotFoundException if no user has this id
      */
     @Transactional(readOnly = true)
     public UserResponse findById(Long id) {
@@ -90,15 +90,15 @@ public class UserService {
      * @param id      user identifier
      * @param request validated payload with the new values
      * @return the updated user
-     * @throws RecursoNaoEncontradoException if no user has this id
-     * @throws ConflitoException             if the e-mail belongs to another user
+     * @throws ResourceNotFoundException if no user has this id
+     * @throws ConflictException         if the e-mail belongs to another user
      */
     public UserResponse updateUser(Long id, UserRequest request) {
         User user = findUserOrThrow(id);
         String email = normalizeEmail(request.email());
 
         if (!user.getEmail().equals(email) && userRepository.existsByEmail(email)) {
-            throw new ConflitoException("This e-mail is already registered");
+            throw new ConflictException("This e-mail is already registered");
         }
 
         user.setName(request.name());
@@ -114,15 +114,15 @@ public class UserService {
      * @param id      id of the authenticated user
      * @param request validated payload with the new name and e-mail
      * @return the updated user
-     * @throws RecursoNaoEncontradoException if the user no longer exists
-     * @throws ConflitoException             if the e-mail belongs to another user
+     * @throws ResourceNotFoundException if the user no longer exists
+     * @throws ConflictException         if the e-mail belongs to another user
      */
     public UserResponse updateProfile(Long id, ProfileRequest request) {
         User user = findUserOrThrow(id);
         String email = normalizeEmail(request.email());
 
         if (!user.getEmail().equals(email) && userRepository.existsByEmail(email)) {
-            throw new ConflitoException("This e-mail is already registered");
+            throw new ConflictException("This e-mail is already registered");
         }
 
         user.setName(request.name());
@@ -141,17 +141,17 @@ public class UserService {
      *
      * @param id      id of the authenticated user
      * @param request current and new passwords
-     * @throws RecursoNaoEncontradoException if the user no longer exists
-     * @throws RegraNegocioException         if the current password is wrong or the new one is unchanged
+     * @throws ResourceNotFoundException if the user no longer exists
+     * @throws BusinessRuleException     if the current password is wrong or the new one is unchanged
      */
     public void changePassword(Long id, ChangePasswordRequest request) {
         User user = findUserOrThrow(id);
 
         if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
-            throw new RegraNegocioException("The current password is incorrect");
+            throw new BusinessRuleException("The current password is incorrect");
         }
         if (request.currentPassword().equals(request.newPassword())) {
-            throw new RegraNegocioException("The new password must be different from the current one");
+            throw new BusinessRuleException("The new password must be different from the current one");
         }
 
         user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
@@ -162,7 +162,7 @@ public class UserService {
      * Deletes a user by id.
      *
      * @param id user identifier
-     * @throws RecursoNaoEncontradoException if no user has this id
+     * @throws ResourceNotFoundException if no user has this id
      */
     public void deleteById(Long id) {
         userRepository.delete(findUserOrThrow(id));
@@ -179,13 +179,13 @@ public class UserService {
      * @param request validated registration payload
      * @param role    role to assign to the new account
      * @return the created user
-     * @throws ConflitoException if the e-mail is already registered
+     * @throws ConflictException if the e-mail is already registered
      */
     private UserResponse createUser(UserRequest request, Role role) {
         String email = normalizeEmail(request.email());
 
         if (userRepository.existsByEmail(email)) {
-            throw new ConflitoException("This e-mail is already registered");
+            throw new ConflictException("This e-mail is already registered");
         }
 
         User user = new User();
@@ -204,7 +204,7 @@ public class UserService {
      */
     private User findUserOrThrow(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     /**

@@ -4,8 +4,8 @@ import com.huariservice.huariia.dto.CourseModuleRequest;
 import com.huariservice.huariia.dto.CourseModuleResponse;
 import com.huariservice.huariia.entities.Course;
 import com.huariservice.huariia.entities.CourseModule;
-import com.huariservice.huariia.exceptions.ConflitoException;
-import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
+import com.huariservice.huariia.exceptions.ConflictException;
+import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.CourseModuleRepository;
 import com.huariservice.huariia.repositories.CourseRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class CourseModuleService {
      */
     public CourseModuleResponse createModule(CourseModuleRequest request) {
         if (moduleRepository.existsByCourseIdAndPosition(request.courseId(), request.position())) {
-            throw new ConflitoException("A module with this position already exists in the course");
+            throw new ConflictException("A module with this position already exists in the course");
         }
 
         CourseModule module = new CourseModule();
@@ -77,7 +77,7 @@ public class CourseModuleService {
      *
      * @param id module identifier
      * @return the module as a response DTO
-     * @throws RecursoNaoEncontradoException if no module has this id
+     * @throws ResourceNotFoundException if no module has this id
      */
     @Transactional(readOnly = true)
     public CourseModuleResponse findById(Long id) {
@@ -96,8 +96,8 @@ public class CourseModuleService {
      * @param id      module identifier
      * @param request validated payload with the new values
      * @return the updated module
-     * @throws RecursoNaoEncontradoException if the module or the course does not exist
-     * @throws ConflitoException             if the target position is already taken
+     * @throws ResourceNotFoundException if the module or the course does not exist
+     * @throws ConflictException         if the target position is already taken
      */
     public CourseModuleResponse updateModule(Long id, CourseModuleRequest request) {
         CourseModule module = findModuleOrThrow(id);
@@ -106,7 +106,7 @@ public class CourseModuleService {
                 || !module.getPosition().equals(request.position());
         if (positionChanged
                 && moduleRepository.existsByCourseIdAndPosition(request.courseId(), request.position())) {
-            throw new ConflitoException("A module with this position already exists in the course");
+            throw new ConflictException("A module with this position already exists in the course");
         }
 
         applyRequest(module, request);
@@ -117,7 +117,7 @@ public class CourseModuleService {
      * Deletes a module by id.
      *
      * @param id module identifier
-     * @throws RecursoNaoEncontradoException if no module has this id
+     * @throws ResourceNotFoundException if no module has this id
      */
     public void deleteById(Long id) {
         moduleRepository.delete(findModuleOrThrow(id));
@@ -128,11 +128,11 @@ public class CourseModuleService {
      *
      * @param module  the entity to fill (new or managed)
      * @param request the source payload
-     * @throws RecursoNaoEncontradoException if the course does not exist
+     * @throws ResourceNotFoundException if the course does not exist
      */
     private void applyRequest(CourseModule module, CourseModuleRequest request) {
         Course course = courseRepository.findById(request.courseId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         module.setTitle(request.title());
         module.setDescription(request.description());
@@ -148,6 +148,6 @@ public class CourseModuleService {
      */
     private CourseModule findModuleOrThrow(Long id) {
         return moduleRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Module not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Module not found"));
     }
 }

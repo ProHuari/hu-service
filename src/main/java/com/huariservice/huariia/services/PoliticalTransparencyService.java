@@ -10,8 +10,8 @@ import com.huariservice.huariia.entities.LegislativeBill;
 import com.huariservice.huariia.entities.Parliamentarian;
 import com.huariservice.huariia.entities.ParliamentarianExpense;
 import com.huariservice.huariia.entities.enums.ParliamentarianChamber;
-import com.huariservice.huariia.exceptions.ConflitoException;
-import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
+import com.huariservice.huariia.exceptions.ConflictException;
+import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.LegislativeBillRepository;
 import com.huariservice.huariia.repositories.ParliamentarianExpenseRepository;
 import com.huariservice.huariia.repositories.ParliamentarianRepository;
@@ -59,13 +59,13 @@ public class PoliticalTransparencyService {
     @Transactional(readOnly = true)
     public ParliamentarianResponse findParliamentarianById(Long id) {
         Parliamentarian entity = parliamentarianRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Parliamentarian not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Parliamentarian not found"));
         return ParliamentarianResponse.from(entity);
     }
 
     public void deleteParliamentarian(Long id) {
         Parliamentarian entity = parliamentarianRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Parliamentarian not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Parliamentarian not found"));
         parliamentarianRepository.delete(entity);
     }
 
@@ -73,7 +73,7 @@ public class PoliticalTransparencyService {
 
     public LegislativeBillResponse createBill(LegislativeBillRequest request) {
         if (legislativeBillRepository.existsByCodeIgnoreCase(request.code().trim())) {
-            throw new ConflitoException("A legislative bill with this code already exists");
+            throw new ConflictException("A legislative bill with this code already exists");
         }
         LegislativeBill bill = new LegislativeBill();
         bill.setCode(request.code().trim());
@@ -84,7 +84,7 @@ public class PoliticalTransparencyService {
 
         if (request.authorId() != null) {
             Parliamentarian author = parliamentarianRepository.findById(request.authorId())
-                    .orElseThrow(() -> new RecursoNaoEncontradoException("Author parliamentarian not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Author parliamentarian not found"));
             bill.setAuthor(author);
         }
 
@@ -104,13 +104,13 @@ public class PoliticalTransparencyService {
     @Transactional(readOnly = true)
     public LegislativeBillResponse findBillById(Long id) {
         LegislativeBill bill = legislativeBillRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Legislative bill not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Legislative bill not found"));
         return LegislativeBillResponse.from(bill);
     }
 
     public void deleteBill(Long id) {
         LegislativeBill bill = legislativeBillRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Legislative bill not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Legislative bill not found"));
         legislativeBillRepository.delete(bill);
     }
 
@@ -118,7 +118,7 @@ public class PoliticalTransparencyService {
 
     public ParliamentarianExpenseResponse createExpense(ParliamentarianExpenseRequest request) {
         Parliamentarian parliamentarian = parliamentarianRepository.findById(request.parliamentarianId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Parliamentarian not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Parliamentarian not found"));
 
         ParliamentarianExpense expense = new ParliamentarianExpense();
         expense.setParliamentarian(parliamentarian);
@@ -141,7 +141,7 @@ public class PoliticalTransparencyService {
 
     public void deleteExpense(Long id) {
         ParliamentarianExpense expense = expenseRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Expense not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
         expenseRepository.delete(expense);
     }
 

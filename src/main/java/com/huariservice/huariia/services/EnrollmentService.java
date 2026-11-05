@@ -6,8 +6,8 @@ import com.huariservice.huariia.entities.Course;
 import com.huariservice.huariia.entities.Enrollment;
 import com.huariservice.huariia.entities.User;
 import com.huariservice.huariia.entities.enums.EnrollmentStatus;
-import com.huariservice.huariia.exceptions.ConflitoException;
-import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
+import com.huariservice.huariia.exceptions.ConflictException;
+import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.CourseRepository;
 import com.huariservice.huariia.repositories.EnrollmentRepository;
 import com.huariservice.huariia.repositories.UserRepository;
@@ -49,12 +49,12 @@ public class EnrollmentService {
      */
     public EnrollmentResponse enroll(Long userId, EnrollmentRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         Course course = courseRepository.findById(request.courseId())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         if (enrollmentRepository.existsByUserIdAndCourseId(user.getId(), course.getId())) {
-            throw new ConflitoException("The user is already enrolled in this course");
+            throw new ConflictException("The user is already enrolled in this course");
         }
 
         Enrollment enrollment = new Enrollment();
@@ -96,14 +96,14 @@ public class EnrollmentService {
      * @param userId  id of the authenticated user
      * @param admin   whether the caller has the admin role
      * @return the enrollment
-     * @throws RecursoNaoEncontradoException if it does not exist or is not visible to the caller
+     * @throws ResourceNotFoundException if it does not exist or is not visible to the caller
      */
     @Transactional(readOnly = true)
     public EnrollmentResponse findById(Long id, Long userId, boolean admin) {
         Enrollment enrollment = findEnrollmentOrThrow(id);
 
         if (!admin && !enrollment.getUser().getId().equals(userId)) {
-            throw new RecursoNaoEncontradoException("Enrollment not found");
+            throw new ResourceNotFoundException("Enrollment not found");
         }
         return EnrollmentResponse.from(enrollment);
     }
@@ -115,7 +115,7 @@ public class EnrollmentService {
      * @param id        enrollment identifier
      * @param newStatus the status to apply
      * @return the updated enrollment
-     * @throws RecursoNaoEncontradoException if no enrollment has this id
+     * @throws ResourceNotFoundException if no enrollment has this id
      */
     public EnrollmentResponse updateStatus(Long id, EnrollmentStatus newStatus) {
         Enrollment enrollment = findEnrollmentOrThrow(id);
@@ -127,7 +127,7 @@ public class EnrollmentService {
      * Deletes an enrollment by id.
      *
      * @param id enrollment identifier
-     * @throws RecursoNaoEncontradoException if no enrollment has this id
+     * @throws ResourceNotFoundException if no enrollment has this id
      */
     public void deleteById(Long id) {
         enrollmentRepository.delete(findEnrollmentOrThrow(id));
@@ -141,6 +141,6 @@ public class EnrollmentService {
      */
     private Enrollment findEnrollmentOrThrow(Long id) {
         return enrollmentRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Enrollment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found"));
     }
 }

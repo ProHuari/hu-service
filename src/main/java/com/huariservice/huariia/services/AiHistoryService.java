@@ -3,7 +3,7 @@ package com.huariservice.huariia.services;
 import com.huariservice.huariia.dto.AiHistoryResponse;
 import com.huariservice.huariia.entities.AiHistory;
 import com.huariservice.huariia.entities.User;
-import com.huariservice.huariia.exceptions.RecursoNaoEncontradoException;
+import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.AiHistoryRepository;
 import com.huariservice.huariia.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class AiHistoryService {
      */
     public AiHistoryResponse saveHistory(Long userId, String question, String answer) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         AiHistory history = new AiHistory();
         history.setQuestion(question);
@@ -101,10 +101,10 @@ public class AiHistoryService {
      */
     private AiHistory findHistoryOrThrow(Long id, Long userId, boolean isAdmin) {
         AiHistory history = historyRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("AI history not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("AI history not found"));
 
         if (!isAdmin && !history.getUser().getId().equals(userId)) {
-            throw new RecursoNaoEncontradoException("AI history not found");
+            throw new ResourceNotFoundException("AI history not found");
         }
         return history;
     }
