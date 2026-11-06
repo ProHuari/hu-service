@@ -132,7 +132,6 @@ Os testes devem ser utilizados para verificar as regras de negócio, a validaç�
 *USUARIOS*
 
 GET ``/usuarios/{id}`` — Busca um usuário pelo ID (somente ADMIN)
-
 resultado esperado:
 <code>
 {
@@ -143,9 +142,7 @@ resultado esperado:
 }
 </code>
 PUT ``/usuarios/{id}`` — Atualiza um usuário e redefine a senha (somente ADMIN)
-
 resultado esperado:
-
 <code>
 {
   "nome": "string",
@@ -154,13 +151,11 @@ resultado esperado:
 }
 </code>
 DELETE ``/usuarios/{id}`` — Remove um usuário (somente ADMIN)
-
 resultado esperado:
 <code>
 code  200 OK
 </code>
 GET ``/usuarios/me`` — Mostra o perfil do usuário logado
-
 resultado esperado:
 <code>
 {
@@ -171,7 +166,6 @@ resultado esperado:
 }
 </code>
 PUT ``/usuarios/me`` — Atualiza nome e e-mail do usuário logado
-
 resultado esperado:
 <code>
 {
@@ -182,7 +176,6 @@ resultado esperado:
 }
 </code>
 GET ``/usuarios`` — Lista os usuários (somente ADMIN)
-
 resultado esperado:
 <code>
 [
@@ -195,7 +188,6 @@ resultado esperado:
 ]
 </code>
 POST ``/usuarios`` — Cadastra um usuário (perfil ALUNO)
-
 resultado esperado:
 <code>
 {
@@ -206,7 +198,6 @@ resultado esperado:
 }
 </code>
 POST ``/usuarios/admin`` — Cadastra um administrador (somente ADMIN)
-
 resultado esperado:
 <code>
 {
@@ -217,7 +208,6 @@ resultado esperado:
 }
 </code>
 PATCH ``/usuarios/me/senha`` — Troca a senha do usuário logado (exige a senha atual)
-
 resultado esperado:
 <code>
 {
@@ -226,8 +216,8 @@ resultado esperado:
 }
 </code>
 
+
 *PROGRESSO DAS AULAS*
-Aqui está o texto exatamente como aparece na imagem:
 
 **GET** `/progresso-aulas/{id}` Busca um progresso pelo id (aluno só acessa o próprio)
 resultado esperado:
@@ -240,7 +230,6 @@ resultado esperado:
   "aulaId": 0
 }
 </code>
-
 **PUT** `/progresso-aulas/{id}` Atualiza o status do progresso (usuário e aula não mudam)
 resultado esperado:
 <code>
@@ -252,13 +241,11 @@ resultado esperado:
   "aulaId": 0
 }
 <code/>
-
 **DELETE** `/progresso-aulas/{id}` Remove um progresso (aluno só remove o próprio)
 resutado esperado:
 <code>
 code 200 ok
 </code>
-
 **GET** `/progresso-aulas` Aluno vê o próprio progresso; admin vê todos (filtro opcional usuarioId)
 resultado esperado:
 <code>
@@ -283,7 +270,6 @@ resultado esperado:
   "aulaId": 0
 }
 </code>
-
 *MÓDULOS*
 GET ``/modulos/{id}`` Busca um módulo pelo id
 resultado esperado:
@@ -296,7 +282,6 @@ resultado esperado:
   "cursoId": 0
 }
 </code>
-
 PUT ``/modulos/{id}`` Atualiza um módulo
 resultado esperado:
 <code>
@@ -307,11 +292,8 @@ resultado esperado:
   "cursoId": 0
 }
 </code>
-
 **DELETE** `/modulos/{id}` Remove um módulo
-
 **GET** `/modulos` Lista os módulos (use cursoId para filtrar por curso, em ordem)
-
 **POST** `/modulos` Cadastra um módulo
 *CURSOS*
 GET /cursos/{id} — Busca um curso pelo ID
@@ -332,7 +314,6 @@ GET /cursos/{id} — Busca um curso pelo ID
     "channelUrl": "string"
   }
 }</code>
-
 PUT /cursos/{id} — Atualiza um curso existente (somente ADMIN)
 <code>
 {
@@ -343,20 +324,14 @@ PUT /cursos/{id} — Atualiza um curso existente (somente ADMIN)
   "authorId": 0
 }</code>
 DELETE /cursos/{id} — Exclui logicamente um curso (soft-delete) pelo ID (somente ADMIN)
-
 GET /cursos — Lista cursos com paginação
-
 POST /cursos — Publica um novo curso (somente ADMIN)
 
 *CATEGORIAS*
 GET /categorias/{id} Encontra uma categoria por ID
-
 PUT /categorias/{id} Atualiza uma categoria (apenas ADMIN)
-
 DELETE /categorias/{id} Elimina (remoção lógica/soft-delete) uma categoria por ID (apenas ADMIN)
-
 GET /categorias Lista categorias com paginação
-
 POST /categorias Cria uma nova categoria (apenas ADMIN)
 
 *AUTORES*
@@ -374,7 +349,6 @@ PUT /autores/{id} — Atualiza um autor (somente ADMIN)
   "channelUrl": "string"
 }</code>
 DELETE /autores/{id} — Exclui logicamente um autor (soft-delete) pelo ID (somente ADMIN)
-
 GET /autores — Lista autores com paginação
 Em caso de sucesso:
 <code>
