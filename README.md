@@ -314,19 +314,138 @@ resultado esperado:
 
 **POST** `/modulos` Cadastra um módulo
 *CURSOS*
+GET /cursos/{id} — Busca um curso pelo ID
+<code>
+{
+  "id": 0,
+  "title": "string",
+  "description": "string",
+  "videoUrl": "string",
+  "category": {
+    "id": 0,
+    "name": "string",
+    "description": "string"
+  },
+  "author": {
+    "id": 0,
+    "channelName": "string",
+    "channelUrl": "string"
+  }
+}</code>
+
+PUT /cursos/{id} — Atualiza um curso existente (somente ADMIN)
+<code>
+{
+  "title": "string",
+  "description": "string",
+  "videoUrl": "string",
+  "categoryId": 0,
+  "authorId": 0
+}</code>
+DELETE /cursos/{id} — Exclui logicamente um curso (soft-delete) pelo ID (somente ADMIN)
+
+GET /cursos — Lista cursos com paginação
+
+POST /cursos — Publica um novo curso (somente ADMIN)
 
 *CATEGORIAS*
+GET /categorias/{id} Encontra uma categoria por ID
+
+PUT /categorias/{id} Atualiza uma categoria (apenas ADMIN)
+
+DELETE /categorias/{id} Elimina (remoção lógica/soft-delete) uma categoria por ID (apenas ADMIN)
+
+GET /categorias Lista categorias com paginação
+
+POST /categorias Cria uma nova categoria (apenas ADMIN)
 
 *AUTORES*
+GET /autores/{id} — Busca um autor pelo ID
+<code>
+{
+  "id": 0,
+  "channelName": "string",
+  "channelUrl": "string"
+}</code>
+PUT /autores/{id} — Atualiza um autor (somente ADMIN)
+<code>
+{
+  "channelName": "string",
+  "channelUrl": "string"
+}</code>
+DELETE /autores/{id} — Exclui logicamente um autor (soft-delete) pelo ID (somente ADMIN)
+
+GET /autores — Lista autores com paginação
+Em caso de sucesso:
+<code>
+{
+  "totalPages": 0,
+  "totalElements": 0,
+  "size": 0,
+  "content": [
+    {
+      "id": 0,
+      "channelName": "string",
+      "channelUrl": "string"
+    }
+  ],
+  "number": 0,
+  "sort": {
+    "empty": true,
+    "sorted": true,
+    "unsorted": true
+  },
+  "pageable": {
+    "offset": 0,
+    "paged": true,
+    "pageNumber": 0,
+    "pageSize": 0,
+    "sort": {
+      "empty": true,
+      "sorted": true,
+      "unsorted": true
+    },
+    "unpaged": true
+  },
+  "numberOfElements": 0,
+  "first": true,
+  "last": true,
+  "empty": true
+}</code>
+
+POST /autores — Cadastra um novo autor (somente ADMIN)
+<code>{
+  "channelName": "string",
+  "channelUrl": "string"
+}</code>
 
 *AULAS*
+GET /aulas/{id} Encontra uma lição por ID
+PUT /aulas/{id} Atualiza uma lição (somente ADMINISTRADOR)
+DELETE /aulas/{id} Exclui (exclusão lógica) uma lição por ID (somente ADMINISTRADOR)
+GET /aulas Lista as lições com paginação (filtro opcional por moduleId)
+POST /aulas Publica uma nova lição (somente para administradores)
 
 *MATRICULAS*
+GET /matriculas Lista as matrículas com paginação (os alunos veem as suas próprias; os administradores veem todas ou podem filtrar por ID do utilizador)
+POST /matriculas Inscreve o utilizador autenticado num curso
+PATCH /matriculas/{id}/status Atualiza o estado de uma inscrição (apenas ADMIN)
+GET /matriculas/{id} Encontra uma matrícula pelo ID (os alunos só têm acesso à sua própria)
+DELETE /matriculas/{id} Elimina (remoção lógica/soft-delete) uma inscrição por ID (apenas ADMIN) 
 
 *HISTÓRICO DA IA*
+GET /historico-ia Lista o histórico de consultas da IA com paginação (os alunos veem o seu próprio; os administradores veem todos)
+POST /historico-ia Envia uma pergunta ao assistente de IA (com contexto RAG) e guarda a resposta no histórico
+POST /historico-ia/stream Envia uma pergunta ao assistente de IA com contexto RAG e transmite a resposta em fluxo via SSE
+GET /historico-ia/{id} Encontra um registo do histórico de IA pelo ID (os alunos só têm acesso ao seu próprio)
+DELETE /historico-ia/{id} Elimina (remoção lógica/soft-delete) um registo do histórico de IA por ID
 
 *AUTENTICAÇÃO*
-
+POST /auth/reset-password Redefine a palavra-passe do utilizador usando um token de recuperação temporário válido  
+POST /auth/refresh Emite um novo par de tokens de acesso e de atualização (refresh token) a partir de um Refresh Token válido  
+POST /auth/logout Revoga o token JWT atual do utilizador autenticado   
+POST /auth/login Autentica as credenciais do utilizador e devolve tokens JWT de acesso e de atualização 
+POST /auth/forgot-password Gera um token de redefinição de palavra-passe de curta duração para um e-mail registado
 
 
 ## Segurança
