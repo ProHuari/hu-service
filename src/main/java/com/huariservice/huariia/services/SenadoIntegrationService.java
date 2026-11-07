@@ -30,10 +30,16 @@ public class SenadoIntegrationService {
 
     public SenadoIntegrationService(
             @Qualifier("senadoRestClient") RestClient restClient,
-            ObjectMapper objectMapper,
             @Value("${app.senado.base-url:https://legis.senado.leg.br/dadosabertos}") String baseUrl) {
+        this(restClient, new ObjectMapper(), baseUrl);
+    }
+
+    public SenadoIntegrationService(
+            RestClient restClient,
+            ObjectMapper objectMapper,
+            String baseUrl) {
         this.restClient = restClient;
-        this.objectMapper = objectMapper;
+        this.objectMapper = objectMapper != null ? objectMapper : new ObjectMapper();
         this.baseUrl = baseUrl;
     }
 
