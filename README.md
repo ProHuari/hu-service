@@ -128,298 +128,324 @@ Os testes devem ser utilizados para verificar as regras de negócio, a validaç�
 
 *Ferramenta utilizada para controle de qualidade das api: swagger 
 
-### métodos atuais
-*USUARIOS*
+### Métodos e Contratos da API (REST)
 
-GET ``/usuarios/{id}`` — Busca um usuário pelo ID (somente ADMIN)
-resultado esperado:
-<code>
+*AUTENTICAÇÃO (`/auth`)*
+
+POST `/auth/login` — Autentica as credenciais do usuário e devolve tokens JWT (acesso e refresh)
+Request:
+```json
 {
-  "id": 0,
-  "nome": "string",
-  "email": "string",
-  "tipoPerfil": "ADMIN"
-}
-</code>
-PUT ``/usuarios/{id}`` — Atualiza um usuário e redefine a senha (somente ADMIN)
-resultado esperado:
-<code>
-{
-  "nome": "string",
   "email": "user@example.com",
-  "senha": "string"
+  "password": "password123"
 }
-</code>
-DELETE ``/usuarios/{id}`` — Remove um usuário (somente ADMIN)
-resultado esperado:
-<code>
-code  200 OK
-</code>
-GET ``/usuarios/me`` — Mostra o perfil do usuário logado
-resultado esperado:
-<code>
+```
+Response (200 OK):
+```json
 {
-  "id": 0,
-  "nome": "string",
-  "email": "string",
-  "tipoPerfil": "ADMIN"
+  "token": "eyJhbGciOiJIUzI1NiIsIn...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsIn...",
+  "type": "Bearer",
+  "userId": 1,
+  "role": "STUDENT"
 }
-</code>
-PUT ``/usuarios/me`` — Atualiza nome e e-mail do usuário logado
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "nome": "string",
-  "email": "string",
-  "tipoPerfil": "ADMIN"
-}
-</code>
-GET ``/usuarios`` — Lista os usuários (somente ADMIN)
-resultado esperado:
-<code>
-[
-  {
-    "id": 0,
-    "nome": "string",
-    "email": "string",
-    "tipoPerfil": "ADMIN"
-  }
-]
-</code>
-POST ``/usuarios`` — Cadastra um usuário (perfil ALUNO)
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "nome": "string",
-  "email": "string",
-  "tipoPerfil": "ALUNO"
-}
-</code>
-POST ``/usuarios/admin`` — Cadastra um administrador (somente ADMIN)
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "nome": "string",
-  "email": "string",
-  "tipoPerfil": "ADMIN"
-}
-</code>
-PATCH ``/usuarios/me/senha`` — Troca a senha do usuário logado (exige a senha atual)
-resultado esperado:
-<code>
-{
-  "senhaAtual": "string",
-  "novaSenha": "string"
-}
-</code>
+```
 
+POST `/auth/refresh` — Emite um novo par de tokens a partir de um Refresh Token válido
+Request:
+```json
+{
+  "refreshToken": "string"
+}
+```
 
-*PROGRESSO DAS AULAS*
+POST `/auth/logout` — Revoga o token JWT atual do usuário autenticado (Header `Authorization: Bearer <token>`)
 
-**GET** `/progresso-aulas/{id}` Busca um progresso pelo id (aluno só acessa o próprio)
-resultado esperado:
-<code>
+POST `/auth/forgot-password` — Solicita recuperação de senha
+Request:
+```json
 {
-  "id": 0,
-  "statusAula": "NAO_INICIADA",
-  "dataConclusao": "2026-10-26T13:16:05.259Z",
-  "usuarioId": 0,
-  "aulaId": 0
+  "email": "user@example.com"
 }
-</code>
-**PUT** `/progresso-aulas/{id}` Atualiza o status do progresso (usuário e aula não mudam)
-resultado esperado:
-<code>
+```
+Response (200 OK):
+```json
 {
-  "id": 0,
-  "statusAula": "NAO_INICIADA",
-  "dataConclusao": "2026-10-26T13:16:50.425Z",
-  "usuarioId": 0,
-  "aulaId": 0
+  "message": "Password reset token generated successfully (valid for 15 minutes).",
+  "resetToken": "token-retornado-apenas-em-dev"
 }
-<code/>
-**DELETE** `/progresso-aulas/{id}` Remove um progresso (aluno só remove o próprio)
-resutado esperado:
-<code>
-code 200 ok
-</code>
-**GET** `/progresso-aulas` Aluno vê o próprio progresso; admin vê todos (filtro opcional usuarioId)
-resultado esperado:
-<code>
-[
-  {
-    "id": 0,
-    "statusAula": "NAO_INICIADA",
-    "dataConclusao": "2026-10-26T13:18:01.750Z",
-    "usuarioId": 0,
-    "aulaId": 0
-  }
-]
-</code>
-**POST** `/progresso-aulas` Registra o progresso do usuário logado em uma aula (exige matrícula no curso)
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "statusAula": "NAO_INICIADA",
-  "dataConclusao": "2026-10-26T13:18:34.492Z",
-  "usuarioId": 0,
-  "aulaId": 0
-}
-</code>
-*MÓDULOS*
-GET ``/modulos/{id}`` Busca um módulo pelo id
-resultado esperado:
-<code>
-{
-  "id": 0,
-  "titulo": "string",
-  "descricao": "string",
-  "ordem": 0,
-  "cursoId": 0
-}
-</code>
-PUT ``/modulos/{id}`` Atualiza um módulo
-resultado esperado:
-<code>
-{
-  "titulo": "string",
-  "descricao": "string",
-  "ordem": 1,
-  "cursoId": 0
-}
-</code>
-**DELETE** `/modulos/{id}` Remove um módulo
-**GET** `/modulos` Lista os módulos (use cursoId para filtrar por curso, em ordem)
-**POST** `/modulos` Cadastra um módulo
-*CURSOS*
-GET /cursos/{id} — Busca um curso pelo ID
-<code>
-{
-  "id": 0,
-  "title": "string",
-  "description": "string",
-  "videoUrl": "string",
-  "category": {
-    "id": 0,
-    "name": "string",
-    "description": "string"
-  },
-  "author": {
-    "id": 0,
-    "channelName": "string",
-    "channelUrl": "string"
-  }
-}</code>
-PUT /cursos/{id} — Atualiza um curso existente (somente ADMIN)
-<code>
-{
-  "title": "string",
-  "description": "string",
-  "videoUrl": "string",
-  "categoryId": 0,
-  "authorId": 0
-}</code>
-DELETE /cursos/{id} — Exclui logicamente um curso (soft-delete) pelo ID (somente ADMIN)
-GET /cursos — Lista cursos com paginação
-POST /cursos — Publica um novo curso (somente ADMIN)
+```
 
-*CATEGORIAS*
-GET /categorias/{id} Encontra uma categoria por ID
-PUT /categorias/{id} Atualiza uma categoria (apenas ADMIN)
-DELETE /categorias/{id} Elimina (remoção lógica/soft-delete) uma categoria por ID (apenas ADMIN)
-GET /categorias Lista categorias com paginação
-POST /categorias Cria uma nova categoria (apenas ADMIN)
+POST `/auth/reset-password` — Redefine a senha com o token temporário
+Request:
+```json
+{
+  "token": "string",
+  "newPassword": "newPassword123"
+}
+```
 
-*AUTORES*
-GET /autores/{id} — Busca um autor pelo ID
-<code>
+*USUÁRIOS (`/usuarios`)*
+
+POST `/usuarios` — Cadastra um novo usuário aluno (perfil público `STUDENT`)
+Request:
+```json
 {
-  "id": 0,
-  "channelName": "string",
-  "channelUrl": "string"
-}</code>
-PUT /autores/{id} — Atualiza um autor (somente ADMIN)
-<code>
+  "name": "Maria Santos",
+  "email": "maria@example.com",
+  "password": "password123"
+}
+```
+Response (201 Created):
+```json
 {
-  "channelName": "string",
-  "channelUrl": "string"
-}</code>
-DELETE /autores/{id} — Exclui logicamente um autor (soft-delete) pelo ID (somente ADMIN)
-GET /autores — Lista autores com paginação
-Em caso de sucesso:
-<code>
+  "id": 1,
+  "name": "Maria Santos",
+  "email": "maria@example.com",
+  "role": "STUDENT"
+}
+```
+
+POST `/usuarios/admin` — Cadastra um novo administrador (somente ADMIN)
+Request:
+```json
 {
-  "totalPages": 0,
-  "totalElements": 0,
-  "size": 0,
-  "content": [
+  "name": "Admin Huari",
+  "email": "admin@huari.com",
+  "password": "adminPassword123"
+}
+```
+
+GET `/usuarios/me` — Retorna o perfil do usuário autenticado (200 OK)
+PUT `/usuarios/me` — Atualiza nome e e-mail do usuário autenticado
+Request:
+```json
+{
+  "name": "Maria Silva Santos",
+  "email": "maria.silva@example.com"
+}
+```
+
+PATCH `/usuarios/me/senha` — Altera a senha do usuário autenticado
+Request:
+```json
+{
+  "currentPassword": "password123",
+  "newPassword": "newPassword456"
+}
+```
+
+GET `/usuarios` — Lista usuários com paginação (somente ADMIN)
+GET `/usuarios/{id}` — Busca usuário por ID (somente ADMIN)
+PUT `/usuarios/{id}` — Atualiza dados e reseta senha de um usuário (somente ADMIN)
+DELETE `/usuarios/{id}` — Remove logicamente (soft-delete) um usuário (somente ADMIN)
+
+*CURSOS (`/cursos`) [Leitura Pública]*
+
+GET `/cursos` — Lista cursos com paginação (Público / Landing Page)
+GET `/cursos/{id}` — Busca curso por ID (Público)
+POST `/cursos` — Cria curso (somente ADMIN)
+Request:
+```json
+{
+  "title": "Introdução ao Processo Legislativo",
+  "description": "Aprenda como leis são criadas no Brasil.",
+  "videoUrl": "https://www.youtube.com/watch?v=exemplo",
+  "categoryId": 1,
+  "authorId": 1
+}
+```
+PUT `/cursos/{id}` — Atualiza curso existente (somente ADMIN)
+DELETE `/cursos/{id}` — Exclui logicamente (soft-delete) um curso (somente ADMIN)
+
+*CATEGORIAS (`/categorias`) [Leitura Pública]*
+
+GET `/categorias` — Lista categorias com paginação
+GET `/categorias/{id}` — Busca categoria por ID
+POST `/categorias` — Cria categoria (somente ADMIN)
+Request:
+```json
+{
+  "name": "Ciência Política",
+  "description": "Estudos sobre instituições, sistemas de governo e democracia."
+}
+```
+PUT `/categorias/{id}` — Atualiza categoria (somente ADMIN)
+DELETE `/categorias/{id}` — Exclui logicamente uma categoria (somente ADMIN)
+
+*AUTORES (`/autores`) [Leitura Pública]*
+
+GET `/autores` — Lista autores/criadores de conteúdo com paginação
+GET `/autores/{id}` — Busca autor por ID
+POST `/autores` — Cadastra novo autor (somente ADMIN)
+Request:
+```json
+{
+  "channelName": "Canal Cidadania Aberta",
+  "channelUrl": "https://youtube.com/@cidadaniaberta"
+}
+```
+PUT `/autores/{id}` — Atualiza autor (somente ADMIN)
+DELETE `/autores/{id}` — Exclui logicamente um autor (somente ADMIN)
+
+*MÓDULOS (`/modulos`) [Leitura Pública]*
+
+GET `/modulos` — Lista módulos com paginação (filtro opcional: `?courseId=1`)
+GET `/modulos/{id}` — Busca módulo por ID
+POST `/modulos` — Cria módulo (somente ADMIN)
+Request:
+```json
+{
+  "title": "Módulo 1: O Papel do Congresso Nacional",
+  "description": "Câmara dos Deputados e Senado Federal.",
+  "position": 1,
+  "courseId": 1
+}
+```
+PUT `/modulos/{id}` — Atualiza módulo (somente ADMIN)
+DELETE `/modulos/{id}` — Exclui logicamente um módulo (somente ADMIN)
+
+*AULAS (`/aulas`)*
+
+GET `/aulas` — Lista aulas com paginação (filtro opcional: `?moduleId=1`)
+GET `/aulas/{id}` — Busca aula por ID
+POST `/aulas` — Cria aula (somente ADMIN)
+Request:
+```json
+{
+  "title": "Aula 1: Como tramita uma PEC",
+  "description": "Entenda as votações em dois turnos.",
+  "videoUrl": "https://youtube.com/watch?v=aula1",
+  "position": 1,
+  "durationInMinutes": 15,
+  "moduleId": 1
+}
+```
+PUT `/aulas/{id}` — Atualiza aula (somente ADMIN)
+DELETE `/aulas/{id}` — Exclui logicamente uma aula (somente ADMIN)
+
+*MATRÍCULAS (`/matriculas`)*
+
+GET `/matriculas` — Lista matrículas com paginação (aluno vê as suas; admin vê todas ou filtra `?userId=1`)
+POST `/matriculas` — Inscreve o usuário autenticado em um curso
+Request:
+```json
+{
+  "courseId": 1
+}
+```
+Response (201 Created):
+```json
+{
+  "id": 1,
+  "enrollmentDate": "2026-11-07",
+  "status": "ACTIVE",
+  "userId": 1,
+  "courseId": 1
+}
+```
+GET `/matriculas/{id}` — Busca matrícula por ID
+PATCH `/matriculas/{id}/status` — Atualiza status da matrícula (`ACTIVE`, `COMPLETED`, `CANCELLED`) (somente ADMIN)
+DELETE `/matriculas/{id}` — Exclui logicamente uma matrícula (somente ADMIN)
+
+*PROGRESSO DAS AULAS (`/progresso-aulas`)*
+
+GET `/progresso-aulas` — Lista progresso com paginação (filtros opcionais: `?courseId=1`, `?userId=1`)
+POST `/progresso-aulas` — **Upsert** de progresso do aluno autenticado (cria ou atualiza automaticamente)
+Request:
+```json
+{
+  "status": "COMPLETED",
+  "lessonId": 1
+}
+```
+Response (201 Created):
+```json
+{
+  "id": 1,
+  "status": "COMPLETED",
+  "completedAt": "2026-11-07T14:00:00",
+  "userId": 1,
+  "lessonId": 1
+}
+```
+GET `/progresso-aulas/{id}` — Busca registro de progresso por ID
+PUT `/progresso-aulas/{id}` — Atualiza status de progresso
+DELETE `/progresso-aulas/{id}` — Remove registro de progresso
+
+*HISTÓRICO DA IA (`/historico-ia`)*
+
+POST `/historico-ia` — Envia pergunta ao assistente cívico (com RAG legislativo e resposta gravada)
+Request:
+```json
+{
+  "question": "O que é o projeto de lei PL 2338/2023 de Inteligência Artificial?"
+}
+```
+Response (201 Created):
+```json
+{
+  "id": 1,
+  "question": "O que é o projeto de lei PL 2338/2023 de Inteligência Artificial?",
+  "answer": "O PL 2338/2023 estabelece o marco legal para o desenvolvimento e uso ético da IA no Brasil...",
+  "queriedAt": "2026-11-07T14:00:00",
+  "userId": 1
+}
+```
+POST `/historico-ia/stream` — Envia pergunta com resposta transmitida em tempo real via Server-Sent Events (SSE)
+GET `/historico-ia` — Lista histórico do usuário autenticado (admin pode filtrar `?userId=1`)
+GET `/historico-ia/{id}` — Busca interação por ID
+DELETE `/historico-ia/{id}` — Remove interação do histórico
+
+*TRANSPARÊNCIA PÚBLICA (`/transparencia`) [Leitura Pública]*
+
+- **Parlamentares (`/transparencia/parlamentares`)**:
+  - `GET /transparencia/parlamentares` — Lista parlamentares (`?chamber=CHAMBER_OF_DEPUTIES` ou `FEDERAL_SENATE`)
+  - `GET /transparencia/parlamentares/{id}` — Detalha parlamentar
+  - `POST /transparencia/parlamentares` — Cadastra parlamentar (somente ADMIN)
+  - `PUT /transparencia/parlamentares/{id}` — Atualiza dados do parlamentar (somente ADMIN)
+  - `DELETE /transparencia/parlamentares/{id}` — Remove parlamentar (somente ADMIN)
+
+- **Projetos de Lei (`/transparencia/projetos-lei`)**:
+  - `GET /transparencia/projetos-lei` — Lista PLs (filtro por texto: `?q=inteligência`)
+  - `GET /transparencia/projetos-lei/{id}` — Detalha PL
+  - `POST /transparencia/projetos-lei` — Cadastra PL (somente ADMIN)
+  - `PUT /transparencia/projetos-lei/{id}` — Atualiza PL (somente ADMIN)
+  - `DELETE /transparencia/projetos-lei/{id}` — Remove PL (somente ADMIN)
+
+- **Despesas Parlamentares CEAP (`/transparencia/despesas`)**:
+  - `GET /transparencia/despesas` — Lista despesas parlamentares (`?parliamentarianId=1`)
+  - `POST /transparencia/despesas` — Registra despesa (somente ADMIN)
+  - `PUT /transparencia/despesas/{id}` — Atualiza despesa (somente ADMIN)
+  - `DELETE /transparencia/despesas/{id}` — Remove despesa (somente ADMIN)
+
+*INTEGRAÇÃO COM DADOS ABERTOS DO TRIBUNAL DE CONTAS (`/transparencia/tribunal-contas`) [Público]*
+
+- `GET /transparencia/tribunal-contas/resumo?q=` — Visão consolidada de processos, contas irregulares e status da API do Tribunal de Contas.
+- `GET /transparencia/tribunal-contas/processos?subject=&limit=` — Lista processos de fiscalização e auditoria em andamento no TCU/TCE.
+- `GET /transparencia/tribunal-contas/contas-irregulares?name=` — Consulta a lista oficial de responsáveis com contas julgadas irregulares.
+Exemplo de resposta consolidada:
+```json
+{
+  "provider": "Tribunal de Contas da União (TCU) / TCE",
+  "status": "ONLINE",
+  "message": "Dados obtidos com sucesso do Tribunal de Contas.",
+  "totalItems": 12,
+  "queriedAt": "2026-11-07T14:00:00",
+  "processes": [
     {
-      "id": 0,
-      "channelName": "string",
-      "channelUrl": "string"
+      "numeroProcesso": "TC 012.345/2026-0",
+      "relator": "Ministro Relator",
+      "situacao": "ABERTO",
+      "assunto": "Auditoria de conformidade em compras de TI",
+      "orgao": "Ministério da Gestão e Inovação",
+      "ano": 2026
     }
   ],
-  "number": 0,
-  "sort": {
-    "empty": true,
-    "sorted": true,
-    "unsorted": true
-  },
-  "pageable": {
-    "offset": 0,
-    "paged": true,
-    "pageNumber": 0,
-    "pageSize": 0,
-    "sort": {
-      "empty": true,
-      "sorted": true,
-      "unsorted": true
-    },
-    "unpaged": true
-  },
-  "numberOfElements": 0,
-  "first": true,
-  "last": true,
-  "empty": true
-}</code>
-
-POST /autores — Cadastra um novo autor (somente ADMIN)
-<code>{
-  "channelName": "string",
-  "channelUrl": "string"
-}</code>
-
-*AULAS*
-GET /aulas/{id} Encontra uma lição por ID
-PUT /aulas/{id} Atualiza uma lição (somente ADMINISTRADOR)
-DELETE /aulas/{id} Exclui (exclusão lógica) uma lição por ID (somente ADMINISTRADOR)
-GET /aulas Lista as lições com paginação (filtro opcional por moduleId)
-POST /aulas Publica uma nova lição (somente para administradores)
-
-*MATRICULAS*
-GET /matriculas Lista as matrículas com paginação (os alunos veem as suas próprias; os administradores veem todas ou podem filtrar por ID do utilizador)
-POST /matriculas Inscreve o utilizador autenticado num curso
-PATCH /matriculas/{id}/status Atualiza o estado de uma inscrição (apenas ADMIN)
-GET /matriculas/{id} Encontra uma matrícula pelo ID (os alunos só têm acesso à sua própria)
-DELETE /matriculas/{id} Elimina (remoção lógica/soft-delete) uma inscrição por ID (apenas ADMIN) 
-
-*HISTÓRICO DA IA*
-GET /historico-ia Lista o histórico de consultas da IA com paginação (os alunos veem o seu próprio; os administradores veem todos)
-POST /historico-ia Envia uma pergunta ao assistente de IA (com contexto RAG) e guarda a resposta no histórico
-POST /historico-ia/stream Envia uma pergunta ao assistente de IA com contexto RAG e transmite a resposta em fluxo via SSE
-GET /historico-ia/{id} Encontra um registo do histórico de IA pelo ID (os alunos só têm acesso ao seu próprio)
-DELETE /historico-ia/{id} Elimina (remoção lógica/soft-delete) um registo do histórico de IA por ID
-
-*AUTENTICAÇÃO*
-POST /auth/reset-password Redefine a palavra-passe do utilizador usando um token de recuperação temporário válido  
-POST /auth/refresh Emite um novo par de tokens de acesso e de atualização (refresh token) a partir de um Refresh Token válido  
-POST /auth/logout Revoga o token JWT atual do utilizador autenticado   
-POST /auth/login Autentica as credenciais do utilizador e devolve tokens JWT de acesso e de atualização 
-POST /auth/forgot-password Gera um token de redefinição de palavra-passe de curta duração para um e-mail registado
+  "irregularAccounts": [],
+  "sourceUrl": "https://dadosabertos.tcu.gov.br/api"
+}
+```
 
 
 ## Segurança
