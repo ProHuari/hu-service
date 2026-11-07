@@ -49,8 +49,7 @@ public class PoliticalTransparencyController {
     @GetMapping("/parlamentares")
     @Operation(summary = "Lists parliamentarians with pagination (optional filter by chamber)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Paginated list of parliamentarians"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Paginated list of parliamentarians")
     })
     public ResponseEntity<Page<ParliamentarianResponse>> listParliamentarians(
             @RequestParam(required = false) ParliamentarianChamber chamber,
@@ -97,8 +96,7 @@ public class PoliticalTransparencyController {
     @GetMapping("/projetos-lei")
     @Operation(summary = "Lists Legislative Bills with pagination (optional keyword search parameter q)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Paginated list of legislative bills"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Paginated list of legislative bills")
     })
     public ResponseEntity<Page<LegislativeBillResponse>> listBills(
             @RequestParam(required = false) String q,
@@ -145,12 +143,13 @@ public class PoliticalTransparencyController {
     @GetMapping("/despesas")
     @Operation(summary = "Lists parliamentary expenses with pagination (optional filter by parliamentarianId)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Paginated list of parliamentary expenses"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Paginated list of parliamentary expenses")
     })
     public ResponseEntity<Page<ParliamentarianExpenseResponse>> listExpenses(
-            @RequestParam(name = "parlamentarId", required = false) Long parliamentarianId,
+            @RequestParam(name = "parliamentarianId", required = false) Long parliamentarianIdParam,
+            @RequestParam(name = "parlamentarId", required = false) Long parlamentarIdParam,
             @ParameterObject Pageable pageable) {
+        Long parliamentarianId = parliamentarianIdParam != null ? parliamentarianIdParam : parlamentarIdParam;
         return ResponseEntity.ok(transparencyService.listExpenses(parliamentarianId, pageable));
     }
 
