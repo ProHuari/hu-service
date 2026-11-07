@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ParliamentarianRepository extends JpaRepository<Parliamentarian, Long> {
 
@@ -15,5 +16,7 @@ public interface ParliamentarianRepository extends JpaRepository<Parliamentarian
     Page<Parliamentarian> findByChamber(ParliamentarianChamber chamber, Pageable pageable);
 
     List<Parliamentarian> findByPartyIgnoreCase(String party);
+
+    Optional<Parliamentarian> findByExternalIdAndChamber(String externalId, ParliamentarianChamber chamber);
 }
 
