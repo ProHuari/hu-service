@@ -54,9 +54,11 @@ public class EnrollmentController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<Page<EnrollmentResponse>> listEnrollments(
-            @RequestParam(name = "usuarioId", required = false) Long userId,
+            @RequestParam(name = "userId", required = false) Long userIdParam,
+            @RequestParam(name = "usuarioId", required = false) Long usuarioIdParam,
             @ParameterObject Pageable pageable,
             @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
+        Long userId = userIdParam != null ? userIdParam : usuarioIdParam;
         Page<EnrollmentResponse> enrollments;
         if (!currentUser.isAdmin()) {
             enrollments = enrollmentService.listEnrollmentsByUser(currentUser.userId(), pageable);
