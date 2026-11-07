@@ -73,6 +73,17 @@ public class PoliticalTransparencyService {
         return ParliamentarianResponse.from(entity);
     }
 
+    public ParliamentarianResponse updateParliamentarian(Long id, ParliamentarianRequest request) {
+        Parliamentarian entity = parliamentarianRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Parliamentarian not found"));
+        entity.setName(request.name().trim());
+        entity.setChamber(request.chamber());
+        entity.setParty(request.party().trim().toUpperCase());
+        entity.setState(request.state().trim().toUpperCase());
+        entity.setExternalId(request.externalId());
+        return ParliamentarianResponse.from(parliamentarianRepository.save(entity));
+    }
+
     public void deleteParliamentarian(Long id) {
         Parliamentarian entity = parliamentarianRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Parliamentarian not found"));
@@ -128,6 +139,33 @@ public class PoliticalTransparencyService {
         return LegislativeBillResponse.from(bill);
     }
 
+    public LegislativeBillResponse updateBill(Long id, LegislativeBillRequest request) {
+        LegislativeBill bill = legislativeBillRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Legislative bill not found"));
+
+        String trimmedCode = request.code().trim();
+        if (!bill.getCode().equalsIgnoreCase(trimmedCode)
+                && legislativeBillRepository.existsByCodeIgnoreCase(trimmedCode)) {
+            throw new ConflictException("A legislative bill with this code already exists");
+        }
+
+        bill.setCode(trimmedCode);
+        bill.setTitle(request.title().trim());
+        bill.setSummary(request.summary().trim());
+        bill.setFullText(request.fullText());
+        bill.setStatus(request.status().trim());
+
+        if (request.authorId() != null) {
+            Parliamentarian author = parliamentarianRepository.findById(request.authorId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Author parliamentarian not found"));
+            bill.setAuthor(author);
+        } else {
+            bill.setAuthor(null);
+        }
+
+        return LegislativeBillResponse.from(legislativeBillRepository.save(bill));
+    }
+
     public void deleteBill(Long id) {
         LegislativeBill bill = legislativeBillRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Legislative bill not found"));
@@ -165,6 +203,23 @@ public class PoliticalTransparencyService {
                 ? expenseRepository.findByParliamentarianIdOrderByExpenseDateDesc(parliamentarianId, pageable)
                 : expenseRepository.findAll(pageable);
         return expenses.map(ParliamentarianExpenseResponse::from);
+    }
+
+    public ParliamentarianExpenseResponse updateExpense(Long id, ParliamentarianExpenseRequest request) {
+        ParliamentarianExpense expense = expenseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
+
+        Parliamentarian parliamentarian = parliamentarianRepository.findById(request.parliamentarianId())
+                .orElseThrow(() -> new ResourceNotFoundException("Parliamentarian not found"));
+
+        expense.setParliamentarian(parliamentarian);
+        expense.setExpenseCategory(request.expenseCategory().trim());
+        expense.setSupplierName(request.supplierName().trim());
+        expense.setAmount(request.amount());
+        expense.setExpenseDate(request.expenseDate());
+        expense.setDocumentUrl(request.documentUrl());
+
+        return ParliamentarianExpenseResponse.from(expenseRepository.save(expense));
     }
 
     public void deleteExpense(Long id) {
