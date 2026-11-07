@@ -67,6 +67,20 @@ public class PoliticalTransparencyController {
         return ResponseEntity.ok(transparencyService.findParliamentarianById(id));
     }
 
+    @PutMapping("/parlamentares/{id}")
+    @Operation(summary = "Updates a parliamentarian by ID (ADMIN only)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Parliamentarian updated"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Parliamentarian not found")
+    })
+    public ResponseEntity<ParliamentarianResponse> updateParliamentarian(
+            @PathVariable Long id,
+            @Valid @RequestBody ParliamentarianRequest request) {
+        return ResponseEntity.ok(transparencyService.updateParliamentarian(id, request));
+    }
+
     @DeleteMapping("/parlamentares/{id}")
     @Operation(summary = "Deletes (soft-delete) a parliamentarian by ID (ADMIN only)")
     @ApiResponses({
@@ -114,6 +128,20 @@ public class PoliticalTransparencyController {
         return ResponseEntity.ok(transparencyService.findBillById(id));
     }
 
+    @PutMapping("/projetos-lei/{id}")
+    @Operation(summary = "Updates a Legislative Bill by ID (ADMIN only)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Legislative bill updated"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "404", description = "Legislative bill or author not found"),
+            @ApiResponse(responseCode = "409", description = "Bill code already exists")
+    })
+    public ResponseEntity<LegislativeBillResponse> updateBill(
+            @PathVariable Long id,
+            @Valid @RequestBody LegislativeBillRequest request) {
+        return ResponseEntity.ok(transparencyService.updateBill(id, request));
+    }
+
     @DeleteMapping("/projetos-lei/{id}")
     @Operation(summary = "Deletes (soft-delete) a Legislative Bill by ID (ADMIN only)")
     @ApiResponses({
@@ -151,6 +179,20 @@ public class PoliticalTransparencyController {
             @ParameterObject Pageable pageable) {
         Long parliamentarianId = parliamentarianIdParam != null ? parliamentarianIdParam : parlamentarIdParam;
         return ResponseEntity.ok(transparencyService.listExpenses(parliamentarianId, pageable));
+    }
+
+    @PutMapping("/despesas/{id}")
+    @Operation(summary = "Updates a parliamentary expense by ID (ADMIN only)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Expense updated"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "404", description = "Expense or parliamentarian not found")
+    })
+    public ResponseEntity<ParliamentarianExpenseResponse> updateExpense(
+            @PathVariable Long id,
+            @Valid @RequestBody ParliamentarianExpenseRequest request) {
+        return ResponseEntity.ok(transparencyService.updateExpense(id, request));
     }
 
     @DeleteMapping("/despesas/{id}")
