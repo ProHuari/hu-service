@@ -62,3 +62,4 @@ public class AuditCourtController {
         return ResponseEntity.ok(auditCourtService.fetchIrregularAccounts(name));
     }
 }
+

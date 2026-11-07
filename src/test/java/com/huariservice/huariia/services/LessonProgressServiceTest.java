@@ -202,3 +202,4 @@ class LessonProgressServiceTest {
         verify(progressRepository).findByUserIdAndLessonModuleCourseId(userId, courseId, pageable);
     }
 }
+

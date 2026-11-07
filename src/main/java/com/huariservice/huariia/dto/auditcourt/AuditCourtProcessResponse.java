@@ -26,3 +26,4 @@ public record AuditCourtProcessResponse(
         @JsonProperty("ano")
         Integer decisionYear
 ) {}
+

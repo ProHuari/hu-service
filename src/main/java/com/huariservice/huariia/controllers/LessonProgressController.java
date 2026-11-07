@@ -27,92 +27,91 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class LessonProgressController {
 
-    private final LessonProgressService lessonProgressService;
+        private final LessonProgressService lessonProgressService;
 
-    @PostMapping
-    @Operation(summary = "Records or updates lesson progress (upsert) for the authenticated user (requires course enrollment)")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Progress record created or updated"),
-            @ApiResponse(responseCode = "400", description = "Validation error"),
-            @ApiResponse(responseCode = "404", description = "Lesson not found"),
-            @ApiResponse(responseCode = "422", description = "User is not enrolled in the course")
-    })
-    public ResponseEntity<LessonProgressResponse> createProgress(
-            @Valid @RequestBody LessonProgressRequest request,
-            @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
-        LessonProgressResponse response =
-                lessonProgressService.createProgress(currentUser.userId(), request);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(response.id()).toUri();
-        return ResponseEntity.created(location).body(response);
-    }
-
-    @GetMapping
-    @Operation(summary = "Lists lesson progress with pagination (students see their own; admins see all; supports optional courseId and userId filters)")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Paginated list of lesson progress records"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
-    public ResponseEntity<Page<LessonProgressResponse>> listProgress(
-            @RequestParam(name = "courseId", required = false) Long courseIdParam,
-            @RequestParam(name = "cursoId", required = false) Long cursoIdParam,
-            @RequestParam(name = "userId", required = false) Long userIdParam,
-            @RequestParam(name = "usuarioId", required = false) Long usuarioIdParam,
-            @ParameterObject Pageable pageable,
-            @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
-        Long courseId = courseIdParam != null ? courseIdParam : cursoIdParam;
-        Long targetUserId = userIdParam != null ? userIdParam : usuarioIdParam;
-
-        Page<LessonProgressResponse> progressPage;
-        if (!currentUser.isAdmin()) {
-            progressPage = lessonProgressService.listProgressByUser(currentUser.userId(), courseId, pageable);
-        } else if (targetUserId != null) {
-            progressPage = lessonProgressService.listProgressByUser(targetUserId, courseId, pageable);
-        } else {
-            progressPage = lessonProgressService.listProgress(courseId, pageable);
+        @PostMapping
+        @Operation(summary = "Records or updates lesson progress (upsert) for the authenticated user (requires course enrollment)")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "201", description = "Progress record created or updated"),
+                        @ApiResponse(responseCode = "400", description = "Validation error"),
+                        @ApiResponse(responseCode = "404", description = "Lesson not found"),
+                        @ApiResponse(responseCode = "422", description = "User is not enrolled in the course")
+        })
+        public ResponseEntity<LessonProgressResponse> createProgress(
+                        @Valid @RequestBody LessonProgressRequest request,
+                        @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
+                LessonProgressResponse response = lessonProgressService.createProgress(currentUser.userId(), request);
+                URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                                .path("/{id}").buildAndExpand(response.id()).toUri();
+                return ResponseEntity.created(location).body(response);
         }
-        return ResponseEntity.ok(progressPage);
-    }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "Finds a lesson progress record by ID (students only access their own)")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Progress record found"),
-            @ApiResponse(responseCode = "404", description = "Progress record not found")
-    })
-    public ResponseEntity<LessonProgressResponse> findById(
-            @PathVariable Long id,
-            @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
-        return ResponseEntity.ok(
-                lessonProgressService.findById(id, currentUser.userId(), currentUser.isAdmin()));
-    }
+        @GetMapping
+        @Operation(summary = "Lists lesson progress with pagination (students see their own; admins see all; supports optional courseId and userId filters)")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Paginated list of lesson progress records"),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized")
+        })
+        public ResponseEntity<Page<LessonProgressResponse>> listProgress(
+                        @RequestParam(name = "courseId", required = false) Long courseIdParam,
+                        @RequestParam(name = "cursoId", required = false) Long cursoIdParam,
+                        @RequestParam(name = "userId", required = false) Long userIdParam,
+                        @RequestParam(name = "usuarioId", required = false) Long usuarioIdParam,
+                        @ParameterObject Pageable pageable,
+                        @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
+                Long courseId = courseIdParam != null ? courseIdParam : cursoIdParam;
+                Long targetUserId = userIdParam != null ? userIdParam : usuarioIdParam;
 
-    @PutMapping("/{id}")
-    @Operation(summary = "Updates the status of a lesson progress record")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Progress record updated"),
-            @ApiResponse(responseCode = "400", description = "Validation error"),
-            @ApiResponse(responseCode = "404", description = "Progress record not found")
-    })
-    public ResponseEntity<LessonProgressResponse> updateProgress(
-            @PathVariable Long id,
-            @Valid @RequestBody LessonProgressRequest request,
-            @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
-        return ResponseEntity.ok(lessonProgressService.updateProgress(
-                id, request, currentUser.userId(), currentUser.isAdmin()));
-    }
+                Page<LessonProgressResponse> progressPage;
+                if (!currentUser.isAdmin()) {
+                        progressPage = lessonProgressService.listProgressByUser(currentUser.userId(), courseId,
+                                        pageable);
+                } else if (targetUserId != null) {
+                        progressPage = lessonProgressService.listProgressByUser(targetUserId, courseId, pageable);
+                } else {
+                        progressPage = lessonProgressService.listProgress(courseId, pageable);
+                }
+                return ResponseEntity.ok(progressPage);
+        }
 
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Deletes (soft-delete) a lesson progress record by ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Progress record deleted"),
-            @ApiResponse(responseCode = "404", description = "Progress record not found")
-    })
-    public ResponseEntity<Void> deleteProgress(
-            @PathVariable Long id,
-            @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
-        lessonProgressService.deleteById(id, currentUser.userId(), currentUser.isAdmin());
-        return ResponseEntity.noContent().build();
-    }
+        @GetMapping("/{id}")
+        @Operation(summary = "Finds a lesson progress record by ID (students only access their own)")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Progress record found"),
+                        @ApiResponse(responseCode = "404", description = "Progress record not found")
+        })
+        public ResponseEntity<LessonProgressResponse> findById(
+                        @PathVariable Long id,
+                        @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
+                return ResponseEntity.ok(
+                                lessonProgressService.findById(id, currentUser.userId(), currentUser.isAdmin()));
+        }
+
+        @PutMapping("/{id}")
+        @Operation(summary = "Updates the status of a lesson progress record")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Progress record updated"),
+                        @ApiResponse(responseCode = "400", description = "Validation error"),
+                        @ApiResponse(responseCode = "404", description = "Progress record not found")
+        })
+        public ResponseEntity<LessonProgressResponse> updateProgress(
+                        @PathVariable Long id,
+                        @Valid @RequestBody LessonProgressRequest request,
+                        @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
+                return ResponseEntity.ok(lessonProgressService.updateProgress(
+                                id, request, currentUser.userId(), currentUser.isAdmin()));
+        }
+
+        @DeleteMapping("/{id}")
+        @Operation(summary = "Deletes (soft-delete) a lesson progress record by ID")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "204", description = "Progress record deleted"),
+                        @ApiResponse(responseCode = "404", description = "Progress record not found")
+        })
+        public ResponseEntity<Void> deleteProgress(
+                        @PathVariable Long id,
+                        @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
+                lessonProgressService.deleteById(id, currentUser.userId(), currentUser.isAdmin());
+                return ResponseEntity.noContent().build();
+        }
 }
-

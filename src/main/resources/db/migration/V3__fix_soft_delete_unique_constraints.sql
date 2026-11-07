@@ -55,3 +55,4 @@ CREATE UNIQUE INDEX uk_progresso_usuario_aula_active ON progresso_aula (usuario_
 ALTER TABLE projetos_lei ADD COLUMN is_active TINYINT(1) GENERATED ALWAYS AS (IF(deleted_at IS NULL, 1, NULL)) VIRTUAL;
 ALTER TABLE projetos_lei DROP INDEX codigo;
 CREATE UNIQUE INDEX uk_projetos_lei_codigo_active ON projetos_lei (codigo, is_active);
+

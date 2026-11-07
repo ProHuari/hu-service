@@ -26,3 +26,4 @@ public record AuditCourtIrregularAccountResponse(
         @JsonProperty("acordao")
         String deliberationNumber
 ) {}
+
