@@ -20,4 +20,10 @@ public interface LessonProgressRepository extends JpaRepository<LessonProgress, 
     List<LessonProgress> findByUserId(Long userId);
 
     Page<LessonProgress> findByUserId(Long userId, Pageable pageable);
+
+    List<LessonProgress> findByUserIdAndLessonModuleCourseId(Long userId, Long courseId);
+
+    Page<LessonProgress> findByUserIdAndLessonModuleCourseId(Long userId, Long courseId, Pageable pageable);
+
+    Page<LessonProgress> findByLessonModuleCourseId(Long courseId, Pageable pageable);
 }
