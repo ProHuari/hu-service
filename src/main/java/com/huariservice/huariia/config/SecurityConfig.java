@@ -18,7 +18,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private static final String[] CONTENT_ENDPOINTS = {
+    private static final String[] PUBLIC_READ_CONTENT_ENDPOINTS = {
+            "/cursos", "/cursos/**",
+            "/categorias", "/categorias/**",
+            "/autores", "/autores/**",
+            "/modulos", "/modulos/**",
+            "/transparencia", "/transparencia/**"
+    };
+
+    private static final String[] ADMIN_CONTENT_ENDPOINTS = {
             "/cursos", "/cursos/**",
             "/categorias", "/categorias/**",
             "/autores", "/autores/**",
@@ -68,8 +76,9 @@ public class SecurityConfig {
                         .requestMatchers("/usuarios/me", "/usuarios/me/**").authenticated()
                         .requestMatchers("/usuarios", "/usuarios/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.GET, CONTENT_ENDPOINTS).authenticated()
-                        .requestMatchers(CONTENT_ENDPOINTS).hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, PUBLIC_READ_CONTENT_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/aulas", "/aulas/**").authenticated()
+                        .requestMatchers(ADMIN_CONTENT_ENDPOINTS).hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.PATCH, "/matriculas/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/matriculas/**").hasRole("ADMIN")
