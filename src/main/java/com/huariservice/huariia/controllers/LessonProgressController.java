@@ -30,12 +30,11 @@ public class LessonProgressController {
     private final LessonProgressService lessonProgressService;
 
     @PostMapping
-    @Operation(summary = "Records lesson progress for the authenticated user (requires course enrollment)")
+    @Operation(summary = "Records or updates lesson progress (upsert) for the authenticated user (requires course enrollment)")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Progress record created"),
+            @ApiResponse(responseCode = "201", description = "Progress record created or updated"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "404", description = "Lesson not found"),
-            @ApiResponse(responseCode = "409", description = "Progress record already exists"),
             @ApiResponse(responseCode = "422", description = "User is not enrolled in the course")
     })
     public ResponseEntity<LessonProgressResponse> createProgress(
@@ -49,22 +48,28 @@ public class LessonProgressController {
     }
 
     @GetMapping
-    @Operation(summary = "Lists lesson progress with pagination (students see their own; admins see all)")
+    @Operation(summary = "Lists lesson progress with pagination (students see their own; admins see all; supports optional courseId and userId filters)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Paginated list of lesson progress records"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<Page<LessonProgressResponse>> listProgress(
-            @RequestParam(name = "usuarioId", required = false) Long userId,
+            @RequestParam(name = "courseId", required = false) Long courseIdParam,
+            @RequestParam(name = "cursoId", required = false) Long cursoIdParam,
+            @RequestParam(name = "userId", required = false) Long userIdParam,
+            @RequestParam(name = "usuarioId", required = false) Long usuarioIdParam,
             @ParameterObject Pageable pageable,
             @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
+        Long courseId = courseIdParam != null ? courseIdParam : cursoIdParam;
+        Long targetUserId = userIdParam != null ? userIdParam : usuarioIdParam;
+
         Page<LessonProgressResponse> progressPage;
         if (!currentUser.isAdmin()) {
-            progressPage = lessonProgressService.listProgressByUser(currentUser.userId(), pageable);
-        } else if (userId != null) {
-            progressPage = lessonProgressService.listProgressByUser(userId, pageable);
+            progressPage = lessonProgressService.listProgressByUser(currentUser.userId(), courseId, pageable);
+        } else if (targetUserId != null) {
+            progressPage = lessonProgressService.listProgressByUser(targetUserId, courseId, pageable);
         } else {
-            progressPage = lessonProgressService.listProgress(pageable);
+            progressPage = lessonProgressService.listProgress(courseId, pageable);
         }
         return ResponseEntity.ok(progressPage);
     }
