@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
  * @param name     display name (required, max 100 chars)
  * @param email    unique login e-mail (required, valid format, max 100 chars)
  * @param password plain-text password, hashed with BCrypt before storage
- *                 (required, 6–72 chars; BCrypt only considers the first 72 bytes)
+ *                 (required, 8–72 chars; BCrypt only considers the first 72 bytes)
  */
 public record UserRequest(
         @NotBlank(message = "Name is required")
@@ -23,6 +23,6 @@ public record UserRequest(
         String email,
 
         @NotBlank(message = "Password is required")
-        @Size(min = 6, max = 72, message = "Password must be between 6 and 72 characters")
+        @Size(min = 8, max = 72, message = "Password must be between 8 and 72 characters")
         String password
 ) {}
