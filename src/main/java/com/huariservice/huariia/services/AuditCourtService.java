@@ -43,8 +43,8 @@ public class AuditCourtService {
      */
     public AuditCourtSummaryResponse fetchTransparencyOverview(String query) {
         try {
-            List<AuditCourtProcessResponse> processes = fetchProcesses(query, 10);
-            List<AuditCourtIrregularAccountResponse> irregularAccounts = fetchIrregularAccounts(query);
+            List<AuditCourtProcessResponse> processes = fetchProcessesOrThrow(query, 10);
+            List<AuditCourtIrregularAccountResponse> irregularAccounts = fetchIrregularAccountsOrThrow(query);
 
             return AuditCourtSummaryResponse.success(
                     PROVIDER_NAME,
@@ -70,18 +70,8 @@ public class AuditCourtService {
      * @return list of processes or empty list on failure
      */
     public List<AuditCourtProcessResponse> fetchProcesses(String subject, Integer limit) {
-        int maxResults = (limit != null && limit > 0) ? Math.min(limit, 50) : 20;
         try {
-            String uri = (subject != null && !subject.isBlank())
-                    ? "/processo/recupera-processos?termo=" + subject.trim() + "&quantidade=" + maxResults
-                    : "/processo/recupera-processos?quantidade=" + maxResults;
-
-            List<AuditCourtProcessResponse> response = restClient.get()
-                    .uri(uri)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<List<AuditCourtProcessResponse>>() {});
-
-            return response != null ? response : Collections.emptyList();
+            return fetchProcessesOrThrow(subject, limit);
         } catch (RestClientResponseException ex) {
             log.warn("Audit Court API returned HTTP status {}: {}", ex.getStatusCode().value(), ex.getMessage());
             return Collections.emptyList();
@@ -94,6 +84,20 @@ public class AuditCourtService {
         }
     }
 
+    private List<AuditCourtProcessResponse> fetchProcessesOrThrow(String subject, Integer limit) {
+        int maxResults = (limit != null && limit > 0) ? Math.min(limit, 50) : 20;
+        String uri = (subject != null && !subject.isBlank())
+                ? "/processo/recupera-processos?termo=" + subject.trim() + "&quantidade=" + maxResults
+                : "/processo/recupera-processos?quantidade=" + maxResults;
+
+        List<AuditCourtProcessResponse> response = restClient.get()
+                .uri(uri)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<AuditCourtProcessResponse>>() {});
+
+        return response != null ? response : Collections.emptyList();
+    }
+
     /**
      * Queries irregular public accounts register with defensive fallback.
      *
@@ -102,16 +106,7 @@ public class AuditCourtService {
      */
     public List<AuditCourtIrregularAccountResponse> fetchIrregularAccounts(String nameOrCpf) {
         try {
-            String uri = (nameOrCpf != null && !nameOrCpf.isBlank())
-                    ? "/contas-irregulares?nome=" + nameOrCpf.trim()
-                    : "/contas-irregulares?quantidade=10";
-
-            List<AuditCourtIrregularAccountResponse> response = restClient.get()
-                    .uri(uri)
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<List<AuditCourtIrregularAccountResponse>>() {});
-
-            return response != null ? response : Collections.emptyList();
+            return fetchIrregularAccountsOrThrow(nameOrCpf);
         } catch (RestClientResponseException ex) {
             log.warn("Audit Court API (irregular accounts) returned HTTP status {}: {}",
                     ex.getStatusCode().value(), ex.getMessage());
@@ -123,6 +118,19 @@ public class AuditCourtService {
             log.warn("Unexpected error reading irregular accounts from Audit Court API: {}", ex.getMessage());
             return Collections.emptyList();
         }
+    }
+
+    private List<AuditCourtIrregularAccountResponse> fetchIrregularAccountsOrThrow(String nameOrCpf) {
+        String uri = (nameOrCpf != null && !nameOrCpf.isBlank())
+                ? "/contas-irregulares?nome=" + nameOrCpf.trim()
+                : "/contas-irregulares?quantidade=10";
+
+        List<AuditCourtIrregularAccountResponse> response = restClient.get()
+                .uri(uri)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<AuditCourtIrregularAccountResponse>>() {});
+
+        return response != null ? response : Collections.emptyList();
     }
 }
 
