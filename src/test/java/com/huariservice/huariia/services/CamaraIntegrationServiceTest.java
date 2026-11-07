@@ -190,11 +190,11 @@ class CamaraIntegrationServiceTest {
         existing.setName("Deputado Antigo");
         existing.setParty("ANTIGO_PARTIDO");
         existing.setState("RJ");
-        existing.setChamber(ParliamentarianChamber.DEPUTADO_FEDERAL);
+        existing.setChamber(ParliamentarianChamber.CHAMBER_OF_DEPUTIES);
 
-        when(parliamentarianRepository.findByExternalIdAndChamber("1001", ParliamentarianChamber.DEPUTADO_FEDERAL))
+        when(parliamentarianRepository.findByExternalIdAndChamber("1001", ParliamentarianChamber.CHAMBER_OF_DEPUTIES))
                 .thenReturn(Optional.empty());
-        when(parliamentarianRepository.findByExternalIdAndChamber("1002", ParliamentarianChamber.DEPUTADO_FEDERAL))
+        when(parliamentarianRepository.findByExternalIdAndChamber("1002", ParliamentarianChamber.CHAMBER_OF_DEPUTIES))
                 .thenReturn(Optional.of(existing));
 
         CamaraSyncSummaryResponse summary = service.syncDeputiesToDatabase(null, 10);

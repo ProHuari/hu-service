@@ -172,7 +172,7 @@ public class CamaraIntegrationService {
             for (CamaraDeputyDto remote : targetList) {
                 String externalId = String.valueOf(remote.id());
                 Optional<Parliamentarian> existingOpt = parliamentarianRepository
-                        .findByExternalIdAndChamber(externalId, ParliamentarianChamber.DEPUTADO_FEDERAL);
+                        .findByExternalIdAndChamber(externalId, ParliamentarianChamber.CHAMBER_OF_DEPUTIES);
 
                 Parliamentarian entity;
                 if (existingOpt.isPresent()) {
@@ -181,7 +181,7 @@ public class CamaraIntegrationService {
                 } else {
                     entity = new Parliamentarian();
                     entity.setExternalId(externalId);
-                    entity.setChamber(ParliamentarianChamber.DEPUTADO_FEDERAL);
+                    entity.setChamber(ParliamentarianChamber.CHAMBER_OF_DEPUTIES);
                     created++;
                 }
 
