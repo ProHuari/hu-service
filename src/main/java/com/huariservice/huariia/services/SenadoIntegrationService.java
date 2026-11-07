@@ -28,6 +28,7 @@ public class SenadoIntegrationService {
     private final ObjectMapper objectMapper;
     private final String baseUrl;
 
+    @org.springframework.beans.factory.annotation.Autowired
     public SenadoIntegrationService(
             @Qualifier("senadoRestClient") RestClient restClient,
             @Value("${app.senado.base-url:https://legis.senado.leg.br/dadosabertos}") String baseUrl) {

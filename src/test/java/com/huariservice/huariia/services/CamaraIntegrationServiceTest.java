@@ -53,8 +53,7 @@ class CamaraIntegrationServiceTest {
         service = new CamaraIntegrationService(
                 restClient,
                 parliamentarianRepository,
-                "https://dadosabertos.camara.leg.br/api/v2"
-        );
+                "https://dadosabertos.camara.leg.br/api/v2");
     }
 
     @Test
@@ -69,8 +68,7 @@ class CamaraIntegrationServiceTest {
                 "SP",
                 57,
                 "https://www.camara.leg.br/internet/deputado/bandep/220593.jpg",
-                "dep.erikahilton@camara.leg.br"
-        );
+                "dep.erikahilton@camara.leg.br");
         CamaraWrapperResponse<CamaraDeputyDto> wrapper = new CamaraWrapperResponse<>(List.of(deputy), List.of());
 
         when(restClient.get()).thenReturn(requestHeadersUriSpec);
@@ -118,8 +116,7 @@ class CamaraIntegrationServiceTest {
                 BigDecimal.ZERO,
                 "123",
                 1,
-                0
-        );
+                0);
         CamaraWrapperResponse<CamaraExpenseDto> wrapper = new CamaraWrapperResponse<>(List.of(expense), List.of());
 
         when(restClient.get()).thenReturn(requestHeadersUriSpec);
@@ -152,8 +149,7 @@ class CamaraIntegrationServiceTest {
                 139,
                 1234,
                 2026,
-                "Dispõe sobre a transparência no uso de inteligência artificial pelo poder público."
-        );
+                "Dispõe sobre a transparência no uso de inteligência artificial pelo poder público.");
         CamaraWrapperResponse<CamaraPropositionDto> wrapper = new CamaraWrapperResponse<>(List.of(prop), List.of());
 
         when(restClient.get()).thenReturn(requestHeadersUriSpec);
@@ -172,12 +168,11 @@ class CamaraIntegrationServiceTest {
     @DisplayName("Should synchronize deputies to database without duplicates")
     void shouldSyncDeputiesToDatabaseWithoutDuplicates() {
         CamaraDeputyDto remote1 = new CamaraDeputyDto(
-                1001L, "", "Deputado Novo", "PARTIDO", "", "SP", 57, "", ""
-        );
+                1001L, "", "Deputado Novo", "PARTIDO", "", "SP", 57, "", "");
         CamaraDeputyDto remote2 = new CamaraDeputyDto(
-                1002L, "", "Deputado Existente Atualizado", "NOVO_PARTIDO", "", "RJ", 57, "", ""
-        );
-        CamaraWrapperResponse<CamaraDeputyDto> wrapper = new CamaraWrapperResponse<>(List.of(remote1, remote2), List.of());
+                1002L, "", "Deputado Existente Atualizado", "NOVO_PARTIDO", "", "RJ", 57, "", "");
+        CamaraWrapperResponse<CamaraDeputyDto> wrapper = new CamaraWrapperResponse<>(List.of(remote1, remote2),
+                List.of());
 
         when(restClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
