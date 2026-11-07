@@ -67,19 +67,22 @@ public class LessonProgressService {
         if (!enrollmentRepository.existsByUserIdAndCourseId(user.getId(), courseId)) {
             throw new BusinessRuleException("The user is not enrolled in the course of this lesson");
         }
-        if (progressRepository.findByUserIdAndLessonId(user.getId(), lesson.getId()).isPresent()) {
-            throw new ConflictException("Progress already exists for this lesson; update the existing record");
-        }
 
-        LessonProgress progress = new LessonProgress();
-        progress.setUser(user);
-        progress.setLesson(lesson);
+        // Upsert logic: if progress already exists for (user, lesson), update it instead of failing
+        LessonProgress progress = progressRepository.findByUserIdAndLessonId(user.getId(), lesson.getId())
+                .orElseGet(() -> {
+                    LessonProgress p = new LessonProgress();
+                    p.setUser(user);
+                    p.setLesson(lesson);
+                    return p;
+                });
+
         applyStatus(progress, request.status());
         return LessonProgressResponse.from(progressRepository.save(progress));
     }
 
     /**
-     * Lists every progress record (administrator view).
+     * Lists every progress record (administrator view), optionally filtered by courseId.
      *
      * @return all records (empty list if none)
      */
@@ -90,11 +93,20 @@ public class LessonProgressService {
 
     @Transactional(readOnly = true)
     public Page<LessonProgressResponse> listProgress(Pageable pageable) {
+        return listProgress(null, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<LessonProgressResponse> listProgress(Long courseId, Pageable pageable) {
+        if (courseId != null) {
+            return progressRepository.findByLessonModuleCourseId(courseId, pageable)
+                    .map(LessonProgressResponse::from);
+        }
         return progressRepository.findAll(pageable).map(LessonProgressResponse::from);
     }
 
     /**
-     * Lists the progress records of one user.
+     * Lists the progress records of one user, optionally filtered by courseId.
      *
      * @param userId user identifier
      * @return the user's records (empty list if none)
@@ -107,6 +119,15 @@ public class LessonProgressService {
 
     @Transactional(readOnly = true)
     public Page<LessonProgressResponse> listProgressByUser(Long userId, Pageable pageable) {
+        return listProgressByUser(userId, null, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<LessonProgressResponse> listProgressByUser(Long userId, Long courseId, Pageable pageable) {
+        if (courseId != null) {
+            return progressRepository.findByUserIdAndLessonModuleCourseId(userId, courseId, pageable)
+                    .map(LessonProgressResponse::from);
+        }
         return progressRepository.findByUserId(userId, pageable)
                 .map(LessonProgressResponse::from);
     }
