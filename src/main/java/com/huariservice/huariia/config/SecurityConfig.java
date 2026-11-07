@@ -23,7 +23,8 @@ public class SecurityConfig {
             "/categorias", "/categorias/**",
             "/autores", "/autores/**",
             "/modulos", "/modulos/**",
-            "/transparencia", "/transparencia/**"
+            "/transparencia", "/transparencia/**",
+            "/localidades", "/localidades/**"
     };
 
     private static final String[] ADMIN_CONTENT_ENDPOINTS = {
@@ -69,7 +70,8 @@ public class SecurityConfig {
                                 "/auth/reset-password",
                                 "/actuator/health",
                                 "/actuator/info",
-                                "/error"
+                                "/error",
+                                "/ia/**"
                         ).permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
@@ -77,6 +79,7 @@ public class SecurityConfig {
                         .requestMatchers("/usuarios/me", "/usuarios/me/**").authenticated()
                         .requestMatchers("/usuarios", "/usuarios/**").hasRole("ADMIN")
 
+                        .requestMatchers(HttpMethod.POST, "/transparencia/camara/sincronizar").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, PUBLIC_READ_CONTENT_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, "/aulas", "/aulas/**").authenticated()
                         .requestMatchers(ADMIN_CONTENT_ENDPOINTS).hasRole("ADMIN")
