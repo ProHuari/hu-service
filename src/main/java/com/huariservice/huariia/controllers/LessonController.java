@@ -48,8 +48,10 @@ public class LessonController {
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<Page<LessonResponse>> listLessons(
-            @RequestParam(name = "moduloId", required = false) Long moduleId,
+            @RequestParam(name = "moduleId", required = false) Long moduleIdParam,
+            @RequestParam(name = "moduloId", required = false) Long moduloIdParam,
             @ParameterObject Pageable pageable) {
+        Long moduleId = moduleIdParam != null ? moduleIdParam : moduloIdParam;
         Page<LessonResponse> page = (moduleId != null)
                 ? lessonService.listLessonsByModule(moduleId, pageable)
                 : lessonService.listLessons(pageable);
