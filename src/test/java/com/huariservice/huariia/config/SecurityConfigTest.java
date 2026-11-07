@@ -42,6 +42,13 @@ class SecurityConfigTest {
     }
 
     @Test
+    @DisplayName("POST on /auth/logout should be permitted to gracefully handle client logouts")
+    void withoutToken_logout_returns204() throws Exception {
+        mockMvc.perform(post("/auth/logout"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
     @DisplayName("POST on /cursos must require authentication")
     void withoutToken_postCourse_returns401() throws Exception {
         mockMvc.perform(post("/cursos"))
