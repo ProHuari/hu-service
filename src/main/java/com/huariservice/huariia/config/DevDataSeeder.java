@@ -1,6 +1,7 @@
 package com.huariservice.huariia.config;
 
 import com.huariservice.huariia.entities.*;
+import com.huariservice.huariia.entities.enums.Role;
 import com.huariservice.huariia.repositories.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -23,6 +23,8 @@ public class DevDataSeeder implements CommandLineRunner {
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
     private final CourseRepository courseRepository;
+    private final CourseModuleRepository courseModuleRepository;
+    private final LessonRepository lessonRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -35,25 +37,26 @@ public class DevDataSeeder implements CommandLineRunner {
 
         log.info("[DevDataSeeder] Iniciando população de dados de teste...");
 
-        // 1. Usuário Aluno de Teste (Ajuste os nomes dos setters conforme a sua classe User atual)
+        // 1. Usuário Aluno de Teste
         if (!userRepository.existsByEmail("aluno@huari.com")) {
             User aluno = new User();
             aluno.setName("Aluno Exemplo");
             aluno.setEmail("aluno@huari.com");
             aluno.setPasswordHash(passwordEncoder.encode("aluno123456"));
-            // aluno.setRole(...); // Defina o Enum de Role correto
+            aluno.setRole(Role.STUDENT);
             userRepository.save(aluno);
+            log.info("[DevDataSeeder] Usuário aluno criado: aluno@huari.com / aluno123456");
         }
 
-        // 2. Categorias
+        // 2. Categoria
         Category catDesenvolvimento = new Category(null, "Desenvolvimento Web", "Cursos de programação web e APIs");
-        categoryRepository.save(catDesenvolvimento);
+        catDesenvolvimento = categoryRepository.save(catDesenvolvimento);
 
-        // 3. Autores
+        // 3. Autor
         Author autor1 = new Author(null, "Huari Academy", "https://youtube.com/@huariacademy");
-        authorRepository.save(autor1);
+        autor1 = authorRepository.save(autor1);
 
-        // 4. Cursos
+        // 4. Curso
         Course curso1 = new Course(
                 null,
                 "Introdução ao Spring Boot e Java 25",
@@ -62,8 +65,30 @@ public class DevDataSeeder implements CommandLineRunner {
                 catDesenvolvimento,
                 autor1
         );
-        courseRepository.save(curso1);
+        curso1 = courseRepository.save(curso1);
 
-        log.info("[DevDataSeeder] População concluída com sucesso!");
+        // 5. Módulo do Curso
+        CourseModule modulo1 = new CourseModule(
+                null,
+                "Módulo 1: Fundamentos do Spring Boot",
+                "Conceitos básicos, injeção de dependência e arquitetura REST.",
+                1,
+                curso1
+        );
+        modulo1 = courseModuleRepository.save(modulo1);
+
+        // 6. Aula do Módulo
+        Lesson aula1 = new Lesson(
+                null,
+                "Aula 1: Setup do Ambiente e Java 25",
+                "Instalação do JDK 25 e inicialização do projeto via Spring Initializr.",
+                "https://www.youtube.com/watch?v=setup-ambiente",
+                1,
+                15,
+                modulo1
+        );
+        lessonRepository.save(aula1);
+
+        log.info("[DevDataSeeder] População concluída com sucesso! (1 Curso, 1 Módulo, 1 Aula cadastrados)");
     }
 }

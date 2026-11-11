@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.util.Locale;
 
 @Slf4j
 @Component
+@Order(1)
 public class AdminInitializer implements ApplicationRunner {
 
     private static final String DEFAULT_ADMIN_NAME = "Administrador";
