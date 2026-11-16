@@ -1,15 +1,21 @@
 package com.huariservice.huariia.services;
 
+import com.huariservice.huariia.dto.CourseModuleResponse;
 import com.huariservice.huariia.dto.CourseRequest;
 import com.huariservice.huariia.dto.CourseResponse;
+import com.huariservice.huariia.dto.LessonResponse;
 import com.huariservice.huariia.entities.Author;
 import com.huariservice.huariia.entities.Category;
 import com.huariservice.huariia.entities.Course;
+import com.huariservice.huariia.entities.CourseModule;
+import com.huariservice.huariia.entities.Lesson;
 import com.huariservice.huariia.exceptions.ConflictException;
 import com.huariservice.huariia.exceptions.ResourceNotFoundException;
 import com.huariservice.huariia.repositories.AuthorRepository;
 import com.huariservice.huariia.repositories.CategoryRepository;
+import com.huariservice.huariia.repositories.CourseModuleRepository;
 import com.huariservice.huariia.repositories.CourseRepository;
+import com.huariservice.huariia.repositories.LessonRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Business logic for managing {@link Course} entities.
@@ -33,51 +40,57 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
+    private final CourseModuleRepository courseModuleRepository;
+    private final LessonRepository lessonRepository;
 
     /**
      * Creates a new course.
-     * <ol>
-     *   <li>Rejects duplicated titles and duplicated video URLs.</li>
-     *   <li>Creates an empty entity and fills it via {@link #applyRequest(Course, CourseRequest)},
-     *       which also resolves the category and the author.</li>
-     *   <li>Persists the course.</li>
-     * </ol>
      *
      * @param request validated payload
      * @return the persisted course with nested category and author
-     * @throws ConflitoException             if the title or the video URL is already used
-     * @throws RecursoNaoEncontradoException if the category or the author does not exist
+     * @throws ConflictException         if the title or the video URL is already used
+     * @throws ResourceNotFoundException if the category or the author does not exist
      */
     public CourseResponse createCourse(CourseRequest request) {
         if (courseRepository.existsByTitle(request.title())) {
             throw new ConflictException("A course with this title already exists");
         }
-        if (courseRepository.existsByVideoUrl(request.videoUrl())) {
+        if (request.videoUrl() != null && courseRepository.existsByVideoUrl(request.videoUrl())) {
             throw new ConflictException("A course with this video URL already exists");
         }
 
         Course course = new Course();
         applyRequest(course, request);
-        return CourseResponse.from(courseRepository.save(course));
+        Course saved = courseRepository.save(course);
+        return CourseResponse.fromWithModules(saved, List.of());
     }
 
     /**
-     * Lists every course.
+     * Lists every course with its nested modules and lessons.
      *
      * @return all courses (empty list if none)
      */
     @Transactional(readOnly = true)
     public List<CourseResponse> listCourses() {
-        return courseRepository.findAll().stream().map(CourseResponse::from).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CourseResponse> listCourses(Pageable pageable) {
-        return courseRepository.findAll(pageable).map(CourseResponse::from);
+        return courseRepository.findAll().stream().map(course -> {
+            List<CourseModuleResponse> modules = loadModulesWithLessons(course.getId());
+            return CourseResponse.fromWithModules(course, modules);
+        }).toList();
     }
 
     /**
-     * Retrieves a single course.
+     * Lists courses with pagination and nested modules/lessons.
+     */
+    @Transactional(readOnly = true)
+    public Page<CourseResponse> listCourses(Pageable pageable) {
+        return courseRepository.findAll(pageable).map(course -> {
+            List<CourseModuleResponse> modules = loadModulesWithLessons(course.getId());
+            return CourseResponse.fromWithModules(course, modules);
+        });
+    }
+
+    /**
+     * Retrieves a single course with its full module and lesson tree.
      *
      * @param id course identifier
      * @return the course as a response DTO
@@ -85,17 +98,24 @@ public class CourseService {
      */
     @Transactional(readOnly = true)
     public CourseResponse findById(Long id) {
-        return CourseResponse.from(findCourseOrThrow(id));
+        Course course = findCourseOrThrow(id);
+        List<CourseModuleResponse> modules = loadModulesWithLessons(id);
+        return CourseResponse.fromWithModules(course, modules);
+    }
+
+    private List<CourseModuleResponse> loadModulesWithLessons(Long courseId) {
+        List<CourseModule> modules = courseModuleRepository.findByCourseIdOrderByPositionAsc(courseId);
+        return modules.stream().map(mod -> {
+            List<Lesson> lessons = lessonRepository.findByModuleIdOrderByPositionAsc(mod.getId());
+            List<LessonResponse> lessonResponses = lessons.stream()
+                    .map(LessonResponse::from)
+                    .toList();
+            return CourseModuleResponse.fromWithLessons(mod, lessonResponses);
+        }).toList();
     }
 
     /**
      * Updates an existing course.
-     * <ol>
-     *   <li>Loads the course (404 if missing).</li>
-     *   <li>Checks title and video URL duplicates only for values that actually changed.</li>
-     *   <li>Re-applies every field, including category and author.</li>
-     *   <li>Saves the entity.</li>
-     * </ol>
      *
      * @param id      course identifier
      * @param request validated payload with the new values
@@ -106,17 +126,20 @@ public class CourseService {
     public CourseResponse updateCourse(Long id, CourseRequest request) {
         Course course = findCourseOrThrow(id);
 
-        if (!course.getTitle().equals(request.title())
+        if (!Objects.equals(course.getTitle(), request.title())
                 && courseRepository.existsByTitle(request.title())) {
             throw new ConflictException("A course with this title already exists");
         }
-        if (!course.getVideoUrl().equals(request.videoUrl())
+        if (request.videoUrl() != null
+                && !Objects.equals(course.getVideoUrl(), request.videoUrl())
                 && courseRepository.existsByVideoUrl(request.videoUrl())) {
             throw new ConflictException("A course with this video URL already exists");
         }
 
         applyRequest(course, request);
-        return CourseResponse.from(courseRepository.save(course));
+        Course saved = courseRepository.save(course);
+        List<CourseModuleResponse> modules = loadModulesWithLessons(saved.getId());
+        return CourseResponse.fromWithModules(saved, modules);
     }
 
     /**
