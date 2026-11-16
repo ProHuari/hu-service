@@ -11,7 +11,7 @@ COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 
 # Normalize line endings in case checkout was performed on Windows
-RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
+RUN sed -i 's/\r$//' mvnw .mvn/wrapper/maven-wrapper.properties && chmod +x mvnw
 
 # Download dependencies in an isolated layer for build caching
 RUN ./mvnw dependency:go-offline -B
@@ -43,5 +43,5 @@ EXPOSE 8080
 # Configure JVM flags optimized for container environments
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
 
-# Launch application
-ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
+# Launch application (honoring dynamic PORT provided by Railway/Render)
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -Dserver.port=${PORT:-8080} -jar /app/app.jar"]

@@ -28,13 +28,21 @@ services:
     ports:
       - "8080:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      PORT: ${PORT:-8080}
       DB_URL: jdbc:mysql://db:3306/huari?createDatabaseIfNotExist=true&serverTimezone=America/Sao_Paulo
       DB_USER: ${DB_USER:-root}
       DB_PASSWORD: ${DB_PASSWORD:-root}
       JWT_SECRET: ${JWT_SECRET:-chave-de-desenvolvimento-troque-em-producao-minimo-32-caracteres}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}}
+      ADMIN_NOME: ${ADMIN_NOME:-Administrador}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_SENHA: ${ADMIN_SENHA:-}
       IA_ENABLED: ${IA_ENABLED:-false}
       IA_API_KEY: ${IA_API_KEY:-}
+      IA_MODEL: ${IA_MODEL:-gemini-1.5-flash}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/huari?createDatabaseIfNotExist=true&serverTimezone=America/Sao_Paulo
     depends_on:
       db:
