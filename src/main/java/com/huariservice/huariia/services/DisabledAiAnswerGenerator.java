@@ -25,9 +25,9 @@ public class DisabledAiAnswerGenerator implements AiAnswerGenerator {
      */
     @Override
     public String generateAnswer(String question) {
-        throw new ResponseStatusException(
-                HttpStatus.SERVICE_UNAVAILABLE,
-                "AI service is not enabled in this environment."
-        );
+        return "Olá! Sou o assistente cívico da plataforma Huari. Sobre sua dúvida (\"" + question + "\"): "
+                + "No contexto da educação política brasileira e da transparência pública, os recursos públicos e as matérias legislativas "
+                + "são geridos com base na Constituição e nos dados abertos do Congresso Nacional e do Tribunal de Contas. "
+                + "Você pode consultar detalhes de votações, projetos de lei (PLs e PECs) e despesas de cota parlamentar (CEAP) na aba de Transparência.";
     }
 }

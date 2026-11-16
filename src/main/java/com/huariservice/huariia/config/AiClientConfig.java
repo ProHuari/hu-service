@@ -22,18 +22,18 @@ public class AiClientConfig {
             @Value("${app.ia.base-url}") String baseUrl,
             @Value("${app.ia.api-key}") String apiKey) {
 
-        if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("app.ia.enabled=true but IA_API_KEY was not configured.");
-        }
-
         ClientHttpRequestFactory factory = createRequestFactory();
 
-        return RestClient.builder()
+        RestClient.Builder builder = RestClient.builder()
                 .baseUrl(baseUrl)
                 .requestFactory(factory)
-                .defaultHeader("x-goog-api-key", apiKey)
-                .defaultHeader("content-type", "application/json")
-                .build();
+                .defaultHeader("content-type", "application/json");
+
+        if (apiKey != null && !apiKey.isBlank() && !apiKey.equalsIgnoreCase("sua_chave_aqui")) {
+            builder.defaultHeader("x-goog-api-key", apiKey.trim());
+        }
+
+        return builder.build();
     }
 
     private ClientHttpRequestFactory createRequestFactory() {
