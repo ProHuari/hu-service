@@ -39,6 +39,7 @@ public class GeminiIntegrationService {
     private final RestClient restClient;
     private final AiHistoryRepository aiHistoryRepository;
     private final UserRepository userRepository;
+    private final PoliticalTransparencyService politicalTransparencyService;
     private final String apiKey;
     private final String model;
 
@@ -48,9 +49,21 @@ public class GeminiIntegrationService {
             UserRepository userRepository,
             @Value("${app.ai.gemini.api-key:}") String apiKey,
             @Value("${app.ai.gemini.model:gemini-2.5-flash}") String model) {
+        this(restClient, aiHistoryRepository, userRepository, null, apiKey, model);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public GeminiIntegrationService(
+            @Qualifier("geminiRestClient") RestClient restClient,
+            AiHistoryRepository aiHistoryRepository,
+            UserRepository userRepository,
+            @org.springframework.context.annotation.Lazy PoliticalTransparencyService politicalTransparencyService,
+            @Value("${app.ai.gemini.api-key:}") String apiKey,
+            @Value("${app.ai.gemini.model:gemini-2.5-flash}") String model) {
         this.restClient = restClient;
         this.aiHistoryRepository = aiHistoryRepository;
         this.userRepository = userRepository;
+        this.politicalTransparencyService = politicalTransparencyService;
         this.apiKey = apiKey != null ? apiKey.trim() : "";
         this.model = model != null && !model.isBlank() ? model.trim() : "gemini-2.5-flash";
     }
@@ -130,13 +143,20 @@ public class GeminiIntegrationService {
      */
     @Transactional
     public AiTutorChatResponse askTutor(AiTutorChatRequest request, Long authenticatedUserId) {
+        String ragContext = politicalTransparencyService != null
+                ? politicalTransparencyService.buildRagContextForQuestion(request.question())
+                : "";
+
         if (!isApiKeyConfigured()) {
             log.info("GEMINI_API_KEY not configured. Using structured fallback simulation for tutor query: {}", request.question());
-            return buildFallbackTutorAnswer(request, authenticatedUserId);
+            return buildFallbackTutorAnswer(request, authenticatedUserId, ragContext);
         }
 
         try {
             String prompt = request.question();
+            if (ragContext != null && !ragContext.isBlank()) {
+                prompt = "[Dados Oficiais da Plataforma:\n" + ragContext + "]\n\n" + prompt;
+            }
             if (request.lessonContext() != null && !request.lessonContext().isBlank()) {
                 prompt = "[Contexto da Aula: " + request.lessonContext() + "] " + prompt;
             }
@@ -144,7 +164,7 @@ public class GeminiIntegrationService {
             String generatedText = callGeminiGenerateContent(prompt, TUTOR_SYSTEM_INSTRUCTION);
 
             if (generatedText == null || generatedText.isBlank()) {
-                return buildFallbackTutorAnswer(request, authenticatedUserId);
+                return buildFallbackTutorAnswer(request, authenticatedUserId, ragContext);
             }
 
             Long historyId = recordHistoryIfUserAuthenticated(
@@ -169,7 +189,7 @@ public class GeminiIntegrationService {
 
         } catch (Exception ex) {
             log.warn("Gemini API call failed for tutor. Activating fallback simulation: {}", ex.getMessage());
-            return buildFallbackTutorAnswer(request, authenticatedUserId);
+            return buildFallbackTutorAnswer(request, authenticatedUserId, ragContext);
         }
     }
 
@@ -240,13 +260,25 @@ public class GeminiIntegrationService {
     }
 
     private AiTutorChatResponse buildFallbackTutorAnswer(AiTutorChatRequest request, Long authenticatedUserId) {
-        String simulatedAnswer = String.format(
+        return buildFallbackTutorAnswer(request, authenticatedUserId, "");
+    }
+
+    private AiTutorChatResponse buildFallbackTutorAnswer(AiTutorChatRequest request, Long authenticatedUserId, String ragContext) {
+        StringBuilder answerBuilder = new StringBuilder();
+        answerBuilder.append(String.format(
                 "Olá! Sou o Tutor Cidadão Huari. Sobre sua dúvida (\"%s\"): "
                         + "No contexto da educação política e da cidadania brasileira, compreender o funcionamento dos órgãos públicos "
                         + "e a destinação dos recursos é fundamental. O poder público atua como representante do cidadão, e mecanismos de transparência "
                         + "permitem fiscalizar projetos de lei, orçamentos e a atuação de deputados e senadores para fortalecer a democracia.",
                 request.question()
-        );
+        ));
+
+        if (ragContext != null && !ragContext.isBlank()) {
+            answerBuilder.append("\n\n**Informações relevantes encontradas na base cívica da Huari:**\n");
+            answerBuilder.append(ragContext);
+        }
+
+        String simulatedAnswer = answerBuilder.toString();
 
         Long historyId = recordHistoryIfUserAuthenticated(
                 authenticatedUserId,
