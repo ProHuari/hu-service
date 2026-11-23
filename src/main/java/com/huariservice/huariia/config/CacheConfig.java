@@ -31,6 +31,8 @@ public class CacheConfig {
     public static final String AUDIT_COURT_IRREGULAR_ACCOUNTS = "auditCourtIrregularAccounts";
     public static final String AUDIT_COURT_OVERVIEW = "auditCourtOverview";
     public static final String INTEGRATIONS_HEALTH = "integrationsHealth";
+    public static final String TSE_CANDIDATES = "tseCandidates";
+    public static final String TSE_CANDIDATE_ASSETS = "tseCandidateAssets";
 
     @Bean
     public CacheManager cacheManager() {
@@ -47,7 +49,9 @@ public class CacheConfig {
                 buildCache(AUDIT_COURT_PROCESSES, Duration.ofMinutes(10), 100),
                 buildCache(AUDIT_COURT_IRREGULAR_ACCOUNTS, Duration.ofMinutes(10), 100),
                 buildCache(AUDIT_COURT_OVERVIEW, Duration.ofMinutes(5), 100),
-                buildCache(INTEGRATIONS_HEALTH, Duration.ofMinutes(5), 10)
+                buildCache(INTEGRATIONS_HEALTH, Duration.ofMinutes(5), 10),
+                buildCache(TSE_CANDIDATES, Duration.ofHours(12), 300),
+                buildCache(TSE_CANDIDATE_ASSETS, Duration.ofHours(12), 300)
         ));
         return manager;
     }
