@@ -1,5 +1,6 @@
 package com.huariservice.huariia.services;
 
+import com.huariservice.huariia.config.CacheConfig;
 import com.huariservice.huariia.dto.camara.*;
 import com.huariservice.huariia.entities.Parliamentarian;
 import com.huariservice.huariia.entities.enums.ParliamentarianChamber;
@@ -7,9 +8,9 @@ import com.huariservice.huariia.repositories.ParliamentarianRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
@@ -43,6 +44,7 @@ public class CamaraIntegrationService {
     /**
      * Searches federal deputies in real-time by name, state (UF), and party with defensive fallback.
      */
+    @Cacheable(value = CacheConfig.CAMARA_DEPUTIES, unless = "#result == null || #result.isEmpty()")
     public List<CamaraDeputyDto> fetchDeputies(String name, String state, String party) {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/deputados")
@@ -80,6 +82,7 @@ public class CamaraIntegrationService {
     /**
      * Searches parliamentary quota expenses (CEAP) for a specific deputy.
      */
+    @Cacheable(value = CacheConfig.CAMARA_EXPENSES, unless = "#result == null || #result.isEmpty()")
     public List<CamaraExpenseDto> fetchDeputyExpenses(Long deputyId, Integer year, Integer month) {
         if (deputyId == null) {
             return Collections.emptyList();
@@ -117,6 +120,7 @@ public class CamaraIntegrationService {
     /**
      * Searches legislative propositions (e.g. PL, PEC) from Camara dos Deputados.
      */
+    @Cacheable(value = CacheConfig.CAMARA_PROPOSITIONS, unless = "#result == null || #result.isEmpty()")
     public List<CamaraPropositionDto> fetchPropositions(String siglaTipo, Integer year, String keyword) {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/proposicoes")
@@ -153,8 +157,8 @@ public class CamaraIntegrationService {
 
     /**
      * Synchronizes real deputies from the Camara API into the local database, avoiding duplicates.
+     * The remote HTTP call executes outside any database transaction to avoid holding pool connections.
      */
-    @Transactional
     public CamaraSyncSummaryResponse syncDeputiesToDatabase(String state, Integer limit) {
         try {
             List<CamaraDeputyDto> remoteDeputies = fetchDeputies(null, state, null);
