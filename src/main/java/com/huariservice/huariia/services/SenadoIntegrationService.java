@@ -2,15 +2,18 @@ package com.huariservice.huariia.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.huariservice.huariia.config.CacheConfig;
 import com.huariservice.huariia.dto.senado.SenadoMatterDto;
 import com.huariservice.huariia.dto.senado.SenadoSenatorDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +50,7 @@ public class SenadoIntegrationService {
     /**
      * Lists current active federal senators, optionally filtered by state (UF) and party.
      */
+    @Cacheable(value = CacheConfig.SENADO_SENATORS, unless = "#result == null || #result.isEmpty()")
     public List<SenadoSenatorDto> fetchCurrentSenators(String state, String party) {
         try {
             String rawJson = restClient.get()
@@ -81,15 +85,18 @@ public class SenadoIntegrationService {
     /**
      * Queries legislative matters from Senado Federal API with defensive fallback.
      */
+    @Cacheable(value = CacheConfig.SENADO_MATTERS, unless = "#result == null || #result.isEmpty()")
     public List<SenadoMatterDto> fetchMatters(String sigla, Integer year) {
         try {
             String type = (sigla != null && !sigla.isBlank()) ? sigla.trim().toUpperCase() : "PL";
-            String uri = (year != null && year > 0)
-                    ? "/materia/pesquisa/lista.json?sigla=" + type + "&ano=" + year
-                    : "/materia/pesquisa/lista.json?sigla=" + type;
+            UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/materia/pesquisa/lista.json")
+                    .queryParam("sigla", type);
+            if (year != null && year > 0) {
+                builder.queryParam("ano", year);
+            }
 
             String rawJson = restClient.get()
-                    .uri(uri)
+                    .uri(builder.build().toUriString())
                     .retrieve()
                     .body(String.class);
 
