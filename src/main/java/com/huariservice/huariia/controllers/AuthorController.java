@@ -43,8 +43,7 @@ public class AuthorController {
     @GetMapping
     @Operation(summary = "Lists authors with pagination")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Paginated list of authors"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Paginated list of authors")
     })
     public ResponseEntity<Page<AuthorResponse>> listAuthors(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(authorService.listAuthors(pageable));

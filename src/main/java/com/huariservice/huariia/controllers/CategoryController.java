@@ -43,8 +43,7 @@ public class CategoryController {
     @GetMapping
     @Operation(summary = "Lists categories with pagination")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Paginated list of categories"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Paginated list of categories")
     })
     public ResponseEntity<Page<CategoryResponse>> listCategories(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(categoryService.listCategories(pageable));

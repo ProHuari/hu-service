@@ -44,8 +44,7 @@ public class CourseController {
     @GetMapping
     @Operation(summary = "Lists courses with pagination")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Paginated list of courses"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Paginated list of courses")
     })
     public ResponseEntity<Page<CourseResponse>> listCourses(@ParameterObject Pageable pageable) {
         return ResponseEntity.ok(courseService.listCourses(pageable));
