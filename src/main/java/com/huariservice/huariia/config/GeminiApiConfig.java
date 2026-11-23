@@ -13,15 +13,17 @@ import java.net.http.HttpClient;
 import java.time.Duration;
 
 /**
- * Configuration for the external Google Gemini Generative AI REST client.
+ * Unified configuration for the Google Gemini Generative AI REST client (v1beta).
+ * Exposes bean aliases ({@code geminiRestClient}, {@code aiRestClient}, {@code iaRestClient})
+ * so both the AI history generator and the Citizen AI Tutor share one consistent HTTP client.
  */
 @Configuration
 public class GeminiApiConfig {
 
-    @Bean(name = "geminiRestClient")
+    @Bean(name = {"geminiRestClient", "aiRestClient", "iaRestClient"})
     public RestClient geminiRestClient(
             @Value("${app.ai.gemini.base-url:https://generativelanguage.googleapis.com/v1beta}") String baseUrl,
-            @Value("${app.ai.gemini.api-key:}") String apiKey,
+            @Value("${app.ai.gemini.api-key:${app.ia.api-key:}}") String apiKey,
             @Value("${app.ai.gemini.connect-timeout-seconds:5}") int connectTimeout,
             @Value("${app.ai.gemini.read-timeout-seconds:30}") int readTimeout) {
 
@@ -33,7 +35,7 @@ public class GeminiApiConfig {
                 .defaultHeader("Content-Type", "application/json")
                 .defaultHeader("User-Agent", "Huari-Civic-Platform/1.0");
 
-        if (apiKey != null && !apiKey.isBlank()) {
+        if (apiKey != null && !apiKey.isBlank() && !apiKey.equalsIgnoreCase("sua_chave_aqui")) {
             builder.defaultHeader("x-goog-api-key", apiKey.trim());
         }
 
