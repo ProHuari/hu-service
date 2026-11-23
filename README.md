@@ -105,6 +105,7 @@ Após iniciar a aplicação, verifique:
 
 - **Swagger UI:** http://localhost:8080/swagger-ui/index.html
 - **Especificação OpenAPI:** http://localhost:8080/v3/api-docs
+- **Guia Oficial de Padrões REST:** [docs/api-standards.md](docs/api-standards.md)
 
 Esses endereços dependem da configuração da aplicação e da disponibilidade dos respectivos endpoints.
 
@@ -206,7 +207,7 @@ Response (201 Created):
 }
 ```
 
-POST `/usuarios/admin` — Cadastra um novo administrador (somente ADMIN)
+POST `/usuarios/admins` — Cadastra um novo administrador (somente ADMIN)
 Request:
 ```json
 {
@@ -290,7 +291,7 @@ DELETE `/autores/{id}` — Exclui logicamente um autor (somente ADMIN)
 
 *MÓDULOS (`/modulos`) [Leitura Pública]*
 
-GET `/modulos` — Lista módulos com paginação (filtro opcional: `?courseId=1`)
+GET `/modulos` — Lista módulos com paginação (filtro opcional: `?curso-id=1`)
 GET `/modulos/{id}` — Busca módulo por ID
 POST `/modulos` — Cria módulo (somente ADMIN)
 Request:
@@ -307,7 +308,7 @@ DELETE `/modulos/{id}` — Exclui logicamente um módulo (somente ADMIN)
 
 *AULAS (`/aulas`)*
 
-GET `/aulas` — Lista aulas com paginação (filtro opcional: `?moduleId=1`)
+GET `/aulas` — Lista aulas com paginação (filtro opcional: `?modulo-id=1`)
 GET `/aulas/{id}` — Busca aula por ID
 POST `/aulas` — Cria aula (somente ADMIN)
 Request:
@@ -326,7 +327,7 @@ DELETE `/aulas/{id}` — Exclui logicamente uma aula (somente ADMIN)
 
 *MATRÍCULAS (`/matriculas`)*
 
-GET `/matriculas` — Lista matrículas com paginação (aluno vê as suas; admin vê todas ou filtra `?userId=1`)
+GET `/matriculas` — Lista matrículas com paginação (aluno vê as suas; admin vê todas ou filtra `?usuario-id=1`)
 POST `/matriculas` — Inscreve o usuário autenticado em um curso
 Request:
 ```json
@@ -350,7 +351,7 @@ DELETE `/matriculas/{id}` — Exclui logicamente uma matrícula (somente ADMIN)
 
 *PROGRESSO DAS AULAS (`/progresso-aulas`)*
 
-GET `/progresso-aulas` — Lista progresso com paginação (filtros opcionais: `?courseId=1`, `?userId=1`)
+GET `/progresso-aulas` — Lista progresso com paginação (filtros opcionais: `?curso-id=1`, `?usuario-id=1`)
 POST `/progresso-aulas` — **Upsert** de progresso do aluno autenticado (cria ou atualiza automaticamente)
 Request:
 ```json
@@ -393,7 +394,7 @@ Response (201 Created):
 }
 ```
 POST `/historico-ia/stream` — Envia pergunta com resposta transmitida em tempo real via Server-Sent Events (SSE)
-GET `/historico-ia` — Lista histórico do usuário autenticado (admin pode filtrar `?userId=1`)
+GET `/historico-ia` — Lista histórico do usuário autenticado (admin pode filtrar `?usuario-id=1`)
 GET `/historico-ia/{id}` — Busca interação por ID
 DELETE `/historico-ia/{id}` — Remove interação do histórico
 
@@ -414,7 +415,7 @@ DELETE `/historico-ia/{id}` — Remove interação do histórico
   - `DELETE /transparencia/projetos-lei/{id}` — Remove PL (somente ADMIN)
 
 - **Despesas Parlamentares CEAP (`/transparencia/despesas`)**:
-  - `GET /transparencia/despesas` — Lista despesas parlamentares (`?parliamentarianId=1`)
+  - `GET /transparencia/despesas` — Lista despesas parlamentares (`?parlamentar-id=1`)
   - `POST /transparencia/despesas` — Registra despesa (somente ADMIN)
   - `PUT /transparencia/despesas/{id}` — Atualiza despesa (somente ADMIN)
   - `DELETE /transparencia/despesas/{id}` — Remove despesa (somente ADMIN)
