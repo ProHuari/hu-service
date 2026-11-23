@@ -1,7 +1,9 @@
 package com.huariservice.huariia.services;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.huariservice.huariia.dto.ai.GeminiApiDtos.GeminiRequest;
+import com.huariservice.huariia.dto.ai.GeminiApiDtos.GeminiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -11,13 +13,11 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-
 /**
- * Implementation of {@link AiAnswerGenerator} backed by the Google Gemini REST API.
+ * Implementation of {@link AiAnswerGenerator} backed by the unified Google Gemini REST client.
  *
- * <p>Activated when {@code app.ia.enabled=true}. Sends the prompt to the configured Gemini model
- * with predefined system instructions tailored to the platform.</p>
+ * <p>Activated when {@code app.ia.enabled=true}. Uses the shared {@code geminiRestClient}
+ * configured with {@code v1beta} base URL and {@code gemini-2.5-flash} default model.</p>
  */
 @Slf4j
 @Component
@@ -35,53 +35,25 @@ public class GeminiAiAnswerGenerator implements AiAnswerGenerator {
     private final RestClient client;
     private final String model;
 
-    public GeminiAiAnswerGenerator(RestClient aiRestClient,
-                                   @Value("${app.ia.model:gemini-1.5-flash}") String model) {
-        this.client = aiRestClient;
+    public GeminiAiAnswerGenerator(
+            @Qualifier("geminiRestClient") RestClient geminiRestClient,
+            @Value("${app.ai.gemini.model:${app.ia.model:gemini-2.5-flash}}") String model) {
+        this.client = geminiRestClient;
         this.model = model;
     }
 
-    /**
-     * Calls the Gemini generateContent endpoint and extracts the text response.
-     * <ol>
-     *   <li>Constructs the payload with system instruction and the user query.</li>
-     *   <li>Executes the HTTP POST request via {@link RestClient}.</li>
-     *   <li>Extracts text fragments from the candidate response.</li>
-     * </ol>
-     *
-     * @param question the user prompt
-     * @return extracted response text or {@code null} if empty
-     * @throws ResponseStatusException on rate limit (503), timeout (504), or remote error (502)
-     */
     @Override
     public String generateAnswer(String question) {
         try {
-            GeminiRequest request = new GeminiRequest(
-                    new SystemContent(List.of(new ContentPart(SYSTEM_INSTRUCTION))),
-                    List.of(new Content(List.of(new ContentPart(question))))
-            );
+            GeminiRequest request = GeminiRequest.text(SYSTEM_INSTRUCTION, question);
 
             GeminiResponse response = client.post()
-                    .uri("/v1beta/models/{model}:generateContent", model)
+                    .uri("/models/{model}:generateContent", model)
                     .body(request)
                     .retrieve()
                     .body(GeminiResponse.class);
 
-            if (response == null || response.candidates() == null || response.candidates().isEmpty()) {
-                return null;
-            }
-
-            Candidate candidate = response.candidates().get(0);
-            if (candidate.content() == null || candidate.content().parts() == null) {
-                return null;
-            }
-
-            return candidate.content().parts().stream()
-                    .map(ContentPart::text)
-                    .filter(t -> t != null && !t.isBlank())
-                    .reduce("", String::concat)
-                    .trim();
-
+            return response != null ? response.extractText() : null;
         } catch (RestClientResponseException e) {
             log.error("Gemini API call failed: status {}", e.getStatusCode().value());
             int status = e.getStatusCode().value();
@@ -97,18 +69,4 @@ public class GeminiAiAnswerGenerator implements AiAnswerGenerator {
                     "AI service timed out while generating response.");
         }
     }
-
-    private record ContentPart(String text) {}
-
-    private record Content(List<ContentPart> parts) {}
-
-    private record SystemContent(@JsonProperty("parts") List<ContentPart> parts) {}
-
-    private record GeminiRequest(
-            @JsonProperty("systemInstruction") SystemContent systemInstruction,
-            List<Content> contents) {}
-
-    private record Candidate(Content content) {}
-
-    private record GeminiResponse(List<Candidate> candidates) {}
 }
