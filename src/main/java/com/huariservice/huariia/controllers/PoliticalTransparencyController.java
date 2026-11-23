@@ -7,7 +7,9 @@ import com.huariservice.huariia.dto.ParliamentarianExpenseRequest;
 import com.huariservice.huariia.dto.ParliamentarianExpenseResponse;
 import com.huariservice.huariia.dto.ParliamentarianRequest;
 import com.huariservice.huariia.dto.ParliamentarianResponse;
+import com.huariservice.huariia.dto.cnpj.ExpenseSupplierAuditResponse;
 import com.huariservice.huariia.entities.enums.ParliamentarianChamber;
+import com.huariservice.huariia.services.CnpjIntegrationService;
 import com.huariservice.huariia.services.PoliticalTransparencyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,6 +33,7 @@ import java.net.URI;
 public class PoliticalTransparencyController {
 
     private final PoliticalTransparencyService transparencyService;
+    private final CnpjIntegrationService cnpjIntegrationService;
 
     @PostMapping("/parlamentares")
     @Operation(summary = "Registers a parliamentarian (Deputy or Senator) (ADMIN only)")
@@ -197,6 +200,19 @@ public class PoliticalTransparencyController {
     })
     public ResponseEntity<ParliamentarianExpenseResponse> getExpense(@PathVariable Long id) {
         return ResponseEntity.ok(transparencyService.findExpenseById(id));
+    }
+
+    @GetMapping("/despesas/{id}/fornecedor")
+    @Operation(summary = "Audits supplier company data, corporate structure, and transparency alerts for a parliamentary expense (CEAP)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Supplier audit retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Expense not found")
+    })
+    public ResponseEntity<ExpenseSupplierAuditResponse> auditExpenseSupplier(
+            @PathVariable Long id,
+            @RequestParam(name = "cnpj", required = false) String cnpjParam) {
+        ParliamentarianExpenseResponse expense = transparencyService.findExpenseById(id);
+        return ResponseEntity.ok(cnpjIntegrationService.auditExpenseSupplier(expense, cnpjParam));
     }
 
     @PutMapping("/despesas/{id}")
