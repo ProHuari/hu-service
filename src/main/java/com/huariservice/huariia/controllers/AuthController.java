@@ -66,11 +66,10 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    @Operation(summary = "Generates a short-lived password reset token for a registered e-mail")
+    @Operation(summary = "Generates a short-lived password reset token for a registered e-mail (returns generic response to prevent user enumeration)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Reset token generated"),
-            @ApiResponse(responseCode = "400", description = "Invalid e-mail format"),
-            @ApiResponse(responseCode = "404", description = "User not found")
+            @ApiResponse(responseCode = "200", description = "Password recovery request processed"),
+            @ApiResponse(responseCode = "400", description = "Invalid e-mail format")
     })
     public ResponseEntity<ForgotPasswordResponse> forgotPassword(
             @Valid @RequestBody ForgotPasswordRequest request) {

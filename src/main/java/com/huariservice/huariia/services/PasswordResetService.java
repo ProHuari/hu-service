@@ -41,11 +41,20 @@ public class PasswordResetService {
     private final Environment environment;
     private final Map<String, ResetTokenEntry> activeTokens = new ConcurrentHashMap<>();
 
+    private static final String GENERIC_RECOVERY_MESSAGE =
+            "If the e-mail is registered, password recovery instructions have been sent.";
+
     @Transactional(readOnly = true)
     public ForgotPasswordResponse requestPasswordReset(ForgotPasswordRequest request) {
+        cleanupExpiredTokens();
+
         String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
-        User user = userRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found for the given e-mail"));
+        User user = userRepository.findByEmail(normalizedEmail).orElse(null);
+
+        if (user == null) {
+            log.debug("Password reset requested for unregistered e-mail; returning generic response.");
+            return new ForgotPasswordResponse(GENERIC_RECOVERY_MESSAGE, null);
+        }
 
         String resetToken = generateShortToken();
         activeTokens.put(resetToken, new ResetTokenEntry(user.getId(), Instant.now().plus(TOKEN_VALIDITY)));
@@ -55,10 +64,7 @@ public class PasswordResetService {
         if (isProduction) {
             log.info("Password reset token generated for user [{}]. Simulated delivery via secure email service.",
                     user.getEmail());
-            return new ForgotPasswordResponse(
-                    "If the e-mail is registered, password recovery instructions have been sent.",
-                    null
-            );
+            return new ForgotPasswordResponse(GENERIC_RECOVERY_MESSAGE, null);
         }
 
         log.debug("Password reset token generated for user [{}]: {}", user.getEmail(), resetToken);
@@ -70,6 +76,8 @@ public class PasswordResetService {
 
     @Transactional
     public void resetPassword(ResetPasswordRequest request) {
+        cleanupExpiredTokens();
+
         String token = request.token().trim();
         ResetTokenEntry entry = activeTokens.remove(token);
 
@@ -82,6 +90,11 @@ public class PasswordResetService {
 
         user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
+    }
+
+    private void cleanupExpiredTokens() {
+        Instant now = Instant.now();
+        activeTokens.entrySet().removeIf(entry -> now.isAfter(entry.getValue().expiresAt()));
     }
 
     private String generateShortToken() {
