@@ -451,6 +451,41 @@ Exemplo de resposta consolidada:
 }
 ```
 
+*INTEGRAÇÃO COM DADOS ABERTOS DO TSE — DIVULGACANDCONTAS (`/transparencia/tse`) [Público]*
+
+- `GET /transparencia/tse/candidatos?nome=&uf=&ano=&cargo=` — Consulta candidaturas registradas no TSE (DivulgaCandContas) com filtros eleitorais.
+- `GET /transparencia/tse/candidatos/{id}/bens?ano=&uf=` — Retorna a lista detalhada de bens declarados e o patrimônio total consolidado do candidato/parlamentar para cruzamento com gastos públicos.
+Exemplo de resposta de bens declarados:
+```json
+{
+  "candidatoId": 250001600123,
+  "nomeUrna": "Tabata Amaral",
+  "nomeCompleto": "Tabata Claudia Amaral de Pontes",
+  "partido": "PSB",
+  "cargo": "Deputado Federal",
+  "uf": "SP",
+  "anoEleicao": 2022,
+  "valorTotalBens": 807446.50,
+  "quantidadeBens": 2,
+  "bens": [
+    {
+      "ordem": 1,
+      "descricao": "Apartamento residencial em São Paulo",
+      "tipo": "Imóvel residencial",
+      "valor": 600000.00
+    },
+    {
+      "ordem": 2,
+      "descricao": "Fundos de investimento de renda fixa",
+      "tipo": "Aplicação financeira",
+      "valor": 207446.50
+    }
+  ],
+  "status": "ONLINE",
+  "mensagem": "Dados patrimoniais recuperados com sucesso da base do TSE (DivulgaCandContas)."
+}
+```
+
 
 ## Segurança
 
