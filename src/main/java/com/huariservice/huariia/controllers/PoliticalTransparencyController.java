@@ -1,5 +1,6 @@
 package com.huariservice.huariia.controllers;
 
+import com.huariservice.huariia.dto.ExpenseSummaryResponse;
 import com.huariservice.huariia.dto.LegislativeBillRequest;
 import com.huariservice.huariia.dto.LegislativeBillResponse;
 import com.huariservice.huariia.dto.ParliamentarianExpenseRequest;
@@ -177,6 +178,25 @@ public class PoliticalTransparencyController {
             @RequestParam(name = "parlamentar-id", required = false) Long parliamentarianId,
             @ParameterObject Pageable pageable) {
         return ResponseEntity.ok(transparencyService.listExpenses(parliamentarianId, pageable));
+    }
+
+    @GetMapping("/despesas/resumo")
+    @Operation(summary = "Returns aggregated CEAP expense analytics (total spent, ranking by parliamentarian, distribution by category and state)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Aggregated expense summary retrieved successfully")
+    })
+    public ResponseEntity<ExpenseSummaryResponse> getExpenseSummary() {
+        return ResponseEntity.ok(transparencyService.getExpenseSummary());
+    }
+
+    @GetMapping("/despesas/{id}")
+    @Operation(summary = "Finds a parliamentary expense by ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Expense found"),
+            @ApiResponse(responseCode = "404", description = "Expense not found")
+    })
+    public ResponseEntity<ParliamentarianExpenseResponse> getExpense(@PathVariable Long id) {
+        return ResponseEntity.ok(transparencyService.findExpenseById(id));
     }
 
     @PutMapping("/despesas/{id}")

@@ -1,5 +1,6 @@
 package com.huariservice.huariia.services;
 
+import com.huariservice.huariia.dto.ExpenseSummaryResponse;
 import com.huariservice.huariia.dto.LegislativeBillRequest;
 import com.huariservice.huariia.dto.LegislativeBillResponse;
 import com.huariservice.huariia.dto.ParliamentarianExpenseRequest;
@@ -203,6 +204,24 @@ public class PoliticalTransparencyService {
                 ? expenseRepository.findByParliamentarianIdOrderByExpenseDateDesc(parliamentarianId, pageable)
                 : expenseRepository.findAll(pageable);
         return expenses.map(ParliamentarianExpenseResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public ParliamentarianExpenseResponse findExpenseById(Long id) {
+        ParliamentarianExpense expense = expenseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
+        return ParliamentarianExpenseResponse.from(expense);
+    }
+
+    @Transactional(readOnly = true)
+    public ExpenseSummaryResponse getExpenseSummary() {
+        return new ExpenseSummaryResponse(
+                expenseRepository.sumTotalAmount(),
+                expenseRepository.count(),
+                expenseRepository.findRankingByParliamentarian(),
+                expenseRepository.findDistributionByCategory(),
+                expenseRepository.findDistributionByState()
+        );
     }
 
     public ParliamentarianExpenseResponse updateExpense(Long id, ParliamentarianExpenseRequest request) {
