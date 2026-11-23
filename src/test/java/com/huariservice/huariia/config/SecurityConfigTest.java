@@ -38,6 +38,13 @@ class SecurityConfigTest {
     }
 
     @Test
+    @DisplayName("Public GET on /transparencia/tse/candidatos should be permitted without authentication")
+    void withoutToken_tseCandidates_isPermitted() throws Exception {
+        mockMvc.perform(get("/transparencia/tse/candidatos"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("GET on /aulas must require authentication")
     void withoutToken_lessons_returns401() throws Exception {
         mockMvc.perform(get("/aulas"))
