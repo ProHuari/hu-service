@@ -78,5 +78,25 @@ class SecurityConfigTest {
                 .andExpect(jsonPath("$.error").value("Unauthorized"))
                 .andExpect(jsonPath("$.message").exists());
     }
+
+    @Test
+    @DisplayName("Public GET on /transparencia/despesas/resumo should return 200 with aggregated summary fields")
+    void withoutToken_expenseSummary_returns200() throws Exception {
+        mockMvc.perform(get("/transparencia/despesas/resumo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalAmount").exists())
+                .andExpect(jsonPath("$.totalExpenses").value(0))
+                .andExpect(jsonPath("$.rankingByParliamentarian").isArray())
+                .andExpect(jsonPath("$.distributionByCategory").isArray())
+                .andExpect(jsonPath("$.distributionByState").isArray());
+    }
+
+    @Test
+    @DisplayName("Public GET on /transparencia/despesas/{id} should return 404 for unknown expense")
+    void withoutToken_expenseById_unknownReturns404() throws Exception {
+        mockMvc.perform(get("/transparencia/despesas/999999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+    }
 }
 
