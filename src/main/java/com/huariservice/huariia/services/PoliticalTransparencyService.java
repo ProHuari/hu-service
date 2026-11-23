@@ -18,11 +18,17 @@ import com.huariservice.huariia.repositories.ParliamentarianExpenseRepository;
 import com.huariservice.huariia.repositories.ParliamentarianRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -249,26 +255,43 @@ public class PoliticalTransparencyService {
 
     // ---------- RAG Context Retrieval ----------
 
+    private static final Set<String> RAG_STOP_WORDS = Set.of(
+            "para", "como", "sobre", "qual", "quais", "isso", "esse", "essa", "esta", "este",
+            "pelo", "pela", "entre", "mais", "muito", "pode", "fazer", "tudo", "quem", "onde",
+            "quando", "porque", "projeto", "projetos"
+    );
+
     @Transactional(readOnly = true)
     public String buildRagContextForQuestion(String question) {
         if (question == null || question.isBlank()) {
             return "";
         }
-        List<LegislativeBill> allBills = legislativeBillRepository.findAll();
-        if (allBills.isEmpty()) {
+
+        List<String> keywords = extractKeywords(question);
+        Map<Long, LegislativeBill> matchedById = new LinkedHashMap<>();
+
+        for (String keyword : keywords) {
+            if (matchedById.size() >= 3) {
+                break;
+            }
+            Page<LegislativeBill> page = legislativeBillRepository
+                    .findByTitleContainingIgnoreCaseOrSummaryContainingIgnoreCaseOrCodeContainingIgnoreCase(
+                            keyword, keyword, keyword, PageRequest.of(0, 3));
+            for (LegislativeBill bill : page.getContent()) {
+                matchedById.putIfAbsent(bill.getId(), bill);
+                if (matchedById.size() >= 3) {
+                    break;
+                }
+            }
+        }
+
+        List<LegislativeBill> selected = matchedById.isEmpty()
+                ? legislativeBillRepository.findAll(PageRequest.of(0, 2)).getContent()
+                : List.copyOf(matchedById.values());
+
+        if (selected.isEmpty()) {
             return "";
         }
-        String lowerQuestion = question.toLowerCase();
-        List<LegislativeBill> matched = allBills.stream()
-                .filter(b -> (b.getCode() != null && lowerQuestion.contains(b.getCode().toLowerCase()))
-                        || (b.getTitle() != null && lowerQuestion.contains(b.getTitle().toLowerCase()))
-                        || (b.getSummary() != null && hasKeywordOverlap(lowerQuestion, b.getSummary().toLowerCase())))
-                .limit(3)
-                .toList();
-
-        List<LegislativeBill> selected = matched.isEmpty()
-                ? allBills.stream().limit(2).toList()
-                : matched;
 
         return selected.stream()
                 .map(b -> String.format(
@@ -281,13 +304,13 @@ public class PoliticalTransparencyService {
                 .collect(Collectors.joining("\n"));
     }
 
-    private boolean hasKeywordOverlap(String question, String summary) {
-        for (String token : question.split("\\s+")) {
-            if (token.length() >= 4 && summary.contains(token)) {
-                return true;
-            }
-        }
-        return false;
+    private List<String> extractKeywords(String question) {
+        return Arrays.stream(question.toLowerCase(Locale.ROOT).split("[^\\p{L}\\p{N}/-]+"))
+                .map(String::trim)
+                .filter(token -> token.length() >= 4 && !RAG_STOP_WORDS.contains(token))
+                .distinct()
+                .limit(5)
+                .toList();
     }
 }
 
