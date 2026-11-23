@@ -1,6 +1,7 @@
 package com.huariservice.huariia.repositories;
 
 import com.huariservice.huariia.entities.LessonProgress;
+import com.huariservice.huariia.entities.enums.LessonStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +27,6 @@ public interface LessonProgressRepository extends JpaRepository<LessonProgress, 
     Page<LessonProgress> findByUserIdAndLessonModuleCourseId(Long userId, Long courseId, Pageable pageable);
 
     Page<LessonProgress> findByLessonModuleCourseId(Long courseId, Pageable pageable);
+
+    long countByUserIdAndLessonModuleCourseIdAndStatus(Long userId, Long courseId, LessonStatus status);
 }

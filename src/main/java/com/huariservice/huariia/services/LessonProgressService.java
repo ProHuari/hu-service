@@ -1,10 +1,13 @@
 package com.huariservice.huariia.services;
 
+import com.huariservice.huariia.dto.CourseProgressSummaryResponse;
 import com.huariservice.huariia.dto.LessonProgressRequest;
 import com.huariservice.huariia.dto.LessonProgressResponse;
+import com.huariservice.huariia.entities.Enrollment;
 import com.huariservice.huariia.entities.Lesson;
 import com.huariservice.huariia.entities.LessonProgress;
 import com.huariservice.huariia.entities.User;
+import com.huariservice.huariia.entities.enums.EnrollmentStatus;
 import com.huariservice.huariia.entities.enums.LessonStatus;
 import com.huariservice.huariia.exceptions.BusinessRuleException;
 import com.huariservice.huariia.exceptions.ConflictException;
@@ -78,7 +81,9 @@ public class LessonProgressService {
                 });
 
         applyStatus(progress, request.status());
-        return LessonProgressResponse.from(progressRepository.save(progress));
+        LessonProgress saved = progressRepository.save(progress);
+        syncEnrollmentCompletion(user.getId(), courseId);
+        return LessonProgressResponse.from(saved);
     }
 
     /**
@@ -160,7 +165,53 @@ public class LessonProgressService {
                                                  Long userId, boolean admin) {
         LessonProgress progress = findProgressOrThrow(id, userId, admin);
         applyStatus(progress, request.status());
-        return LessonProgressResponse.from(progressRepository.save(progress));
+        LessonProgress saved = progressRepository.save(progress);
+        Long courseId = saved.getLesson().getModule().getCourse().getId();
+        syncEnrollmentCompletion(saved.getUser().getId(), courseId);
+        return LessonProgressResponse.from(saved);
+    }
+
+    /**
+     * Returns consolidated completion statistics (total lessons, completed lessons, percentage,
+     * and current enrollment status) for a learner inside a course.
+     */
+    @Transactional(readOnly = true)
+    public CourseProgressSummaryResponse getCourseProgressSummary(Long userId, Long courseId) {
+        Enrollment enrollment = enrollmentRepository.findByUserIdAndCourseId(userId, courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found for this course"));
+
+        long totalLessons = lessonRepository.countByModuleCourseId(courseId);
+        long completedLessons = progressRepository.countByUserIdAndLessonModuleCourseIdAndStatus(
+                userId, courseId, LessonStatus.COMPLETED);
+
+        double percentage = (totalLessons == 0)
+                ? 0.0
+                : Math.round((completedLessons * 10000.0) / totalLessons) / 100.0;
+
+        return new CourseProgressSummaryResponse(
+                courseId,
+                totalLessons,
+                completedLessons,
+                Math.min(100.0, percentage),
+                enrollment.getStatus()
+        );
+    }
+
+    private void syncEnrollmentCompletion(Long userId, Long courseId) {
+        long totalLessons = lessonRepository.countByModuleCourseId(courseId);
+        if (totalLessons <= 0) {
+            return;
+        }
+        long completedLessons = progressRepository.countByUserIdAndLessonModuleCourseIdAndStatus(
+                userId, courseId, LessonStatus.COMPLETED);
+        if (completedLessons >= totalLessons) {
+            enrollmentRepository.findByUserIdAndCourseId(userId, courseId).ifPresent(enrollment -> {
+                if (enrollment.getStatus() == EnrollmentStatus.ACTIVE) {
+                    enrollment.setStatus(EnrollmentStatus.COMPLETED);
+                    enrollmentRepository.save(enrollment);
+                }
+            });
+        }
     }
 
     /**

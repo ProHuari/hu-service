@@ -1,5 +1,6 @@
 package com.huariservice.huariia.controllers;
 
+import com.huariservice.huariia.dto.CourseProgressSummaryResponse;
 import com.huariservice.huariia.dto.LessonProgressRequest;
 import com.huariservice.huariia.dto.LessonProgressResponse;
 import com.huariservice.huariia.security.TokenData;
@@ -68,6 +69,23 @@ public class LessonProgressController {
                         progressPage = lessonProgressService.listProgress(courseId, pageable);
                 }
                 return ResponseEntity.ok(progressPage);
+        }
+
+        @GetMapping("/resumo")
+        @Operation(summary = "Returns consolidated completion progress percentage and enrollment status for a course")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Course progress summary retrieved successfully"),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                        @ApiResponse(responseCode = "404", description = "Enrollment not found for the course")
+        })
+        public ResponseEntity<CourseProgressSummaryResponse> getCourseProgressSummary(
+                        @RequestParam(name = "curso-id") Long courseId,
+                        @RequestParam(name = "usuario-id", required = false) Long targetUserId,
+                        @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
+                Long resolvedUserId = (currentUser.isAdmin() && targetUserId != null)
+                                ? targetUserId
+                                : currentUser.userId();
+                return ResponseEntity.ok(lessonProgressService.getCourseProgressSummary(resolvedUserId, courseId));
         }
 
         @GetMapping("/{id}")

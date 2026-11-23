@@ -21,4 +21,6 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
     boolean existsByModuleIdAndPosition(Long moduleId, Integer position);
 
     boolean existsByVideoUrl(String videoUrl);
+
+    long countByModuleCourseId(Long courseId);
 }
