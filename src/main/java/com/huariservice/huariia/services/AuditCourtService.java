@@ -1,16 +1,19 @@
 package com.huariservice.huariia.services;
 
+import com.huariservice.huariia.config.CacheConfig;
 import com.huariservice.huariia.dto.auditcourt.AuditCourtIrregularAccountResponse;
 import com.huariservice.huariia.dto.auditcourt.AuditCourtProcessResponse;
 import com.huariservice.huariia.dto.auditcourt.AuditCourtSummaryResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +44,7 @@ public class AuditCourtService {
      * @param query optional search keyword or parliamentarian name
      * @return summary response containing status and retrieved items
      */
+    @Cacheable(value = CacheConfig.AUDIT_COURT_OVERVIEW, unless = "#result == null || 'FALLBACK'.equals(#result.status())")
     public AuditCourtSummaryResponse fetchTransparencyOverview(String query) {
         try {
             List<AuditCourtProcessResponse> processes = fetchProcessesOrThrow(query, 10);
@@ -69,6 +73,7 @@ public class AuditCourtService {
      * @param limit maximum items
      * @return list of processes or empty list on failure
      */
+    @Cacheable(value = CacheConfig.AUDIT_COURT_PROCESSES, unless = "#result == null || #result.isEmpty()")
     public List<AuditCourtProcessResponse> fetchProcesses(String subject, Integer limit) {
         try {
             return fetchProcessesOrThrow(subject, limit);
@@ -86,12 +91,14 @@ public class AuditCourtService {
 
     private List<AuditCourtProcessResponse> fetchProcessesOrThrow(String subject, Integer limit) {
         int maxResults = (limit != null && limit > 0) ? Math.min(limit, 50) : 20;
-        String uri = (subject != null && !subject.isBlank())
-                ? "/processo/recupera-processos?termo=" + subject.trim() + "&quantidade=" + maxResults
-                : "/processo/recupera-processos?quantidade=" + maxResults;
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/processo/recupera-processos")
+                .queryParam("quantidade", maxResults);
+        if (subject != null && !subject.isBlank()) {
+            builder.queryParam("termo", subject.trim());
+        }
 
         List<AuditCourtProcessResponse> response = restClient.get()
-                .uri(uri)
+                .uri(builder.build().toUriString())
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<AuditCourtProcessResponse>>() {});
 
@@ -104,6 +111,7 @@ public class AuditCourtService {
      * @param nameOrCpf keyword, name, or document
      * @return list of irregular accounts or empty list on failure
      */
+    @Cacheable(value = CacheConfig.AUDIT_COURT_IRREGULAR_ACCOUNTS, unless = "#result == null || #result.isEmpty()")
     public List<AuditCourtIrregularAccountResponse> fetchIrregularAccounts(String nameOrCpf) {
         try {
             return fetchIrregularAccountsOrThrow(nameOrCpf);
@@ -121,12 +129,15 @@ public class AuditCourtService {
     }
 
     private List<AuditCourtIrregularAccountResponse> fetchIrregularAccountsOrThrow(String nameOrCpf) {
-        String uri = (nameOrCpf != null && !nameOrCpf.isBlank())
-                ? "/contas-irregulares?nome=" + nameOrCpf.trim()
-                : "/contas-irregulares?quantidade=10";
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/contas-irregulares");
+        if (nameOrCpf != null && !nameOrCpf.isBlank()) {
+            builder.queryParam("nome", nameOrCpf.trim());
+        } else {
+            builder.queryParam("quantidade", 10);
+        }
 
         List<AuditCourtIrregularAccountResponse> response = restClient.get()
-                .uri(uri)
+                .uri(builder.build().toUriString())
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<AuditCourtIrregularAccountResponse>>() {});
 
