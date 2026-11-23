@@ -1,11 +1,13 @@
 package com.huariservice.huariia.services;
 
+import com.huariservice.huariia.config.CacheConfig;
 import com.huariservice.huariia.dto.location.CepLookupResponse;
 import com.huariservice.huariia.dto.location.MunicipalityResponse;
 import com.huariservice.huariia.dto.location.StateResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
@@ -43,6 +45,7 @@ public class LocationIntegrationService {
     /**
      * Lists all Brazilian federative states (UFs) ordered alphabetically by name.
      */
+    @Cacheable(value = CacheConfig.IBGE_STATES, unless = "#result == null || #result.isEmpty()")
     public List<StateResponse> getStates() {
         try {
             List<StateResponse> response = ibgeRestClient.get()
@@ -69,6 +72,7 @@ public class LocationIntegrationService {
     /**
      * Lists municipalities of a specific Brazilian state (UF).
      */
+    @Cacheable(value = CacheConfig.IBGE_MUNICIPALITIES, key = "#uf == null ? '' : #uf.trim().toUpperCase()", unless = "#result == null || #result.isEmpty()")
     public List<MunicipalityResponse> getMunicipalities(String uf) {
         if (uf == null || uf.trim().length() != 2) {
             return Collections.emptyList();
@@ -95,6 +99,7 @@ public class LocationIntegrationService {
     /**
      * Looks up address and federative state (UF) information by postal code (CEP).
      */
+    @Cacheable(value = CacheConfig.VIACEP_LOOKUPS, key = "#rawCep == null ? '' : #rawCep.replaceAll('\\D', '')", unless = "#result == null || #result.hasError()")
     public CepLookupResponse lookupCep(String rawCep) {
         if (rawCep == null || rawCep.isBlank()) {
             return CepLookupResponse.fallback("");
