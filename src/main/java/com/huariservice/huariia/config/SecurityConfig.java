@@ -1,5 +1,6 @@
 package com.huariservice.huariia.config;
 
+import com.huariservice.huariia.security.AiRateLimitFilter;
 import com.huariservice.huariia.security.AuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +40,7 @@ public class SecurityConfig {
     };
 
     private final AuthFilter authFilter;
+    private final AiRateLimitFilter aiRateLimitFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -92,7 +94,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/matriculas/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated())
-                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(aiRateLimitFilter, AuthFilter.class);
 
         return http.build();
     }
