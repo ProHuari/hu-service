@@ -486,6 +486,51 @@ Exemplo de resposta de bens declarados:
 }
 ```
 
+*INTEGRAÇÃO COM BRASILAPI — AUDITORIA DE CNPJ E FORNECEDORES DA CEAP (`/transparencia/empresas`, `/transparencia/despesas/{id}/fornecedor`) [Público]*
+
+- `GET /transparencia/empresas/{cnpj}` — Consulta dados cadastrais, situação na Receita Federal, quadro societário (QSA) e alertas automatizados de conformidade da empresa fornecedora.
+- `GET /transparencia/despesas/{id}/fornecedor?cnpj=` — Cruza a despesa pública (CEAP) com o cadastro do fornecedor pago, verificando inconsistências automáticas (como valor de empenho superior ao capital social, empresa recém-aberta ou situação cadastral irregular).
+Exemplo de resposta de auditoria de fornecedor:
+```json
+{
+  "despesa": {
+    "id": 1,
+    "parliamentarianId": 1,
+    "parliamentarianName": "Tabata Amaral",
+    "expenseCategory": "Divulgação da Atividade Parlamentar",
+    "supplierName": "Gráfica & Comunicação Digital Brasil (02.012.862/0001-60)",
+    "amount": 4500.00,
+    "expenseDate": "2026-11-18",
+    "documentUrl": "https://camara.leg.br/doc-exemplo-1.pdf"
+  },
+  "fornecedor": {
+    "cnpj": "02012862000160",
+    "cnpjFormatado": "02.012.862/0001-60",
+    "razaoSocial": "GRAFICA & EDITORA BRASIL LTDA",
+    "nomeFantasia": "GRAFICA BRASIL",
+    "situacaoCadastral": "ATIVA",
+    "dataInicioAtividade": "2018-05-10",
+    "cnaeFiscal": 1813001,
+    "cnaeFiscalDescricao": "Impressão de material para uso publicitário",
+    "capitalSocial": 150000.00,
+    "municipio": "SAO PAULO",
+    "uf": "SP",
+    "qsa": [
+      {
+        "nomeSocio": "Carlos Eduardo Mendonça",
+        "qualificacaoSocio": "Sócio-Administrador",
+        "faixaEtaria": "Entre 41 a 50 anos"
+      }
+    ],
+    "alertasTransparencia": [],
+    "status": "ONLINE"
+  },
+  "alertasConsolidados": [],
+  "nivelRisco": "BAIXO",
+  "mensagem": "Auditoria concluída com sucesso. Nenhuma anomalia cadastral detectada."
+}
+```
+
 
 ## Segurança
 
