@@ -22,8 +22,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Business logic for managing {@link Course} entities.
@@ -66,27 +69,29 @@ public class CourseService {
     }
 
     /**
-     * Lists every course with its nested modules and lessons.
+     * Lists every course with its nested modules and lessons using batch IN queries (avoids N+1).
      *
      * @return all courses (empty list if none)
      */
     @Transactional(readOnly = true)
     public List<CourseResponse> listCourses() {
-        return courseRepository.findAll().stream().map(course -> {
-            List<CourseModuleResponse> modules = loadModulesWithLessons(course.getId());
-            return CourseResponse.fromWithModules(course, modules);
-        }).toList();
+        List<Course> courses = courseRepository.findAll();
+        Map<Long, List<CourseModuleResponse>> modulesByCourse = loadModulesWithLessonsBatch(courses);
+        return courses.stream()
+                .map(course -> CourseResponse.fromWithModules(
+                        course, modulesByCourse.getOrDefault(course.getId(), Collections.emptyList())))
+                .toList();
     }
 
     /**
-     * Lists courses with pagination and nested modules/lessons.
+     * Lists courses with pagination and nested modules/lessons using batch IN queries (avoids N+1).
      */
     @Transactional(readOnly = true)
     public Page<CourseResponse> listCourses(Pageable pageable) {
-        return courseRepository.findAll(pageable).map(course -> {
-            List<CourseModuleResponse> modules = loadModulesWithLessons(course.getId());
-            return CourseResponse.fromWithModules(course, modules);
-        });
+        Page<Course> coursesPage = courseRepository.findAll(pageable);
+        Map<Long, List<CourseModuleResponse>> modulesByCourse = loadModulesWithLessonsBatch(coursesPage.getContent());
+        return coursesPage.map(course -> CourseResponse.fromWithModules(
+                course, modulesByCourse.getOrDefault(course.getId(), Collections.emptyList())));
     }
 
     /**
@@ -103,15 +108,55 @@ public class CourseService {
         return CourseResponse.fromWithModules(course, modules);
     }
 
+    private Map<Long, List<CourseModuleResponse>> loadModulesWithLessonsBatch(List<Course> courses) {
+        if (courses == null || courses.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<Long> courseIds = courses.stream().map(Course::getId).toList();
+        List<CourseModule> allModules = courseModuleRepository
+                .findByCourseIdInOrderByCourseIdAscPositionAsc(courseIds);
+        if (allModules.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<Long> moduleIds = allModules.stream().map(CourseModule::getId).toList();
+        Map<Long, List<LessonResponse>> lessonsByModule = lessonRepository
+                .findByModuleIdInOrderByModuleIdAscPositionAsc(moduleIds)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        lesson -> lesson.getModule().getId(),
+                        Collectors.mapping(LessonResponse::from, Collectors.toList())
+                ));
+
+        return allModules.stream()
+                .collect(Collectors.groupingBy(
+                        mod -> mod.getCourse().getId(),
+                        Collectors.mapping(
+                                mod -> CourseModuleResponse.fromWithLessons(
+                                        mod, lessonsByModule.getOrDefault(mod.getId(), Collections.emptyList())),
+                                Collectors.toList()
+                        )
+                ));
+    }
+
     private List<CourseModuleResponse> loadModulesWithLessons(Long courseId) {
         List<CourseModule> modules = courseModuleRepository.findByCourseIdOrderByPositionAsc(courseId);
-        return modules.stream().map(mod -> {
-            List<Lesson> lessons = lessonRepository.findByModuleIdOrderByPositionAsc(mod.getId());
-            List<LessonResponse> lessonResponses = lessons.stream()
-                    .map(LessonResponse::from)
-                    .toList();
-            return CourseModuleResponse.fromWithLessons(mod, lessonResponses);
-        }).toList();
+        if (modules.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> moduleIds = modules.stream().map(CourseModule::getId).toList();
+        Map<Long, List<LessonResponse>> lessonsByModule = lessonRepository
+                .findByModuleIdInOrderByModuleIdAscPositionAsc(moduleIds)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        lesson -> lesson.getModule().getId(),
+                        Collectors.mapping(LessonResponse::from, Collectors.toList())
+                ));
+        return modules.stream()
+                .map(mod -> CourseModuleResponse.fromWithLessons(
+                        mod, lessonsByModule.getOrDefault(mod.getId(), Collections.emptyList())))
+                .toList();
     }
 
     /**

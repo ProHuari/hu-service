@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -15,6 +16,8 @@ import java.util.List;
 public interface CourseModuleRepository extends JpaRepository<CourseModule, Long> {
 
     List<CourseModule> findByCourseIdOrderByPositionAsc(Long courseId);
+
+    List<CourseModule> findByCourseIdInOrderByCourseIdAscPositionAsc(Collection<Long> courseIds);
 
     Page<CourseModule> findByCourseIdOrderByPositionAsc(Long courseId, Pageable pageable);
 
