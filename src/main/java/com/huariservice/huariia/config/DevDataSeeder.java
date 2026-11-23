@@ -276,19 +276,19 @@ public class DevDataSeeder implements CommandLineRunner {
     private void seedExpensesFor(Parliamentarian p, double divulgacao, double passagens, double veiculos, double consultorias) {
         LocalDate now = LocalDate.now();
         expenseRepository.save(new ParliamentarianExpense(
-                null, p, "Divulgação da Atividade Parlamentar", "Gráfica & Comunicação Digital Brasil",
+                null, p, "Divulgação da Atividade Parlamentar", "Gráfica & Comunicação Digital Brasil (02.012.862/0001-60)",
                 BigDecimal.valueOf(divulgacao), now.minusDays(5), "https://camara.leg.br/doc-exemplo-1.pdf"));
 
         expenseRepository.save(new ParliamentarianExpense(
-                null, p, "Passagens Aéreas e Hospedagem", "Companhias Aéreas Nacionais",
+                null, p, "Passagens Aéreas e Hospedagem", "Companhias Aéreas Nacionais (07.575.651/0001-59)",
                 BigDecimal.valueOf(passagens), now.minusDays(12), "https://camara.leg.br/doc-exemplo-2.pdf"));
 
         expenseRepository.save(new ParliamentarianExpense(
-                null, p, "Locação de Veículos e Combustíveis", "Locadora de Veículos Brasília",
+                null, p, "Locação de Veículos e Combustíveis", "Locadora de Veículos Brasília (16.670.085/0001-55)",
                 BigDecimal.valueOf(veiculos), now.minusDays(18), "https://camara.leg.br/doc-exemplo-3.pdf"));
 
         expenseRepository.save(new ParliamentarianExpense(
-                null, p, "Consultorias e Pesquisas Técnicas", "Instituto de Políticas Públicas Aplicadas",
+                null, p, "Consultorias e Pesquisas Técnicas", "Instituto de Políticas Públicas Aplicadas (33.683.111/0002-80)",
                 BigDecimal.valueOf(consultorias), now.minusDays(25), "https://camara.leg.br/doc-exemplo-4.pdf"));
     }
 }
