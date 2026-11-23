@@ -1,8 +1,10 @@
 package com.huariservice.huariia.services;
 
+import com.huariservice.huariia.dto.CourseProgressSummaryResponse;
 import com.huariservice.huariia.dto.LessonProgressRequest;
 import com.huariservice.huariia.dto.LessonProgressResponse;
 import com.huariservice.huariia.entities.*;
+import com.huariservice.huariia.entities.enums.EnrollmentStatus;
 import com.huariservice.huariia.entities.enums.LessonStatus;
 import com.huariservice.huariia.exceptions.BusinessRuleException;
 import com.huariservice.huariia.repositories.EnrollmentRepository;
@@ -200,6 +202,74 @@ class LessonProgressServiceTest {
         assertEquals(1, result.getTotalElements());
         assertEquals(1L, result.getContent().get(0).id());
         verify(progressRepository).findByUserIdAndLessonModuleCourseId(userId, courseId, pageable);
+    }
+
+    @Test
+    @DisplayName("Should automatically mark enrollment as COMPLETED when all course lessons are completed")
+    void shouldAutoCompleteEnrollmentWhenAllLessonsCompleted() {
+        Long userId = 1L;
+        Long lessonId = 10L;
+        Long courseId = 100L;
+
+        User user = new User();
+        user.setId(userId);
+        Course course = new Course();
+        course.setId(courseId);
+        CourseModule module = new CourseModule();
+        module.setId(5L);
+        module.setCourse(course);
+        Lesson lesson = new Lesson();
+        lesson.setId(lessonId);
+        lesson.setModule(module);
+
+        Enrollment activeEnrollment = new Enrollment();
+        activeEnrollment.setId(50L);
+        activeEnrollment.setUser(user);
+        activeEnrollment.setCourse(course);
+        activeEnrollment.setStatus(EnrollmentStatus.ACTIVE);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(lesson));
+        when(enrollmentRepository.existsByUserIdAndCourseId(userId, courseId)).thenReturn(true);
+        when(progressRepository.findByUserIdAndLessonId(userId, lessonId)).thenReturn(Optional.empty());
+        when(progressRepository.save(any(LessonProgress.class))).thenAnswer(inv -> {
+            LessonProgress p = inv.getArgument(0);
+            p.setId(123L);
+            return p;
+        });
+        when(lessonRepository.countByModuleCourseId(courseId)).thenReturn(3L);
+        when(progressRepository.countByUserIdAndLessonModuleCourseIdAndStatus(userId, courseId, LessonStatus.COMPLETED))
+                .thenReturn(3L);
+        when(enrollmentRepository.findByUserIdAndCourseId(userId, courseId))
+                .thenReturn(Optional.of(activeEnrollment));
+
+        lessonProgressService.createProgress(userId, new LessonProgressRequest(LessonStatus.COMPLETED, lessonId));
+
+        assertEquals(EnrollmentStatus.COMPLETED, activeEnrollment.getStatus());
+        verify(enrollmentRepository).save(activeEnrollment);
+    }
+
+    @Test
+    @DisplayName("Should return course progress summary with accurate completion percentage")
+    void shouldReturnCourseProgressSummary() {
+        Long userId = 1L;
+        Long courseId = 100L;
+
+        Enrollment enrollment = new Enrollment();
+        enrollment.setStatus(EnrollmentStatus.ACTIVE);
+
+        when(enrollmentRepository.findByUserIdAndCourseId(userId, courseId)).thenReturn(Optional.of(enrollment));
+        when(lessonRepository.countByModuleCourseId(courseId)).thenReturn(4L);
+        when(progressRepository.countByUserIdAndLessonModuleCourseIdAndStatus(userId, courseId, LessonStatus.COMPLETED))
+                .thenReturn(3L);
+
+        CourseProgressSummaryResponse summary = lessonProgressService.getCourseProgressSummary(userId, courseId);
+
+        assertEquals(courseId, summary.courseId());
+        assertEquals(4L, summary.totalLessons());
+        assertEquals(3L, summary.completedLessons());
+        assertEquals(75.0, summary.completionPercentage());
+        assertEquals(EnrollmentStatus.ACTIVE, summary.enrollmentStatus());
     }
 }
 
