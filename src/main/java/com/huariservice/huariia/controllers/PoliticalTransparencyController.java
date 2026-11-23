@@ -169,15 +169,13 @@ public class PoliticalTransparencyController {
     }
 
     @GetMapping("/despesas")
-    @Operation(summary = "Lists parliamentary expenses with pagination (optional filter by parliamentarianId)")
+    @Operation(summary = "Lists parliamentary expenses with pagination (optional filter by parlamentar-id)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Paginated list of parliamentary expenses")
     })
     public ResponseEntity<Page<ParliamentarianExpenseResponse>> listExpenses(
-            @RequestParam(name = "parliamentarianId", required = false) Long parliamentarianIdParam,
-            @RequestParam(name = "parlamentarId", required = false) Long parlamentarIdParam,
+            @RequestParam(name = "parlamentar-id", required = false) Long parliamentarianId,
             @ParameterObject Pageable pageable) {
-        Long parliamentarianId = parliamentarianIdParam != null ? parliamentarianIdParam : parlamentarIdParam;
         return ResponseEntity.ok(transparencyService.listExpenses(parliamentarianId, pageable));
     }
 

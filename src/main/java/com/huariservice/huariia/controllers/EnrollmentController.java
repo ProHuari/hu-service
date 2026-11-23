@@ -48,17 +48,15 @@ public class EnrollmentController {
     }
 
     @GetMapping
-    @Operation(summary = "Lists enrollments with pagination (students see their own; admins see all or filter by userId)")
+    @Operation(summary = "Lists enrollments with pagination (students see their own; admins see all or filter by usuario-id)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Paginated list of enrollments"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<Page<EnrollmentResponse>> listEnrollments(
-            @RequestParam(name = "userId", required = false) Long userIdParam,
-            @RequestParam(name = "usuarioId", required = false) Long usuarioIdParam,
+            @RequestParam(name = "usuario-id", required = false) Long userId,
             @ParameterObject Pageable pageable,
             @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
-        Long userId = userIdParam != null ? userIdParam : usuarioIdParam;
         Page<EnrollmentResponse> enrollments;
         if (!currentUser.isAdmin()) {
             enrollments = enrollmentService.listEnrollmentsByUser(currentUser.userId(), pageable);

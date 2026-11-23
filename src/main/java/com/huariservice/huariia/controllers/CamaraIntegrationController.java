@@ -53,13 +53,13 @@ public class CamaraIntegrationController {
             @ApiResponse(responseCode = "200", description = "Propositions retrieved successfully")
     })
     public ResponseEntity<List<CamaraPropositionDto>> getPropositions(
-            @RequestParam(name = "siglaTipo", required = false, defaultValue = "PL") String siglaTipo,
+            @RequestParam(name = "sigla-tipo", required = false, defaultValue = "PL") String siglaTipo,
             @RequestParam(name = "ano", required = false) Integer ano,
             @RequestParam(name = "ementa", required = false) String ementa) {
         return ResponseEntity.ok(camaraService.fetchPropositions(siglaTipo, ano, ementa));
     }
 
-    @PostMapping("/sincronizar")
+    @PostMapping("/sincronizacoes")
     @Operation(summary = "Synchronizes federal deputies into the local database (ADMIN only)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Deputies synchronized successfully"),

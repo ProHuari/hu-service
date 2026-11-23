@@ -73,17 +73,15 @@ public class AiHistoryController {
     }
 
     @GetMapping
-    @Operation(summary = "Lists AI query history with pagination (students see their own; admins see all)")
+    @Operation(summary = "Lists AI query history with pagination (students see their own; admins see all or filter by usuario-id)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Paginated list of AI history records"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<Page<AiHistoryResponse>> listHistory(
-            @RequestParam(name = "userId", required = false) Long userIdParam,
-            @RequestParam(name = "usuarioId", required = false) Long usuarioIdParam,
+            @RequestParam(name = "usuario-id", required = false) Long userId,
             @ParameterObject Pageable pageable,
             @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
-        Long userId = userIdParam != null ? userIdParam : usuarioIdParam;
         Page<AiHistoryResponse> historyPage;
         if (!currentUser.isAdmin()) {
             historyPage = aiHistoryService.listHistoryByUser(currentUser.userId(), pageable);

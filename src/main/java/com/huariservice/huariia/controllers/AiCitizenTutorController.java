@@ -28,7 +28,7 @@ public class AiCitizenTutorController {
 
     private final GeminiIntegrationService geminiIntegrationService;
 
-    @PostMapping("/explicar-projeto-lei")
+    @PostMapping("/explicacoes-projetos-lei")
     @Operation(summary = "Translates formal legislative bills ('juridiques') into plain, accessible language with impact analysis")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Bill explanation generated successfully"),

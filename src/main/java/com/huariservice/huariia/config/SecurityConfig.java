@@ -13,6 +13,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.time.LocalDateTime;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -53,13 +55,15 @@ public class SecurityConfig {
                             response.setStatus(HttpStatus.UNAUTHORIZED.value());
                             response.setContentType("application/json;charset=UTF-8");
                             response.getWriter().write("""
-                                    {"status":401,"error":"Unauthorized","message":"Missing, invalid, or expired token."}""");
+                                    {"timestamp":"%s","status":401,"error":"Unauthorized","message":"Missing, invalid, or expired token."}"""
+                                    .formatted(LocalDateTime.now()));
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(HttpStatus.FORBIDDEN.value());
                             response.setContentType("application/json;charset=UTF-8");
                             response.getWriter().write("""
-                                    {"status":403,"error":"Forbidden","message":"You do not have permission to access this resource."}""");
+                                    {"timestamp":"%s","status":403,"error":"Forbidden","message":"You do not have permission to access this resource."}"""
+                                    .formatted(LocalDateTime.now()));
                         }))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -79,7 +83,7 @@ public class SecurityConfig {
                         .requestMatchers("/usuarios/me", "/usuarios/me/**").authenticated()
                         .requestMatchers("/usuarios", "/usuarios/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/transparencia/camara/sincronizar").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/transparencia/camara/sincronizacoes").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, PUBLIC_READ_CONTENT_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, "/aulas", "/aulas/**").authenticated()
                         .requestMatchers(ADMIN_CONTENT_ENDPOINTS).hasRole("ADMIN")

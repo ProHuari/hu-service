@@ -42,16 +42,14 @@ public class LessonController {
     }
 
     @GetMapping
-    @Operation(summary = "Lists lessons with pagination (optional filter by moduleId)")
+    @Operation(summary = "Lists lessons with pagination (optional filter by modulo-id)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Paginated list of lessons"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     public ResponseEntity<Page<LessonResponse>> listLessons(
-            @RequestParam(name = "moduleId", required = false) Long moduleIdParam,
-            @RequestParam(name = "moduloId", required = false) Long moduloIdParam,
+            @RequestParam(name = "modulo-id", required = false) Long moduleId,
             @ParameterObject Pageable pageable) {
-        Long moduleId = moduleIdParam != null ? moduleIdParam : moduloIdParam;
         Page<LessonResponse> page = (moduleId != null)
                 ? lessonService.listLessonsByModule(moduleId, pageable)
                 : lessonService.listLessons(pageable);

@@ -43,7 +43,7 @@ public class LocationController {
         return ResponseEntity.ok(locationService.getMunicipalities(uf));
     }
 
-    @GetMapping("/cep/{cep}")
+    @GetMapping("/ceps/{cep}")
     @Operation(summary = "Looks up address and state (UF) from ViaCEP to automatically filter regional representatives")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Postal code details retrieved successfully")

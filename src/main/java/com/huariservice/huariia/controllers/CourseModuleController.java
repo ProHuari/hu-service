@@ -42,15 +42,13 @@ public class CourseModuleController {
         }
 
         @GetMapping
-        @Operation(summary = "Lists course modules with pagination (optional filter by courseId)")
+        @Operation(summary = "Lists course modules with pagination (optional filter by curso-id)")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "Paginated list of modules")
         })
         public ResponseEntity<Page<CourseModuleResponse>> listModules(
-                        @RequestParam(name = "courseId", required = false) Long courseIdParam,
-                        @RequestParam(name = "cursoId", required = false) Long cursoIdParam,
+                        @RequestParam(name = "curso-id", required = false) Long courseId,
                         @ParameterObject Pageable pageable) {
-                Long courseId = courseIdParam != null ? courseIdParam : cursoIdParam;
                 Page<CourseModuleResponse> page = (courseId != null)
                                 ? courseModuleService.listModulesByCourse(courseId, pageable)
                                 : courseModuleService.listModules(pageable);

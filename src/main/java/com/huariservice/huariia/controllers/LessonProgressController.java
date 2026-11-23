@@ -47,20 +47,16 @@ public class LessonProgressController {
         }
 
         @GetMapping
-        @Operation(summary = "Lists lesson progress with pagination (students see their own; admins see all; supports optional courseId and userId filters)")
+        @Operation(summary = "Lists lesson progress with pagination (students see their own; admins see all; supports optional curso-id and usuario-id filters)")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "Paginated list of lesson progress records"),
                         @ApiResponse(responseCode = "401", description = "Unauthorized")
         })
         public ResponseEntity<Page<LessonProgressResponse>> listProgress(
-                        @RequestParam(name = "courseId", required = false) Long courseIdParam,
-                        @RequestParam(name = "cursoId", required = false) Long cursoIdParam,
-                        @RequestParam(name = "userId", required = false) Long userIdParam,
-                        @RequestParam(name = "usuarioId", required = false) Long usuarioIdParam,
+                        @RequestParam(name = "curso-id", required = false) Long courseId,
+                        @RequestParam(name = "usuario-id", required = false) Long targetUserId,
                         @ParameterObject Pageable pageable,
                         @Parameter(hidden = true) @AuthenticationPrincipal TokenData currentUser) {
-                Long courseId = courseIdParam != null ? courseIdParam : cursoIdParam;
-                Long targetUserId = userIdParam != null ? userIdParam : usuarioIdParam;
 
                 Page<LessonProgressResponse> progressPage;
                 if (!currentUser.isAdmin()) {

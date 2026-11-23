@@ -83,7 +83,7 @@ public class UserController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PostMapping("/admin")
+    @PostMapping("/admins")
     @Operation(summary = "Registers a new administrator account (ADMIN only)")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Admin account created"),
