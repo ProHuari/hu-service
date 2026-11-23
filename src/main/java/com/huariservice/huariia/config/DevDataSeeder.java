@@ -214,7 +214,7 @@ public class DevDataSeeder implements CommandLineRunner {
 
         // Parlamentares
         Parliamentarian tabata = parliamentarianRepository.save(new Parliamentarian(
-                null, "Tabata Amaral", ParliamentarianChamber.CHAMBER_OF_DEPUTIES, "PSB", "SP", "204536"));
+                null, "Tabata Amaral", ParliamentarianChamber.CHAMBER_OF_DEPUTIES, "PSB", "SP", "204534"));
 
         Parliamentarian nikolas = parliamentarianRepository.save(new Parliamentarian(
                 null, "Nikolas Ferreira", ParliamentarianChamber.CHAMBER_OF_DEPUTIES, "PL", "MG", "204526"));
