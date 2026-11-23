@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = {
         "app.ia.enabled=true",
         "app.ia.api-key=dummy-test-key",
-        "app.ia.model=gemini-1.5-flash"
+        "app.ai.gemini.model=gemini-2.5-flash"
 })
 class AiEnabledContextTest {
 

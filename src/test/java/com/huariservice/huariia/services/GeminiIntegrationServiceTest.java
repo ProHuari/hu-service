@@ -4,6 +4,11 @@ import com.huariservice.huariia.dto.ai.AiTutorChatRequest;
 import com.huariservice.huariia.dto.ai.AiTutorChatResponse;
 import com.huariservice.huariia.dto.ai.ExplainBillRequest;
 import com.huariservice.huariia.dto.ai.ExplainBillResponse;
+import com.huariservice.huariia.dto.ai.GeminiApiDtos.Candidate;
+import com.huariservice.huariia.dto.ai.GeminiApiDtos.Content;
+import com.huariservice.huariia.dto.ai.GeminiApiDtos.ContentPart;
+import com.huariservice.huariia.dto.ai.GeminiApiDtos.GeminiRequest;
+import com.huariservice.huariia.dto.ai.GeminiApiDtos.GeminiResponse;
 import com.huariservice.huariia.entities.AiHistory;
 import com.huariservice.huariia.entities.User;
 import com.huariservice.huariia.repositories.AiHistoryRepository;
@@ -11,11 +16,13 @@ import com.huariservice.huariia.repositories.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,7 +58,7 @@ class GeminiIntegrationServiceTest {
                 restClient,
                 aiHistoryRepository,
                 userRepository,
-                "", // empty API key
+                "",
                 "gemini-2.5-flash"
         );
 
@@ -83,7 +90,7 @@ class GeminiIntegrationServiceTest {
                 restClient,
                 aiHistoryRepository,
                 userRepository,
-                "", // empty API key
+                "",
                 "gemini-2.5-flash"
         );
 
@@ -126,7 +133,7 @@ class GeminiIntegrationServiceTest {
 
         when(restClient.post()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(anyString(), any(Object[].class))).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(any())).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any(GeminiRequest.class))).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenThrow(new ResourceAccessException("Gemini connection timed out"));
 
         ExplainBillRequest request = new ExplainBillRequest(
@@ -141,5 +148,95 @@ class GeminiIntegrationServiceTest {
         assertNotNull(response);
         assertEquals("FALLBACK_SIMULATION", response.mode());
         assertTrue(response.simplifiedExplanation().contains("PL 9999/2026"));
+        verify(requestBodySpec, times(1)).retrieve();
+    }
+
+    @Test
+    @DisplayName("Should request JSON structured output and parse dynamic pros/cons/impacts in explainBill")
+    void shouldParseStructuredJsonOutputForExplainBill() {
+        GeminiIntegrationService service = new GeminiIntegrationService(
+                restClient,
+                aiHistoryRepository,
+                userRepository,
+                "real-api-key-test",
+                "gemini-2.5-flash"
+        );
+
+        String jsonPayload = """
+                {
+                  "simplifiedExplanation": "Cria regras de transparência para algoritmos públicos.",
+                  "practicalImpacts": "Cidadãos poderão auditar decisões automatizadas de benefícios sociais.",
+                  "pointsInFavor": ["Garante direito à explicação", "Reduz vieses discriminatórios"],
+                  "pointsAgainst": ["Custo inicial de adequação para prefeituras pequenas"]
+                }
+                """;
+
+        GeminiResponse apiResponse = new GeminiResponse(
+                List.of(new Candidate(new Content(List.of(new ContentPart(jsonPayload)))))
+        );
+
+        when(restClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString(), any(Object[].class))).thenReturn(requestBodySpec);
+        ArgumentCaptor<GeminiRequest> payloadCaptor = ArgumentCaptor.forClass(GeminiRequest.class);
+        when(requestBodySpec.body(payloadCaptor.capture())).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.body(GeminiResponse.class)).thenReturn(apiResponse);
+
+        ExplainBillRequest request = new ExplainBillRequest(
+                "PL 2338/2023",
+                "Marco Legal da Inteligência Artificial.",
+                "Senado Federal",
+                "Tecnologia"
+        );
+
+        ExplainBillResponse response = service.explainBill(request, null);
+
+        assertEquals("REAL_API", response.mode());
+        assertEquals("Cria regras de transparência para algoritmos públicos.", response.simplifiedExplanation());
+        assertEquals("Cidadãos poderão auditar decisões automatizadas de benefícios sociais.", response.practicalImpacts());
+        assertEquals(List.of("Garante direito à explicação", "Reduz vieses discriminatórios"), response.pointsInFavor());
+        assertEquals(List.of("Custo inicial de adequação para prefeituras pequenas"), response.pointsAgainst());
+        assertEquals("application/json", payloadCaptor.getValue().generationConfig().responseMimeType());
+    }
+
+    @Test
+    @DisplayName("Should request JSON structured output and parse dynamic suggestedTopics in askTutor")
+    void shouldParseStructuredJsonOutputForAskTutor() {
+        GeminiIntegrationService service = new GeminiIntegrationService(
+                restClient,
+                aiHistoryRepository,
+                userRepository,
+                "real-api-key-test",
+                "gemini-2.5-flash"
+        );
+
+        String jsonPayload = """
+                {
+                  "answer": "A LDO define as metas e prioridades do orçamento para o ano seguinte.",
+                  "suggestedTopics": ["Diferença entre PPA, LDO e LOA", "Audiências públicas orçamentárias"]
+                }
+                """;
+
+        GeminiResponse apiResponse = new GeminiResponse(
+                List.of(new Candidate(new Content(List.of(new ContentPart(jsonPayload)))))
+        );
+
+        when(restClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString(), any(Object[].class))).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any(GeminiRequest.class))).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.body(GeminiResponse.class)).thenReturn(apiResponse);
+
+        AiTutorChatRequest request = new AiTutorChatRequest(
+                "Para que serve a LDO?",
+                "Orçamento Público",
+                null
+        );
+
+        AiTutorChatResponse response = service.askTutor(request, null);
+
+        assertEquals("REAL_API", response.mode());
+        assertEquals("A LDO define as metas e prioridades do orçamento para o ano seguinte.", response.answer());
+        assertEquals(List.of("Diferença entre PPA, LDO e LOA", "Audiências públicas orçamentárias"), response.suggestedTopics());
     }
 }
