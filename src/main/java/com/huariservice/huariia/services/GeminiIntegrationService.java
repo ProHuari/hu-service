@@ -1,29 +1,36 @@
 package com.huariservice.huariia.services;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huariservice.huariia.dto.ai.AiTutorChatRequest;
 import com.huariservice.huariia.dto.ai.AiTutorChatResponse;
 import com.huariservice.huariia.dto.ai.ExplainBillRequest;
 import com.huariservice.huariia.dto.ai.ExplainBillResponse;
+import com.huariservice.huariia.dto.ai.GeminiApiDtos.GeminiRequest;
+import com.huariservice.huariia.dto.ai.GeminiApiDtos.GeminiResponse;
 import com.huariservice.huariia.entities.AiHistory;
 import com.huariservice.huariia.entities.User;
 import com.huariservice.huariia.repositories.AiHistoryRepository;
 import com.huariservice.huariia.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientResponseException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Service managing real generative AI operations with Google Gemini (gemini-2.5-flash)
- * alongside intelligent local fallbacks for development environments lacking an API key.
+ * using Structured JSON Output ({@code responseMimeType: "application/json"}), alongside
+ * intelligent local fallbacks for development environments lacking an API key.
+ *
+ * <p>External HTTP calls execute outside database transactions; history persistence uses
+ * repository-level transactions only after the AI response is obtained.</p>
  */
 @Slf4j
 @Service
@@ -40,6 +47,7 @@ public class GeminiIntegrationService {
     private final AiHistoryRepository aiHistoryRepository;
     private final UserRepository userRepository;
     private final PoliticalTransparencyService politicalTransparencyService;
+    private final ObjectMapper objectMapper;
     private final String apiKey;
     private final String model;
 
@@ -49,21 +57,33 @@ public class GeminiIntegrationService {
             UserRepository userRepository,
             @Value("${app.ai.gemini.api-key:}") String apiKey,
             @Value("${app.ai.gemini.model:gemini-2.5-flash}") String model) {
-        this(restClient, aiHistoryRepository, userRepository, null, apiKey, model);
+        this(restClient, aiHistoryRepository, userRepository, null, new ObjectMapper(), apiKey, model);
     }
 
-    @org.springframework.beans.factory.annotation.Autowired
+    @Autowired
     public GeminiIntegrationService(
             @Qualifier("geminiRestClient") RestClient restClient,
             AiHistoryRepository aiHistoryRepository,
             UserRepository userRepository,
-            @org.springframework.context.annotation.Lazy PoliticalTransparencyService politicalTransparencyService,
+            @Lazy PoliticalTransparencyService politicalTransparencyService,
             @Value("${app.ai.gemini.api-key:}") String apiKey,
             @Value("${app.ai.gemini.model:gemini-2.5-flash}") String model) {
+        this(restClient, aiHistoryRepository, userRepository, politicalTransparencyService, new ObjectMapper(), apiKey, model);
+    }
+
+    GeminiIntegrationService(
+            RestClient restClient,
+            AiHistoryRepository aiHistoryRepository,
+            UserRepository userRepository,
+            PoliticalTransparencyService politicalTransparencyService,
+            ObjectMapper objectMapper,
+            String apiKey,
+            String model) {
         this.restClient = restClient;
         this.aiHistoryRepository = aiHistoryRepository;
         this.userRepository = userRepository;
         this.politicalTransparencyService = politicalTransparencyService;
+        this.objectMapper = objectMapper != null ? objectMapper : new ObjectMapper();
         this.apiKey = apiKey != null ? apiKey.trim() : "";
         this.model = model != null && !model.isBlank() ? model.trim() : "gemini-2.5-flash";
     }
@@ -76,9 +96,8 @@ public class GeminiIntegrationService {
     }
 
     /**
-     * Simplifies a legislative bill's formal text ("juridiques") for citizens.
+     * Simplifies a legislative bill's formal text ("juridiquês") into structured citizen-friendly JSON.
      */
-    @Transactional
     public ExplainBillResponse explainBill(ExplainBillRequest request, Long authenticatedUserId) {
         if (!isApiKeyConfigured()) {
             log.info("GEMINI_API_KEY not configured. Using structured fallback simulation for bill: {}", request.billCode());
@@ -91,8 +110,14 @@ public class GeminiIntegrationService {
                     Código do Projeto: %s
                     Ementa Original: %s
                     Autor/Tema: %s / %s
-                    
-                    Forneça uma explicação direta em linguagem cidadã, destacando o objetivo real e como isso afeta a vida prática das pessoas.
+
+                    Responda EXCLUSIVAMENTE com um objeto JSON válido contendo exatamente as chaves:
+                    {
+                      "simplifiedExplanation": "Explicação clara e direta em linguagem cidadã",
+                      "practicalImpacts": "Como este projeto afeta o dia a dia das pessoas e dos serviços públicos",
+                      "pointsInFavor": ["Argumento favorável 1 específico do PL", "Argumento favorável 2", "Argumento favorável 3"],
+                      "pointsAgainst": ["Crítica ou ponto de atenção 1 específico do PL", "Crítica ou ponto de atenção 2"]
+                    }
                     """,
                     request.billCode(),
                     request.ementa(),
@@ -100,36 +125,29 @@ public class GeminiIntegrationService {
                     request.theme() != null ? request.theme() : "Geral"
             );
 
-            String generatedText = callGeminiGenerateContent(prompt, TUTOR_SYSTEM_INSTRUCTION);
-
-            if (generatedText == null || generatedText.isBlank()) {
+            String rawJson = callGeminiStructuredJson(prompt, TUTOR_SYSTEM_INSTRUCTION);
+            if (rawJson == null || rawJson.isBlank()) {
                 return buildFallbackBillExplanation(request, authenticatedUserId);
             }
 
-            String practicalImpacts = "Impacto direto na transparência e aplicação das diretrizes estabelecidas pelo texto da lei para a sociedade.";
-            List<String> pros = List.of(
-                    "Aumenta a clareza e previsibilidade das normas para a população",
-                    "Fortalece o debate democrático e a fiscalização cidadã",
-                    "Moderniza procedimentos legislativos e administrativos"
-            );
-            List<String> cons = List.of(
-                    "Demanda adaptação de órgãos públicos e regulamentação complementar",
-                    "Necessidade de monitoramento contínuo dos custos de implementação"
-            );
+            StructuredBillAnalysis parsed = parseBillAnalysis(rawJson);
+            if (parsed == null || parsed.simplifiedExplanation() == null || parsed.simplifiedExplanation().isBlank()) {
+                return buildFallbackBillExplanation(request, authenticatedUserId);
+            }
 
             recordHistoryIfUserAuthenticated(
                     authenticatedUserId,
                     "Explicar Projeto de Lei " + request.billCode() + ": " + request.ementa(),
-                    generatedText
+                    parsed.simplifiedExplanation()
             );
 
             return ExplainBillResponse.ofReal(
                     request.billCode(),
                     request.ementa(),
-                    generatedText,
-                    practicalImpacts,
-                    pros,
-                    cons
+                    parsed.simplifiedExplanation(),
+                    parsed.practicalImpacts(),
+                    parsed.pointsInFavor(),
+                    parsed.pointsAgainst()
             );
 
         } catch (Exception ex) {
@@ -139,9 +157,9 @@ public class GeminiIntegrationService {
     }
 
     /**
-     * Answers citizen questions about democracy, citizenship, public transparency, or course topics.
+     * Answers citizen questions about democracy, citizenship, public transparency, or course topics
+     * using structured JSON output for dynamic suggested topics.
      */
-    @Transactional
     public AiTutorChatResponse askTutor(AiTutorChatRequest request, Long authenticatedUserId) {
         String ragContext = politicalTransparencyService != null
                 ? politicalTransparencyService.buildRagContextForQuestion(request.question())
@@ -153,37 +171,43 @@ public class GeminiIntegrationService {
         }
 
         try {
-            String prompt = request.question();
+            StringBuilder promptBuilder = new StringBuilder();
             if (ragContext != null && !ragContext.isBlank()) {
-                prompt = "[Dados Oficiais da Plataforma:\n" + ragContext + "]\n\n" + prompt;
+                promptBuilder.append("[Dados Oficiais da Plataforma:\n").append(ragContext).append("]\n\n");
             }
             if (request.lessonContext() != null && !request.lessonContext().isBlank()) {
-                prompt = "[Contexto da Aula: " + request.lessonContext() + "] " + prompt;
+                promptBuilder.append("[Contexto da Aula: ").append(request.lessonContext()).append("]\n\n");
+            }
+            promptBuilder.append("Pergunta do cidadão: ").append(request.question()).append("\n\n");
+            promptBuilder.append("""
+                    Responda EXCLUSIVAMENTE com um objeto JSON válido contendo exatamente as chaves:
+                    {
+                      "answer": "Resposta didática, apartidária e objetiva em português do Brasil",
+                      "suggestedTopics": ["Tópico relacionado 1 para aprofundar", "Tópico relacionado 2", "Tópico relacionado 3"]
+                    }
+                    """);
+
+            String rawJson = callGeminiStructuredJson(promptBuilder.toString(), TUTOR_SYSTEM_INSTRUCTION);
+            if (rawJson == null || rawJson.isBlank()) {
+                return buildFallbackTutorAnswer(request, authenticatedUserId, ragContext);
             }
 
-            String generatedText = callGeminiGenerateContent(prompt, TUTOR_SYSTEM_INSTRUCTION);
-
-            if (generatedText == null || generatedText.isBlank()) {
+            StructuredTutorReply parsed = parseTutorReply(rawJson);
+            if (parsed == null || parsed.answer() == null || parsed.answer().isBlank()) {
                 return buildFallbackTutorAnswer(request, authenticatedUserId, ragContext);
             }
 
             Long historyId = recordHistoryIfUserAuthenticated(
                     authenticatedUserId,
                     request.question(),
-                    generatedText
-            );
-
-            List<String> topics = List.of(
-                    "Acompanhamento de votações na Câmara e Senado",
-                    "Fiscalização e transparência de recursos públicos",
-                    "Canais de ouvidoria e participação popular"
+                    parsed.answer()
             );
 
             return AiTutorChatResponse.ofReal(
                     request.question(),
-                    generatedText,
+                    parsed.answer(),
                     request.subject() != null ? request.subject() : "Cidadania e Política",
-                    topics,
+                    parsed.suggestedTopics(),
                     historyId
             );
 
@@ -193,32 +217,101 @@ public class GeminiIntegrationService {
         }
     }
 
-    private String callGeminiGenerateContent(String userPrompt, String systemInstruction) {
-        GeminiPayload payload = new GeminiPayload(
-                new SystemContent(List.of(new ContentPart(systemInstruction))),
-                List.of(new Content(List.of(new ContentPart(userPrompt))))
-        );
+    private String callGeminiStructuredJson(String userPrompt, String systemInstruction) {
+        GeminiRequest payload = GeminiRequest.structuredJson(systemInstruction, userPrompt);
 
-        GeminiResult result = restClient.post()
+        GeminiResponse result = restClient.post()
                 .uri("/models/{model}:generateContent", model)
                 .body(payload)
                 .retrieve()
-                .body(GeminiResult.class);
+                .body(GeminiResponse.class);
 
-        if (result == null || result.candidates() == null || result.candidates().isEmpty()) {
-            return null;
+        return result != null ? result.extractText() : null;
+    }
+
+    private StructuredBillAnalysis parseBillAnalysis(String rawText) {
+        try {
+            JsonNode root = objectMapper.readTree(stripCodeFences(rawText));
+            String simplified = root.path("simplifiedExplanation").asText(null);
+            String impacts = root.path("practicalImpacts").asText(null);
+            List<String> pros = extractStringList(root.path("pointsInFavor"));
+            List<String> cons = extractStringList(root.path("pointsAgainst"));
+
+            if (simplified == null || simplified.isBlank()) {
+                return null;
+            }
+            if (impacts == null || impacts.isBlank()) {
+                impacts = "Impacto direto na regulamentação e aplicação das diretrizes deste projeto de lei.";
+            }
+            if (pros.isEmpty()) {
+                pros = List.of("Promove maior clareza normativa sobre o tema abordado no projeto.");
+            }
+            if (cons.isEmpty()) {
+                cons = List.of("Exige acompanhamento da regulamentação e da viabilidade de implementação.");
+            }
+            return new StructuredBillAnalysis(simplified.trim(), impacts.trim(), pros, cons);
+        } catch (Exception ex) {
+            log.warn("Could not parse structured JSON for explainBill, falling back to plain text: {}", ex.getMessage());
+            return new StructuredBillAnalysis(
+                    rawText.trim(),
+                    "Impacto direto na regulamentação e aplicação das diretrizes deste projeto de lei.",
+                    List.of("Promove maior clareza normativa sobre o tema abordado no projeto."),
+                    List.of("Exige acompanhamento da regulamentação e da viabilidade de implementação.")
+            );
         }
+    }
 
-        Candidate candidate = result.candidates().get(0);
-        if (candidate.content() == null || candidate.content().parts() == null) {
-            return null;
+    private StructuredTutorReply parseTutorReply(String rawText) {
+        try {
+            JsonNode root = objectMapper.readTree(stripCodeFences(rawText));
+            String answer = root.path("answer").asText(null);
+            List<String> topics = extractStringList(root.path("suggestedTopics"));
+
+            if (answer == null || answer.isBlank()) {
+                return null;
+            }
+            if (topics.isEmpty()) {
+                topics = List.of(
+                        "Acompanhamento de proposições no Congresso Nacional",
+                        "Controle social e transparência de recursos públicos"
+                );
+            }
+            return new StructuredTutorReply(answer.trim(), topics);
+        } catch (Exception ex) {
+            log.warn("Could not parse structured JSON for askTutor, falling back to plain text: {}", ex.getMessage());
+            return new StructuredTutorReply(
+                    rawText.trim(),
+                    List.of(
+                            "Acompanhamento de proposições no Congresso Nacional",
+                            "Controle social e transparência de recursos públicos"
+                    )
+            );
         }
+    }
 
-        return candidate.content().parts().stream()
-                .map(ContentPart::text)
-                .filter(t -> t != null && !t.isBlank())
-                .reduce("", String::concat)
-                .trim();
+    private List<String> extractStringList(JsonNode arrayNode) {
+        List<String> items = new ArrayList<>();
+        if (arrayNode != null && arrayNode.isArray()) {
+            for (JsonNode item : arrayNode) {
+                String value = item.asText("").trim();
+                if (!value.isEmpty()) {
+                    items.add(value);
+                }
+            }
+        }
+        return items;
+    }
+
+    private String stripCodeFences(String raw) {
+        String trimmed = raw.trim();
+        if (trimmed.startsWith("```")) {
+            int firstNewline = trimmed.indexOf('\n');
+            int lastFence = trimmed.lastIndexOf("```");
+            if (firstNewline > 0 && lastFence > firstNewline) {
+                return trimmed.substring(firstNewline + 1, lastFence).trim();
+            }
+        }
+        return trimmed;
     }
 
     private ExplainBillResponse buildFallbackBillExplanation(ExplainBillRequest request, Long authenticatedUserId) {
@@ -257,10 +350,6 @@ public class GeminiIntegrationService {
                 pros,
                 cons
         );
-    }
-
-    private AiTutorChatResponse buildFallbackTutorAnswer(AiTutorChatRequest request, Long authenticatedUserId) {
-        return buildFallbackTutorAnswer(request, authenticatedUserId, "");
     }
 
     private AiTutorChatResponse buildFallbackTutorAnswer(AiTutorChatRequest request, Long authenticatedUserId, String ragContext) {
@@ -323,13 +412,15 @@ public class GeminiIntegrationService {
         }
     }
 
-    // JSON mapping internal records for Gemini API
-    private record ContentPart(String text) {}
-    private record Content(List<ContentPart> parts) {}
-    private record SystemContent(@JsonProperty("parts") List<ContentPart> parts) {}
-    private record GeminiPayload(
-            @JsonProperty("systemInstruction") SystemContent systemInstruction,
-            List<Content> contents) {}
-    private record Candidate(Content content) {}
-    private record GeminiResult(List<Candidate> candidates) {}
+    private record StructuredBillAnalysis(
+            String simplifiedExplanation,
+            String practicalImpacts,
+            List<String> pointsInFavor,
+            List<String> pointsAgainst) {
+    }
+
+    private record StructuredTutorReply(
+            String answer,
+            List<String> suggestedTopics) {
+    }
 }
