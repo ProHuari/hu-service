@@ -40,7 +40,7 @@ services:
       ADMIN_SENHA: ${ADMIN_SENHA:-}
       IA_ENABLED: ${IA_ENABLED:-false}
       IA_API_KEY: ${IA_API_KEY:-}
-      IA_MODEL: ${IA_MODEL:-gemini-1.5-flash}
+      IA_MODEL: ${IA_MODEL:-gemini-2.5-flash}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/huari?createDatabaseIfNotExist=true&serverTimezone=America/Sao_Paulo
