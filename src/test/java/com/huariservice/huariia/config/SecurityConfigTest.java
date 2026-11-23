@@ -45,6 +45,13 @@ class SecurityConfigTest {
     }
 
     @Test
+    @DisplayName("Public GET on /transparencia/empresas/{cnpj} should be permitted without authentication")
+    void withoutToken_companyCnpj_isPermitted() throws Exception {
+        mockMvc.perform(get("/transparencia/empresas/00000000000191"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("GET on /aulas must require authentication")
     void withoutToken_lessons_returns401() throws Exception {
         mockMvc.perform(get("/aulas"))
