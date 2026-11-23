@@ -352,6 +352,7 @@ DELETE `/matriculas/{id}` — Exclui logicamente uma matrícula (somente ADMIN)
 *PROGRESSO DAS AULAS (`/progresso-aulas`)*
 
 GET `/progresso-aulas` — Lista progresso com paginação (filtros opcionais: `?curso-id=1`, `?usuario-id=1`)
+GET `/progresso-aulas/resumo?curso-id=1` — Retorna percentual de conclusão do aluno no curso (`totalLessons`, `completedLessons`, `completionPercentage`, `enrollmentStatus`); ao concluir 100% das aulas, a matrícula é marcada automaticamente como `COMPLETED`
 POST `/progresso-aulas` — **Upsert** de progresso do aluno autenticado (cria ou atualiza automaticamente)
 Request:
 ```json
@@ -416,6 +417,8 @@ DELETE `/historico-ia/{id}` — Remove interação do histórico
 
 - **Despesas Parlamentares CEAP (`/transparencia/despesas`)**:
   - `GET /transparencia/despesas` — Lista despesas parlamentares (`?parlamentar-id=1`)
+  - `GET /transparencia/despesas/resumo` — Retorna resumo analítico agregado (total gasto, ranking por parlamentar e distribuição por categoria e UF)
+  - `GET /transparencia/despesas/{id}` — Detalha uma despesa parlamentar por ID
   - `POST /transparencia/despesas` — Registra despesa (somente ADMIN)
   - `PUT /transparencia/despesas/{id}` — Atualiza despesa (somente ADMIN)
   - `DELETE /transparencia/despesas/{id}` — Remove despesa (somente ADMIN)

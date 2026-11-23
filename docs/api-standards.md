@@ -20,7 +20,7 @@ Este documento estabelece as convenções oficiais de design, nomenclatura, vali
   - ✅ `/ia/explicacoes-projetos-lei`
 - **Sub-recursos singulares e aliases de contexto:**
   - `/usuarios/me` e `/usuarios/me/senha` representam o recurso único do usuário autenticado.
-  - `/transparencia/tribunal-contas/resumo` e `/transparencia/integracoes/status` representam agregados singulares de leitura.
+  - `/transparencia/tribunal-contas/resumo`, `/transparencia/despesas/resumo`, `/progresso-aulas/resumo` e `/transparencia/integracoes/status` representam agregados singulares de leitura.
   - `/auth/*` (`/auth/login`, `/auth/refresh`, `/auth/logout`, `/auth/forgot-password`, `/auth/reset-password`) segue convenção RPC amplamente adotada para operações de ciclo de vida de sessão JWT.
 - **Versionamento (Diretriz de Evolução):** Atualmente a API opera sem prefixo de versão na raiz (`/`). Novas gerações incompatíveis de contrato deverão introduzir versionamento explícito via URI (`/api/v1/...`, `/api/v2/...`).
 
@@ -63,7 +63,7 @@ Este documento estabelece as convenções oficiais de design, nomenclatura, vali
 | `405 Method Not Allowed` | Verbo HTTP não suportado na rota | `HttpRequestMethodNotSupportedException` |
 | `409 Conflict` | Violação de unicidade (e-mail, título de curso, código de PL, matrícula duplicada) | `ConflictException`, `DataIntegrityViolationException` |
 | `422 Unprocessable Entity` | Violação de regra de negócio (ex.: token de recuperação expirado, aluno sem matrícula no curso) | `BusinessRuleException` |
-| `429 Too Many Requests` | Excesso de tentativas de login falhas (*brute-force protection*) | `TooManyRequestsException` |
+| `429 Too Many Requests` | Excesso de tentativas de login falhas (*brute-force protection*) ou limite de requisições em `/ia/**` | `TooManyRequestsException` / `AiRateLimitFilter` |
 | `500 Internal Server Error` | Falha inesperada não tratada (sem vazar *stack trace* ao cliente) | `GlobalExceptionHandler.handleGenericException` |
 | `502 Bad Gateway` / `503 Service Unavailable` | Falha ou indisponibilidade de provedor externo de IA | `ResponseStatusException` |
 
@@ -123,10 +123,13 @@ Filtros específicos de domínio são passados como query params em `kebab-case`
 - `GET /aulas?modulo-id=3`
 - `GET /matriculas?usuario-id=2`
 - `GET /progresso-aulas?curso-id=1&usuario-id=2`
+- `GET /progresso-aulas/resumo?curso-id=1`
 - `GET /historico-ia?usuario-id=2`
 - `GET /transparencia/parlamentares?chamber=CHAMBER_OF_DEPUTIES`
 - `GET /transparencia/projetos-lei?q=inteligencia`
 - `GET /transparencia/despesas?parlamentar-id=1`
+- `GET /transparencia/despesas/{id}`
+- `GET /transparencia/despesas/resumo`
 - `GET /transparencia/camara/proposicoes?sigla-tipo=PL&ano=2025&ementa=educacao`
 
 > **Nota sobre integrações em tempo real:** Endpoints proxy de APIs governamentais externas (`/transparencia/camara/*`, `/transparencia/senado/*`, `/transparencia/tribunal-contas/*`, `/localidades/*`) retornam `List<DTO>` com filtros próprios (como `uf`, `partido`, `ano`, `limit`) refletindo as capacidades das fontes externas (Câmara, Senado, TCU, IBGE).
