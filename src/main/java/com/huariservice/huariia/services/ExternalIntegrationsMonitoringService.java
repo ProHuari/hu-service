@@ -32,6 +32,7 @@ public class ExternalIntegrationsMonitoringService {
     private final String ibgeBaseUrl;
     private final String viaCepBaseUrl;
     private final String geminiBaseUrl;
+    private final String tseBaseUrl;
 
     public ExternalIntegrationsMonitoringService(
             GeminiIntegrationService geminiService,
@@ -40,7 +41,8 @@ public class ExternalIntegrationsMonitoringService {
             @Value("${app.senado.base-url:https://legis.senado.leg.br/dadosabertos}") String senadoBaseUrl,
             @Value("${app.ibge.base-url:https://servicodados.ibge.gov.br/api/v1/localidades}") String ibgeBaseUrl,
             @Value("${app.viacep.base-url:https://viacep.com.br/ws}") String viaCepBaseUrl,
-            @Value("${app.ai.gemini.base-url:https://generativelanguage.googleapis.com/v1beta}") String geminiBaseUrl) {
+            @Value("${app.ai.gemini.base-url:https://generativelanguage.googleapis.com/v1beta}") String geminiBaseUrl,
+            @Value("${app.tse.base-url:https://divulgacandcontas.tse.jus.br/divulga/rest/v1}") String tseBaseUrl) {
         this.geminiService = geminiService;
         this.tcuBaseUrl = tcuBaseUrl;
         this.camaraBaseUrl = camaraBaseUrl;
@@ -48,6 +50,7 @@ public class ExternalIntegrationsMonitoringService {
         this.ibgeBaseUrl = ibgeBaseUrl;
         this.viaCepBaseUrl = viaCepBaseUrl;
         this.geminiBaseUrl = geminiBaseUrl;
+        this.tseBaseUrl = tseBaseUrl;
 
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(PROBE_TIMEOUT_MS);
@@ -67,6 +70,7 @@ public class ExternalIntegrationsMonitoringService {
         String senadoStatus = probeReachability(senadoBaseUrl + "/senador/lista/atual.json");
         String ibgeStatus = probeReachability(ibgeBaseUrl + "/estados");
         String viaCepStatus = probeReachability(viaCepBaseUrl + "/01001000/json");
+        String tseStatus = probeReachability(tseBaseUrl + "/candidatura/listar/2022/SP/2040602022/6/candidatos");
         String geminiStatus = geminiReal ? "ONLINE" : "FALLBACK_SIMULATION";
 
         List<IntegrationItemStatusDto> items = List.of(
@@ -109,6 +113,14 @@ public class ExternalIntegrationsMonitoringService {
                         viaCepBaseUrl,
                         viaCepStatus,
                         "Resolução automática de CEP para vinculação do cidadão à sua bancada estadual."
+                ),
+                new IntegrationItemStatusDto(
+                        "tse",
+                        "TSE (DivulgaCandContas)",
+                        "TRANSPARÊNCIA ELEITORAL",
+                        tseBaseUrl,
+                        tseStatus,
+                        "Candidaturas eleitorais, patrimônio e evolução de bens declarados por políticos."
                 ),
                 new IntegrationItemStatusDto(
                         "gemini",
