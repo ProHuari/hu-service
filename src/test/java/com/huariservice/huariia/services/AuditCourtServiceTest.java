@@ -20,14 +20,14 @@ class AuditCourtServiceTest {
     private RestClient restClient;
 
     @Mock
-    private RestClient.RequestHeadersUriSpec requestHeadersUriSpec;
+    private RestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec;
 
     @Test
     @DisplayName("Should return resilient fallback response when Audit Court API fails with timeout")
     void shouldReturnFallbackOnNetworkFailure() {
         AuditCourtService service = new AuditCourtService(restClient, "https://dadosabertos.tcu.gov.br/api");
 
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
+        doReturn(requestHeadersUriSpec).when(restClient).get();
         when(requestHeadersUriSpec.uri(anyString())).thenThrow(new ResourceAccessException("Connection timed out"));
 
         AuditCourtSummaryResponse response = service.fetchTransparencyOverview("educacao");
@@ -45,7 +45,7 @@ class AuditCourtServiceTest {
     void shouldReturnEmptyListWhenProcessesQueryFails() {
         AuditCourtService service = new AuditCourtService(restClient, "https://dadosabertos.tcu.gov.br/api");
 
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
+        doReturn(requestHeadersUriSpec).when(restClient).get();
         when(requestHeadersUriSpec.uri(anyString())).thenThrow(new ResourceAccessException("Timeout"));
 
         var processes = service.fetchProcesses("saude", 10);
@@ -58,7 +58,7 @@ class AuditCourtServiceTest {
     void shouldReturnEmptyListWhenIrregularAccountsQueryFails() {
         AuditCourtService service = new AuditCourtService(restClient, "https://dadosabertos.tcu.gov.br/api");
 
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
+        doReturn(requestHeadersUriSpec).when(restClient).get();
         when(requestHeadersUriSpec.uri(anyString())).thenThrow(new ResourceAccessException("Service error"));
 
         var irregular = service.fetchIrregularAccounts("12345678900");
