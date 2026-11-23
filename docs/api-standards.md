@@ -17,6 +17,7 @@ Este documento estabelece as convenções oficiais de design, nomenclatura, vali
   - ✅ `/transparencia/parlamentares`, `/transparencia/projetos-lei`, `/transparencia/despesas`
   - ✅ `/transparencia/camara/deputados`, `/transparencia/camara/proposicoes`, `/transparencia/camara/sincronizacoes`
   - ✅ `/transparencia/tse/candidatos`, `/transparencia/tse/candidatos/{id}/bens`
+  - ✅ `/transparencia/empresas/{cnpj}`, `/transparencia/despesas/{id}/fornecedor`
   - ✅ `/localidades/estados`, `/localidades/estados/{uf}/municipios`, `/localidades/ceps/{cep}`
   - ✅ `/ia/explicacoes-projetos-lei`
 - **Sub-recursos singulares e aliases de contexto:**
@@ -134,8 +135,10 @@ Filtros específicos de domínio são passados como query params em `kebab-case`
 - `GET /transparencia/camara/proposicoes?sigla-tipo=PL&ano=2025&ementa=educacao`
 - `GET /transparencia/tse/candidatos?nome=tabata&uf=SP&ano=2022&cargo=deputado`
 - `GET /transparencia/tse/candidatos/{id}/bens?ano=2022&uf=SP`
+- `GET /transparencia/empresas/{cnpj}`
+- `GET /transparencia/despesas/{id}/fornecedor?cnpj=02012862000160`
 
-> **Nota sobre integrações em tempo real:** Endpoints proxy de APIs governamentais externas (`/transparencia/camara/*`, `/transparencia/senado/*`, `/transparencia/tribunal-contas/*`, `/transparencia/tse/*`, `/localidades/*`) retornam `List<DTO>` com filtros próprios (como `uf`, `partido`, `ano`, `cargo`, `limit`) refletindo as capacidades das fontes externas (Câmara, Senado, TCU, TSE, IBGE).
+> **Nota sobre integrações em tempo real:** Endpoints proxy de APIs governamentais externas (`/transparencia/camara/*`, `/transparencia/senado/*`, `/transparencia/tribunal-contas/*`, `/transparencia/tse/*`, `/transparencia/empresas/*`, `/localidades/*`) retornam `List<DTO>` ou DTOs enriquecidos com filtros próprios refletindo as capacidades das fontes externas (Câmara, Senado, TCU, TSE, BrasilAPI / Receita Federal, IBGE).
 
 ---
 
